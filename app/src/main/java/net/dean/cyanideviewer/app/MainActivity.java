@@ -22,7 +22,7 @@ public class MainActivity extends FragmentActivity {
     private CyanideApiImpl api;
 
     private ViewPager viewPager;
-    private ComicPagerAdapter2 pagerAdapter;
+    private ComicPagerAdapter pagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,8 +34,7 @@ public class MainActivity extends FragmentActivity {
         // Instantiate a ViewPager and a PagerAdapter
         viewPager = (ViewPager) findViewById(R.id.comic_pager);
 
-        //pagerAdapter = new ComicPagerAdapter(getSupportFragmentManager(), initialComics);
-        pagerAdapter = new ComicPagerAdapter2(getApplicationContext());
+        pagerAdapter = new ComicPagerAdapter(getApplicationContext());
         viewPager.setAdapter(pagerAdapter);
 
         try {
@@ -133,7 +132,7 @@ public class MainActivity extends FragmentActivity {
         api.setComicRandom();
     }
 
-    public ComicPagerAdapter2 getPagerAdapter() {
+    public ComicPagerAdapter getPagerAdapter() {
         return pagerAdapter;
     }
 

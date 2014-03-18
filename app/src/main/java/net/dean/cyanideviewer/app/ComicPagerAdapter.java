@@ -1,58 +1,81 @@
 package net.dean.cyanideviewer.app;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.content.Context;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.view.View;
+import android.view.ViewGroup;
 
 import net.dean.cyanideviewer.app.api.Comic;
 
 import java.util.ArrayList;
 
 /**
- * Created by matthew on 3/16/14, taken from http://stackoverflow.com/a/13671777/1275092
+ * http://stackoverflow.com/a/13671777/1275092
  */
-public class ComicPagerAdapter extends FragmentStatePagerAdapter {
-    private ArrayList<Comic> comics;
+public class ComicPagerAdapter extends PagerAdapter {
+    private final Context context;
+    private ArrayList<View> views = new ArrayList<View>();
 
-    public ComicPagerAdapter(FragmentManager manager, ArrayList<Comic> comics) {
-        super(manager);
-        this.comics = comics;
+    public ComicPagerAdapter(Context context) {
+        this.context = context;
     }
-
-//    @Override
-//    public Fragment getItem(int position) {
-//        Log.i(CyanideViewer.TAG, "Getting item at position " + position);
-//        if (comics != null && comics.size() > 0) {
-//            position = position % comics.size(); // Use modulo for infinite cycling
-//            return ComicStage.newInstance(comics.get(position), g);
-//        } else {
-//            return ComicStage.newInstance(null);
-//        }
-//    }
-
 
     @Override
-    public Fragment getItem(int position) {
-        return null;
+    public int getItemPosition(Object object) {
+        int index = views.indexOf(object);
+        if (index == -1) {
+            return POSITION_NONE;
+        } else {
+            return index;
+        }
     }
 
-    public Comic getComic(int position) {
-        return comics.get(position);
+    @Override
+    public Object instantiateItem(ViewGroup container, int position) {
+        View v = views.get(position);
+        container.addView(v);
+        return v;
+    }
+
+    @Override
+    public void destroyItem(ViewGroup container, int position, Object object) {
+        container.removeView(views.get(position));
     }
 
     @Override
     public int getCount() {
-        return comics.size();
+        return views.size();
     }
 
-    public void addComic(Comic c) {
-        comics.add(c);
-        notifyDataSetChanged();
+    @Override
+    public boolean isViewFromObject(View view, Object object) {
+        return view == object;
     }
 
-    public void prependComic(Comic c) {
-        // TODO here
-        comics.add(0, c);
+    public int addView(Comic c) {
+        return addView(c, views.size());
+    }
+
+    public int addView(Comic c, int position) {
+        views.add(position, ComicStage.newInstance(this.context, c));
         notifyDataSetChanged();
+        return position;
+    }
+
+    public int removeView(ViewPager pager, View v) {
+        return removeView(pager, views.indexOf(v));
+    }
+
+    public int removeView(ViewPager pager, int position) {
+        pager.setAdapter(null);
+        views.remove(position);
+        pager.setAdapter(this);
+
+        return position;
+    }
+
+    public View getComic(int position) {
+        return views.get(position);
     }
 }

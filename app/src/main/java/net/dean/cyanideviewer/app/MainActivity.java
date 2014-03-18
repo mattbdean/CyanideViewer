@@ -22,15 +22,14 @@ import java.util.concurrent.ExecutionException;
  */
 public class MainActivity extends FragmentActivity {
 
-    /**
-     * The ViewPager used to scroll through comics
-     */
+    /** The ViewPager used to scroll through comics */
     private ViewPager viewPager;
 
-    /**
-     * The ComicPagerAdapter used to provide pages to the ViewPager
-     */
+    /** The ComicPagerAdapter used to provide pages to the ViewPager */
     private ComicPagerAdapter pagerAdapter;
+
+    /** The button that, when pressed, downloads the current comic */
+    private ImageButton downloadButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,9 +37,9 @@ public class MainActivity extends FragmentActivity {
         setContentView(R.layout.activity_main);
 
         // Instantiate a ViewPager and a PagerAdapter
-        viewPager = (ViewPager) findViewById(R.id.comic_pager);
+        this.viewPager = (ViewPager) findViewById(R.id.comic_pager);
 
-        pagerAdapter = new ComicPagerAdapter();
+        this.pagerAdapter = new ComicPagerAdapter();
         viewPager.setAdapter(pagerAdapter);
 
         try {
@@ -63,10 +62,10 @@ public class MainActivity extends FragmentActivity {
         }
 
         viewPager.setCurrentItem(1);
+
+        this.downloadButton = (ImageButton) findViewById(R.id.download);
         // Disable the Download button if the file already exists
-        Comic currentComic = pagerAdapter.getComicStage(viewPager.getCurrentItem()).getComic();
-        boolean hasLocal = CyanideApi.hasLocal(currentComic.getId());
-        ((ImageButton) findViewById(R.id.download)).setEnabled(!hasLocal);
+        refreshDownloadButtonState();
 
         viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -74,12 +73,10 @@ public class MainActivity extends FragmentActivity {
 
             @Override
             public void onPageSelected(int position) {
-                Log.v(CyanideViewer.TAG, "At position: " + position);
-                Comic currentComic = pagerAdapter.getComicStage(position).getComic();
-
                 if (position == 0) { // At the very left
                     try {
-                        Comic comicToShowNext = new RetrievePreviousComicTask().execute(currentComic.getId()).get();
+                        Comic comicToShowNext = new RetrievePreviousComicTask()
+                                .execute(getCurrentComic().getId()).get();
                         pagerAdapter.addView(comicToShowNext, 0);
                     } catch (InterruptedException | ExecutionException e) {
                         Log.e(CyanideViewer.TAG, "Failed to get the previous comic", e);
@@ -87,15 +84,14 @@ public class MainActivity extends FragmentActivity {
                 }
 
                 // Disable the Download button if the file already exists
-                boolean hasLocal = CyanideApi.hasLocal(currentComic.getId());
-                ((ImageButton) findViewById(R.id.download)).setEnabled(!hasLocal);
+                refreshDownloadButtonState();
             }
 
             @Override
             public void onPageScrollStateChanged(int state) { }
         });
 
-        (findViewById(R.id.download)).setOnClickListener(new View.OnClickListener() {
+        downloadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Download the comic at the current ID
@@ -109,9 +105,19 @@ public class MainActivity extends FragmentActivity {
                     toastText = "Comic failed to download!";
                 }
 
+                refreshDownloadButtonState();
                 Toast.makeText(CyanideViewer.getContext(), toastText, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void refreshDownloadButtonState() {
+        boolean hasLocal = CyanideApi.hasLocal(getCurrentComic().getId());
+        downloadButton.setEnabled(!hasLocal);
+    }
+
+    private Comic getCurrentComic() {
+        return pagerAdapter.getComicStage(viewPager.getCurrentItem()).getComic();
     }
 
     @Override

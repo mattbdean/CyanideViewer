@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import net.dean.cyanideviewer.app.api.Comic;
 import net.dean.cyanideviewer.app.api.CyanideApi;
@@ -30,7 +31,7 @@ public class MainActivity extends FragmentActivity {
         this.api = new CyanideApiImpl(this);
 
         // Instantiate a ViewPager and a PagerAdapter
-        viewPager = (ViewPager) findViewById(R.id.comicPager);
+        viewPager = (ViewPager) findViewById(R.id.comic_pager);
 
         //pagerAdapter = new ComicPagerAdapter(getSupportFragmentManager(), initialComics);
         pagerAdapter = new ComicPagerAdapter2(getApplicationContext());
@@ -55,7 +56,6 @@ public class MainActivity extends FragmentActivity {
             e.printStackTrace();
         }
 
-
         viewPager.setCurrentItem(1);
         // There are currently two items in the adapter. Set it to the right-most one. (the newest comic)
 
@@ -77,6 +77,24 @@ public class MainActivity extends FragmentActivity {
 
             @Override
             public void onPageScrollStateChanged(int state) { }
+        });
+
+        (findViewById(R.id.download)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Download the comic at the current ID
+                boolean succeeded = ((ComicStage) pagerAdapter.getComic(viewPager.getCurrentItem()))
+                        .getComic().download();
+
+                String toastText = null;
+                if (succeeded) {
+                    toastText = "Comic downloaded";
+                } else {
+                    toastText = "Comic failed to download!";
+                }
+
+                Toast.makeText(CyanideViewer.getContext(), toastText, Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
@@ -104,24 +122,8 @@ public class MainActivity extends FragmentActivity {
         return true;
     }
 
-    public void onNewestClicked(View v) {
-        api.setComicNewest();
-    }
-
-    public void onFirstClicked(View v) {
-        api.setComicFirst();
-    }
-
     public void onRandomClicked(View v) {
         api.setComicRandom();
-    }
-
-    public void onNextClicked(View v) {
-        api.setComicNext();
-    }
-
-    public void onPreviousClicked(View v) {
-        api.setComicPrevious();
     }
 
     public ComicPagerAdapter2 getPagerAdapter() {

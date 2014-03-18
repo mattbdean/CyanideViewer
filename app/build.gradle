@@ -2,7 +2,7 @@ apply plugin: 'android'
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "19.0.1"
+    buildToolsVersion "19.0.3"
 
     defaultConfig {
         minSdkVersion 14
@@ -25,6 +25,6 @@ android {
 
 dependencies {
     compile 'org.jsoup:jsoup:1.7.2'
-    compile 'com.android.support:support-v13:+'
+    compile 'com.android.support:support-v4:19.0.0'
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }

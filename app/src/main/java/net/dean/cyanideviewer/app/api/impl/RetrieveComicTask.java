@@ -1,9 +1,6 @@
 package net.dean.cyanideviewer.app.api.impl;
 
-import android.graphics.Bitmap;
-import android.widget.ImageView;
-import android.widget.TextView;
-
+import net.dean.cyanideviewer.app.api.Comic;
 import net.dean.cyanideviewer.app.api.CyanideApi;
 
 /**
@@ -11,12 +8,12 @@ import net.dean.cyanideviewer.app.api.CyanideApi;
  */
 public class RetrieveComicTask extends AbstractComicTask<Long> {
 
-    public RetrieveComicTask(ImageView imageView, TextView label, CyanideApiImpl api) {
-        super(imageView, label, api);
+    public RetrieveComicTask() {
+        super();
     }
 
     @Override
-    protected Bitmap doInBackground(Long... params) {
+    protected Comic doInBackground(Long... params) {
         return CyanideApi.instance.getComic(params[0]);
     }
 }

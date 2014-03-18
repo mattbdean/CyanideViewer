@@ -1,9 +1,6 @@
 package net.dean.cyanideviewer.app.api.impl;
 
-import android.graphics.Bitmap;
-import android.widget.ImageView;
-import android.widget.TextView;
-
+import net.dean.cyanideviewer.app.api.Comic;
 import net.dean.cyanideviewer.app.api.CyanideApi;
 
 /**
@@ -11,12 +8,12 @@ import net.dean.cyanideviewer.app.api.CyanideApi;
  */
 public class RetrieveRandomComicTask extends AbstractComicTask<Void> {
 
-    public RetrieveRandomComicTask(ImageView imageView, TextView label, CyanideApiImpl api) {
-        super(imageView, label, api);
+    public RetrieveRandomComicTask() {
+        super();
     }
 
     @Override
-    protected Bitmap doInBackground(Void... params) {
+    protected Comic doInBackground(Void... params) {
         return CyanideApi.instance.getRandom();
     }
 }

@@ -1,31 +1,83 @@
 package net.dean.cyanideviewer.app;
 
-import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
 
+import net.dean.cyanideviewer.app.api.Comic;
+import net.dean.cyanideviewer.app.api.CyanideApi;
 import net.dean.cyanideviewer.app.api.impl.CyanideApiImpl;
 
+import java.util.concurrent.ExecutionException;
 
-public class MainActivity extends Activity {
+
+public class MainActivity extends FragmentActivity {
     private CyanideApiImpl api;
-    private TextView comicIdLabel;
-    private ImageView comicViewer;
+
+    private ViewPager viewPager;
+    private ComicPagerAdapter2 pagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Get the latest comic and display it
-        this.comicViewer = (ImageView) findViewById(R.id.viewer);
-        this.comicIdLabel = (TextView) findViewById(R.id.currentId);
-        this.api = new CyanideApiImpl(comicViewer, comicIdLabel);
-        api.setComicNewest();
+        this.api = new CyanideApiImpl(this);
+
+        // Instantiate a ViewPager and a PagerAdapter
+        viewPager = (ViewPager) findViewById(R.id.comicPager);
+
+        //pagerAdapter = new ComicPagerAdapter(getSupportFragmentManager(), initialComics);
+        pagerAdapter = new ComicPagerAdapter2(getApplicationContext());
+        viewPager.setAdapter(pagerAdapter);
+
+        try {
+            new AsyncTask<Void, Void, Void>() {
+
+                @Override
+                protected Void doInBackground(Void... params) {
+                    // Add the newest
+                    pagerAdapter.addView(CyanideApi.instance.getNewest());
+
+                    // Add the second newest
+                    ComicStage cs = (ComicStage) pagerAdapter.getComic(pagerAdapter.getCount() - 1);
+                    pagerAdapter.addView(CyanideApi.instance.getPrevious(cs.getComic().getId()), 0);
+
+                    return null;
+                }
+            }.execute().get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+
+
+        viewPager.setCurrentItem(1);
+        // There are currently two items in the adapter. Set it to the right-most one. (the newest comic)
+
+        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { }
+
+            @Override
+            public void onPageSelected(int position) {
+                Log.v(CyanideViewer.TAG, "At position: " + position);
+
+                if (position == 0) { // At the very left
+                    Comic comicToShow = ((ComicStage)pagerAdapter.getComic(position)).getComic();
+                    Comic comicToShowNext = api.getComicPrevious(comicToShow.getId());
+                    pagerAdapter.addView(comicToShowNext, 0);
+                    System.out.println();
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) { }
+        });
     }
 
     @Override
@@ -34,10 +86,15 @@ public class MainActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+
+        return id == R.id.action_settings || super.onOptionsItemSelected(item);
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        // TODO: Go to last viewed
     }
 
     @Override
@@ -65,5 +122,13 @@ public class MainActivity extends Activity {
 
     public void onPreviousClicked(View v) {
         api.setComicPrevious();
+    }
+
+    public ComicPagerAdapter2 getPagerAdapter() {
+        return pagerAdapter;
+    }
+
+    public CyanideApiImpl getApi() {
+        return api;
     }
 }

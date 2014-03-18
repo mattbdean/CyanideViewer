@@ -1,7 +1,5 @@
 package net.dean.cyanideviewer.app.api;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Looper;
 import android.os.NetworkOnMainThreadException;
@@ -26,7 +24,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -51,6 +48,9 @@ public class CyanideApi {
      */
     public long newestId;
 
+    /**
+     * The ID of the last comic that was retrieved
+     */
     public long currentId;
 
     public static CyanideApi instance;
@@ -63,6 +63,7 @@ public class CyanideApi {
         instance = this;
         this.currentId = -1;
         initIdRanges();
+        Log.i(CyanideViewer.TAG, "C&H API instantiated");
     }
 
     public void initIdRanges() {
@@ -103,6 +104,11 @@ public class CyanideApi {
         return Long.parseLong(currentUrl.substring(currentUrl.lastIndexOf('/', currentUrl.length() - 2)).replace("/", ""));
     }
 
+    /**
+     * Follows a given URL and returns the URL that the request was redirected to.
+     * @param url The URL to follow
+     * @return The URL that the given URL will redirect to
+     */
     private String followRedirect(String url) {
         checkMainThread();
 
@@ -154,7 +160,7 @@ public class CyanideApi {
     }
 
     // TODO: getPrevious() and getNext() are pretty much the same method; they can be shortened
-    public Bitmap getPrevious(long id) {
+    public Comic getPrevious(long id) {
         long newId = id - 1;
 
         Log.i(CyanideViewer.TAG, "Getting the previous comic relative to #" + id);
@@ -182,7 +188,7 @@ public class CyanideApi {
         return getPrevious(newId);
     }
 
-    public Bitmap getNext(long id) {
+    public Comic getNext(long id) {
         long newId = id + 1;
 
         Log.i(CyanideViewer.TAG, "Getting the previous comic relative to #" + id);
@@ -210,19 +216,19 @@ public class CyanideApi {
         return getNext(newId);
     }
 
-    public Bitmap getNewest() {
+    public Comic getNewest() {
         return getComic(newestId);
     }
 
-    public Bitmap getFirst() {
+    public Comic getFirst() {
         return getComic(firstId);
     }
 
-    public Bitmap getRandom() {
+    public Comic getRandom() {
         return getComic(parseId(followRedirect(SpecialSelection.RANDOM.getUrl())));
     }
 
-    public Bitmap getComic(long id) {
+    public Comic getComic(long id) {
         checkMainThread();
 
         String img = null;
@@ -241,11 +247,9 @@ public class CyanideApi {
                 }
             }
 
-            InputStream in = new URL(img).openStream();
-            Bitmap comic = BitmapFactory.decodeStream(in);
             Log.i(CyanideViewer.TAG, String.format("Retrieved comic #%s in %s milliseconds", id, (System.nanoTime() - time) / 1_000_000));
             this.currentId = id;
-            return comic;
+            return new Comic(id, img);
         } catch (MalformedURLException e) {
             Log.e(CyanideViewer.TAG, "Malformed URL while trying to get #" + id + ": " + img, e);
             return null;

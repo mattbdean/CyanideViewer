@@ -1,19 +1,17 @@
 package net.dean.cyanideviewer.app.api;
 
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
 import net.dean.cyanideviewer.app.CyanideViewer;
-import net.dean.cyanideviewer.app.R;
+
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
 
@@ -89,28 +87,16 @@ public class Comic implements Parcelable {
                 @Override
                 protected Boolean doInBackground(Void... params) {
                     try {
-                        URL url = new URL(getUrl());
-                        InputStream input = url.openStream();
+                        InputStream input = new URL(getUrl()).openStream();
+
                         // "/sdcard/CyanideViewer"
-                        File storagePath = new File(Environment.getExternalStorageDirectory(),
-                                CyanideViewer.getContext().getResources().getString(R.string.app_name));
-                        storagePath.mkdirs();
+                        CyanideApi.IMAGE_DIR.mkdirs();
 
                         String ext = getUrl().substring(getUrl().lastIndexOf('.'));
-                        File dest = new File(storagePath, getId() + ext);
+                        File dest = new File(CyanideApi.IMAGE_DIR, getId() + ext);
                         if (!dest.exists()) {
                             // Only download it if the file doesn't already exist
-                            OutputStream output = new FileOutputStream(dest);
-
-                            byte[] buffer = new byte[2048];
-                            int bytesRead;
-
-                            while ((bytesRead = input.read(buffer, 0, buffer.length)) >= 0) {
-                                output.write(buffer, 0, bytesRead);
-                            }
-
-                            output.close();
-                            input.close();
+                            FileUtils.copyInputStreamToFile(input, dest);
                         }
 
                         Log.i(CyanideViewer.TAG, "Downloaded comic #" + id + " to " + dest.getAbsolutePath());

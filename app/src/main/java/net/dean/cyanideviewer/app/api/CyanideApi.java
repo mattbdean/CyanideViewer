@@ -1,13 +1,16 @@
 package net.dean.cyanideviewer.app.api;
 
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.os.Looper;
 import android.os.NetworkOnMainThreadException;
 import android.util.Log;
 
 import net.dean.cyanideviewer.app.CyanideViewer;
+import net.dean.cyanideviewer.app.R;
 import net.dean.cyanideviewer.app.api.impl.SpecialSelection;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -23,10 +26,12 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -52,6 +57,12 @@ public class CyanideApi {
      * The ID of the last comic that was retrieved
      */
     public long currentId;
+
+    /**
+     * The directory that this app will download comics to. Sample value: "/sdcard/CyanideViewer/"
+     */
+    public static final File IMAGE_DIR = new File(Environment.getExternalStorageDirectory(),
+            CyanideViewer.getContext().getResources().getString(R.string.app_name));
 
     public static CyanideApi instance;
 
@@ -130,7 +141,7 @@ public class CyanideApi {
             HttpUriRequest currentReq = (HttpUriRequest) context.getAttribute(ExecutionContext.HTTP_REQUEST);
             HttpHost currentHost = (HttpHost) context.getAttribute(ExecutionContext.HTTP_TARGET_HOST);
             String currentUrl = (currentReq.getURI().isAbsolute() ? currentReq.getURI().toString() : (currentHost.toURI() + currentReq.getURI()));
-            Log.i(CyanideViewer.TAG, "Followed " + url + " to " + currentUrl);
+            Log.i(CyanideViewer.TAG, "Followed \"" + url + "\" to \"" + currentUrl + "\"");
             return currentUrl;
         } catch (IOException e) {
             Log.e(CyanideViewer.TAG, "Unable to get the latest comic ID", e);
@@ -229,6 +240,27 @@ public class CyanideApi {
     }
 
     public Comic getComic(long id) {
+        // Check locally first
+        List<File> files = (List) FileUtils.listFiles(IMAGE_DIR, new String[] {"jpg", "jpeg", "png"}, false);
+        for (File f : files) {
+            String lookingFor = f.getAbsolutePath().substring(f.getAbsolutePath().lastIndexOf('/') + 1, f.getAbsolutePath().indexOf('.'));
+            String idString = Long.toString(id);
+            if (lookingFor.equals(idString)) {
+                // Found the local file, instantiate a Comic using the local URL
+                try {
+                    URL localUrl = files.get(0).toURI().toURL();
+                    Log.i(CyanideViewer.TAG, "Using comic on filesystem for #" + id + ": " + localUrl.toExternalForm());
+                    return new Comic(id, localUrl.toExternalForm());
+                } catch (MalformedURLException e) {
+                    Log.e(CyanideViewer.TAG, "Failed to lookup local comic (malformed URL: " + files.get(0).toString() + ")");
+                    // Continue and get the URL from the internet
+                 }
+            }
+        }
+
+
+        Log.i(CyanideViewer.TAG, "Local comic not found for #" + id + ", using internet");
+        // The comic wasn't download already, get it from the internets
         checkMainThread();
 
         String img = null;

@@ -53,7 +53,6 @@ public class ComicStage extends LinearLayout {
     }
 
     public class BitmapLoaderTask extends AsyncTask<Comic, Void, Bitmap> {
-
         public BitmapLoaderTask() {
 
         }
@@ -72,7 +71,14 @@ public class ComicStage extends LinearLayout {
             // Adapted from http://stackoverflow.com/a/6621552/1275092
 
             try {
-                HttpGet request = new HttpGet(new URL(c.getUrl()).toURI());
+                URL url = new URL(c.getUrl());
+
+                if (url.getProtocol().equals("file")) {
+                    // Local file, no need to make any HTTP requests
+                    return BitmapFactory.decodeStream(url.openStream());
+                }
+
+                HttpGet request = new HttpGet(url.toURI());
                 HttpClient client = new DefaultHttpClient();
                 HttpResponse response = client.execute(request);
                 BufferedHttpEntity entity = new BufferedHttpEntity(response.getEntity());

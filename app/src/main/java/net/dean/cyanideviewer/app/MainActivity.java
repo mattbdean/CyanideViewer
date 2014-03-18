@@ -86,7 +86,7 @@ public class MainActivity extends FragmentActivity {
                 boolean succeeded = ((ComicStage) pagerAdapter.getComic(viewPager.getCurrentItem()))
                         .getComic().download();
 
-                String toastText = null;
+                String toastText;
                 if (succeeded) {
                     toastText = "Comic downloaded";
                 } else {

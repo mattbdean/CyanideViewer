@@ -7,11 +7,13 @@ import android.util.Log;
 import net.dean.cyanideviewer.app.api.CyanideApi;
 
 /**
- * Created by matthew on 3/16/14.
+ * The main class for Cyanide Viewer.
  */
 public class CyanideViewer extends Application {
+    /** The tag used by all Log.x methods in this app */
     public static final String TAG = "CyanideViewer";
 
+    /** The application context */
     private static Context context;
 
     @Override
@@ -19,9 +21,10 @@ public class CyanideViewer extends Application {
         super.onCreate();
         Log.i(TAG, "Starting application");
         CyanideViewer.context = getApplicationContext();
-        new CyanideApi(); // Initialize CyanideApi.instance
+        CyanideApi.initIdRanges();
     }
 
+    /** Returns this application's context */
     public static Context getContext() {
         return context;
     }

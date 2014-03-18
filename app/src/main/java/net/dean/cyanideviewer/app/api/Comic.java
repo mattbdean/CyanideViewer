@@ -17,17 +17,29 @@ import java.net.URL;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Created by matthew on 3/17/14.
+ * Represents an Cyanide and Happiness comic.
  */
 public class Comic implements Parcelable {
+    /** The ID of the comic. */
     private long id;
+
+    /** The URL of the comic's image */
     private URL url;
 
+    /**
+     * Instantiates a new Comic
+     * @param id The ID of the comic
+     * @param url The URL of the comic's image
+     */
     public Comic(long id, URL url) {
         this.url = url;
         this.id = id;
     }
 
+    /**
+     * Instanties a new Comic with a Parcel.
+     * @param in A Parcel created by {@link #CREATOR}
+     */
     public Comic(Parcel in) {
         in.readBundle();
         this.id = in.readLong();
@@ -40,24 +52,35 @@ public class Comic implements Parcelable {
 
     }
 
+    /** Gets the URL */
     public URL getUrl() {
         return url;
     }
 
+    /**
+     * Sets the URL
+     * @param url The new URL
+     */
     public void setUrl(URL url) {
         this.url = url;
     }
 
+    /** Gets the URL */
     public long getId() {
         return id;
     }
 
+    /**
+     * Sets the ID
+     * @param id The new ID
+     */
     public void setId(long id) {
         this.id = id;
     }
 
     @Override
     public int describeContents() {
+        // I don't know what I'm doing here
         return 0;
     }
 
@@ -67,6 +90,7 @@ public class Comic implements Parcelable {
         dest.writeString(url.toExternalForm());
     }
 
+    /** The Creator used to create Comics using Parcels */
     public static final Creator CREATOR = new Creator() {
 
         @Override
@@ -88,6 +112,11 @@ public class Comic implements Parcelable {
                 '}';
     }
 
+    /**
+     * Tries to download this comic to the local file system. Will download to
+     * "/sdard/Cyanide Viewer/$id.$extension
+     * @return Whether or not the download succeeded.
+     */
     public boolean download() {
         try {
             return new AsyncTask<Void, Void, Boolean>() {

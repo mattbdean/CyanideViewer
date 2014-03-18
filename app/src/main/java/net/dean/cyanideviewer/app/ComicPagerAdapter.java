@@ -1,8 +1,6 @@
 package net.dean.cyanideviewer.app;
 
-import android.content.Context;
 import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -11,15 +9,12 @@ import net.dean.cyanideviewer.app.api.Comic;
 import java.util.ArrayList;
 
 /**
+ * A PagerAdapter to hold (in theory) an infinite amount of ComicStages. Adapted from
  * http://stackoverflow.com/a/13671777/1275092
  */
 public class ComicPagerAdapter extends PagerAdapter {
-    private final Context context;
-    private ArrayList<View> views = new ArrayList<View>();
-
-    public ComicPagerAdapter(Context context) {
-        this.context = context;
-    }
+    /** A list of ComicStages that this adapter holds. */
+    private ArrayList<ComicStage> views = new ArrayList<>();
 
     @Override
     public int getItemPosition(Object object) {
@@ -53,29 +48,56 @@ public class ComicPagerAdapter extends PagerAdapter {
         return view == object;
     }
 
+    /**
+     * Instantiates a new ComicStage with a given Comic and adds it to the list of views.
+     * @param c The comic to use to create a new ComicStage with
+     * @return The position at which this view was added
+     */
     public int addView(Comic c) {
         return addView(c, views.size());
     }
 
+    /**
+     * Instantiates a new ComicStage with a given Comic and adds it to the list of views.
+     * @param c The comic to use to create a new ComicStage with
+     * @param position The position at which to insert the new View at
+     * @return The position at which this view was added
+     */
     public int addView(Comic c, int position) {
-        views.add(position, ComicStage.newInstance(this.context, c));
+        views.add(position, ComicStage.newInstance(c));
         notifyDataSetChanged();
         return position;
     }
 
-    public int removeView(ViewPager pager, View v) {
-        return removeView(pager, views.indexOf(v));
+    /**
+     * Removes a ComicStage
+     * @param v The view to remove
+     * @return The index at which this view was removed
+     */
+    public int removeView(View v) {
+        return removeView(views.indexOf(v));
     }
 
-    public int removeView(ViewPager pager, int position) {
-        pager.setAdapter(null);
+    /**
+     * Removes a ComicStage
+     * @param position The position at which to remove the view from
+     * @return The position the view was removed from
+     */
+    public int removeView(int position) {
+        //pager.setAdapter(null);
         views.remove(position);
-        pager.setAdapter(this);
+        notifyDataSetChanged();
+        //pager.setAdapter(this);
 
         return position;
     }
 
-    public View getComic(int position) {
+    /**
+     * Gets a ComicStage at a given position
+     * @param position
+     * @return
+     */
+    public ComicStage getComicStage(int position) {
         return views.get(position);
     }
 }

@@ -8,7 +8,6 @@ import android.util.Log;
 
 import net.dean.cyanideviewer.app.CyanideViewer;
 import net.dean.cyanideviewer.app.R;
-import net.dean.cyanideviewer.app.api.impl.SpecialSelection;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpHost;
@@ -35,78 +34,48 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Created by matthew on 3/16/14.
+ * Provides high level access to the unofficial Cyanide and Happiness API.
  */
 public class CyanideApi {
-    /**
-     * The base URL for the Cyanide and Happiness comic.
-     */
+    /** The base URL for the Cyanide and Happiness comic. */
     public static final String BASE_URL = "http://explosm.net/comics/";
 
-    /**
-     * The ID of the very first publicly available C&H comic
-     */
-    public long firstId;
+    /** The ID of the very first publicly available C&H comic */
+    public static long firstId;
 
-    /**
-     * The ID of the newest C&H comic
-     */
-    public long newestId;
+    /** The ID of the newest C&H comic */
+    public static long newestId;
 
-    /**
-     * The ID of the last comic that was retrieved
-     */
-    public long currentId;
+    /** The ID of the last comic that was retrieved */
+    public static long currentId = -1;
 
-    /**
-     * The directory that this app will download comics to. Sample value: "/sdcard/CyanideViewer/"
-     */
+    /** The HttpClient that will be used to host requests */
+    private static HttpClient client = new DefaultHttpClient();
+
+    /** The directory that this app will download comics to. Sample value: "/sdcard/CyanideViewer/" */
     public static final File IMAGE_DIR = new File(Environment.getExternalStorageDirectory(),
             CyanideViewer.getContext().getResources().getString(R.string.app_name));
 
-    public static CyanideApi instance;
-
-    public CyanideApi() {
-        if (instance != null) {
-            // Oh my god this is so bad
-            throw new IllegalStateException("Only one instance of CyanideApi allowed");
-        }
-        instance = this;
-        this.currentId = -1;
-        initIdRanges();
-        Log.i(CyanideViewer.TAG, "C&H API instantiated");
+    private CyanideApi() {
+        // Prevent instances
     }
 
-    public void initIdRanges() {
-        try {
-            firstId = new AsyncTask<Void, Void, Long>() {
-                @Override
-                protected Long doInBackground(Void... params) {
-                    return instance.parseId(SpecialSelection.FIRST.getUrl());
-                }
-            }.execute().get();
-            Log.i(CyanideViewer.TAG, "Found first ID: " + firstId);
-
-            newestId = new AsyncTask<Void, Void, Long>() {
-
-                @Override
-                protected Long doInBackground(Void... params) {
-                    return instance.parseId(SpecialSelection.NEWEST.getUrl());
-                }
-            }.execute().get();
-            Log.i(CyanideViewer.TAG, "Found newest ID: " + newestId);
-        } catch (InterruptedException | ExecutionException e) {
-            Log.e(CyanideViewer.TAG, "Failed to find the first or newest comic IDs", e);
-        }
-    }
-
-    private void checkMainThread() {
+    /**
+     * Checks if the current code is being executed on the UI thread. If it is, it logs a
+     * NetworkOnMainThreadException.
+     */
+    private static void checkMainThread() {
         if (Looper.myLooper() == Looper.getMainLooper()) {
             Log.e(CyanideViewer.TAG, "Networking on main thread", new NetworkOnMainThreadException());
         }
     }
 
-    public Long parseId(String url) {
+    /**
+     * Parses an ID from a URL. For example, http://explosm.net/comics/1234 would return 1234.
+     * @param url The URL to parse
+     * @return The ID of the given comic URL
+     */
+    public static Long parseId(String url) {
         String currentUrl = followRedirect(url);
         if (!currentUrl.contains("explosm.net/comics/")) {
             Log.e(CyanideViewer.TAG, "Cannot load comic: URL not in correct format: " + currentUrl);
@@ -120,7 +89,7 @@ public class CyanideApi {
      * @param url The URL to follow
      * @return The URL that the given URL will redirect to
      */
-    private String followRedirect(String url) {
+    private static String followRedirect(String url) {
         checkMainThread();
 
         try {
@@ -131,7 +100,6 @@ public class CyanideApi {
         }
 
         try {
-            HttpClient client = new DefaultHttpClient();
             HttpGet get = new HttpGet(url);
             HttpContext context = new BasicHttpContext();
             HttpResponse response = client.execute(get, context);
@@ -149,7 +117,12 @@ public class CyanideApi {
         }
     }
 
-    public String getComicUrl(long id) {
+    /**
+     * Gets the URL of a Comic from the internet.
+     * @param id The ID of the comic to look up
+     * @return A String representing a URL, or null if the comic does not exist.
+     */
+    public static String getComicUrl(long id) {
         checkMainThread();
 
         try {
@@ -171,7 +144,13 @@ public class CyanideApi {
     }
 
     // TODO: getPrevious() and getNext() are pretty much the same method; they can be shortened
-    public Comic getPrevious(long id) {
+
+    /**
+     * Gets the comic relative to the of the comic given.
+     * @param id The ID of the comic to get the comic previous to
+     * @return The comic before the given ID
+     */
+    public static Comic getPrevious(long id) {
         long newId = id - 1;
 
         Log.i(CyanideViewer.TAG, "Getting the previous comic relative to #" + id);
@@ -199,7 +178,12 @@ public class CyanideApi {
         return getPrevious(newId);
     }
 
-    public Comic getNext(long id) {
+    /**
+     * Gets the next comic relative to a certain ID
+     * @param id The ID to use
+     * @return The comic next in line from the given ID
+     */
+    public static Comic getNext(long id) {
         long newId = id + 1;
 
         Log.i(CyanideViewer.TAG, "Getting the previous comic relative to #" + id);
@@ -227,23 +211,45 @@ public class CyanideApi {
         return getNext(newId);
     }
 
-    public Comic getNewest() {
+    /**
+     * Gets the newest comic
+     * @return The newest comic
+     */
+    public static Comic getNewest() {
         return getComic(newestId);
     }
 
-    public Comic getFirst() {
+    /**
+     * Gets the first comic
+     * @return The first comic
+     */
+    public static Comic getFirst() {
         return getComic(firstId);
     }
 
-    public Comic getRandom() {
+    /**
+     * Gets a random comic
+     * @return A random comic
+     */
+    public static Comic getRandom() {
         return getComic(parseId(followRedirect(SpecialSelection.RANDOM.getUrl())));
     }
 
-    public boolean hasLocal(long id) {
+    /**
+     * Tests if a comic with a certain ID has been downloaded
+     * @param id The ID to use
+     * @return Whether the comic has been downloaded
+     */
+    public static boolean hasLocal(long id) {
         return getLocalComic(id) != null;
     }
 
-    private File getLocalComic(long id) {
+    /**
+     * Gets the location of a comic on the filesystem.
+     * @param id The ID of the comic to find
+     * @return A File pointing to the comic represented by the given ID
+     */
+    private static File getLocalComic(long id) {
         List<File> files = (List) FileUtils.listFiles(IMAGE_DIR, new String[] {"jpg", "jpeg", "png"}, false);
         for (File f : files) {
             // ex: 3496
@@ -258,7 +264,13 @@ public class CyanideApi {
         return null;
     }
 
-    public Comic getComic(long id) {
+    /**
+     * Gets a comic based on ID. Will check for a local copy before going on the internet and getting
+     * a copy.
+     * @param id The ID of the comic to find
+     * @return A new Comic based on the current ID, or null if that comic does not exist.
+     */
+    public static Comic getComic(long id) {
         // Check locally first
         File localComic = getLocalComic(id);
         if (localComic != null) {
@@ -269,7 +281,6 @@ public class CyanideApi {
             } catch (MalformedURLException e) {
                 Log.e(CyanideViewer.TAG, "Malformed URL: " + localComic.getAbsolutePath(), e);
             }
-
         }
 
         Log.i(CyanideViewer.TAG, "Local comic not found for #" + id + ", using internet");
@@ -293,7 +304,7 @@ public class CyanideApi {
             }
 
             Log.i(CyanideViewer.TAG, String.format("Retrieved comic #%s in %s milliseconds", id, (System.nanoTime() - time) / 1_000_000));
-            this.currentId = id;
+            currentId = id;
             return new Comic(id, new URL(img));
         } catch (MalformedURLException e) {
             Log.e(CyanideViewer.TAG, "Malformed URL while trying to get #" + id + ": " + img, e);
@@ -304,12 +315,28 @@ public class CyanideApi {
         }
     }
 
+    public static void initIdRanges() {
+        // Get the first and last comics available
 
-    public long getFirstId() {
-        return firstId;
-    }
+        try {
+            firstId = new AsyncTask<Void, Void, Long>() {
+                @Override
+                protected Long doInBackground(Void... params) {
+                    return parseId(SpecialSelection.FIRST.getUrl());
+                }
+            }.execute().get();
+            Log.i(CyanideViewer.TAG, "Found first ID: " + firstId);
 
-    public long getNewestId() {
-        return newestId;
+            newestId = new AsyncTask<Void, Void, Long>() {
+
+                @Override
+                protected Long doInBackground(Void... params) {
+                    return parseId(SpecialSelection.NEWEST.getUrl());
+                }
+            }.execute().get();
+            Log.i(CyanideViewer.TAG, "Found newest ID: " + newestId);
+        } catch (InterruptedException | ExecutionException e) {
+            Log.e(CyanideViewer.TAG, "Failed to find the first or newest comic IDs", e);
+        }
     }
 }

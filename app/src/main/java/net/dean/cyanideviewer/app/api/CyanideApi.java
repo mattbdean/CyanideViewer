@@ -164,7 +164,7 @@ public class CyanideApi {
                 }
             }
         } catch (IOException e) {
-            Log.e(CyanideViewer.TAG, "IOException while testing if comic #" + id + " was a comic page or not");
+            Log.e(CyanideViewer.TAG, "IOException while testing if comic #" + id + " was a comic page or not", e);
         }
 
         return null;
@@ -239,25 +239,38 @@ public class CyanideApi {
         return getComic(parseId(followRedirect(SpecialSelection.RANDOM.getUrl())));
     }
 
-    public Comic getComic(long id) {
-        // Check locally first
+    public boolean hasLocal(long id) {
+        return getLocalComic(id) != null;
+    }
+
+    private File getLocalComic(long id) {
         List<File> files = (List) FileUtils.listFiles(IMAGE_DIR, new String[] {"jpg", "jpeg", "png"}, false);
         for (File f : files) {
+            // ex: 3496
             String lookingFor = f.getAbsolutePath().substring(f.getAbsolutePath().lastIndexOf('/') + 1, f.getAbsolutePath().indexOf('.'));
             String idString = Long.toString(id);
             if (lookingFor.equals(idString)) {
-                // Found the local file, instantiate a Comic using the local URL
-                try {
-                    URL localUrl = files.get(0).toURI().toURL();
-                    Log.i(CyanideViewer.TAG, "Using comic on filesystem for #" + id + ": " + localUrl.toExternalForm());
-                    return new Comic(id, localUrl.toExternalForm());
-                } catch (MalformedURLException e) {
-                    Log.e(CyanideViewer.TAG, "Failed to lookup local comic (malformed URL: " + files.get(0).toString() + ")");
-                    // Continue and get the URL from the internet
-                 }
+                // Found the local file
+                return f;
             }
         }
 
+        return null;
+    }
+
+    public Comic getComic(long id) {
+        // Check locally first
+        File localComic = getLocalComic(id);
+        if (localComic != null) {
+            try {
+                URL url = localComic.toURI().toURL();
+                Log.i(CyanideViewer.TAG, "Using comic on filesystem for #" + id + ": " + url.toExternalForm());
+                return new Comic(id, url);
+            } catch (MalformedURLException e) {
+                Log.e(CyanideViewer.TAG, "Malformed URL: " + localComic.getAbsolutePath(), e);
+            }
+
+        }
 
         Log.i(CyanideViewer.TAG, "Local comic not found for #" + id + ", using internet");
         // The comic wasn't download already, get it from the internets
@@ -281,7 +294,7 @@ public class CyanideApi {
 
             Log.i(CyanideViewer.TAG, String.format("Retrieved comic #%s in %s milliseconds", id, (System.nanoTime() - time) / 1_000_000));
             this.currentId = id;
-            return new Comic(id, img);
+            return new Comic(id, new URL(img));
         } catch (MalformedURLException e) {
             Log.e(CyanideViewer.TAG, "Malformed URL while trying to get #" + id + ": " + img, e);
             return null;

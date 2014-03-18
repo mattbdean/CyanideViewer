@@ -35,7 +35,7 @@ public class CyanideApiImpl {
                 }
             }.execute(currentId).get();
         } catch (InterruptedException | ExecutionException e) {
-            Log.e(CyanideViewer.TAG, "Exception while trying to get the comic relative to #" + currentId);
+            Log.e(CyanideViewer.TAG, "Exception while trying to get the comic relative to #" + currentId, e);
             return null;
         }
     }

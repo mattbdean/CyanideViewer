@@ -22,9 +22,7 @@ import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URISyntaxException;
-import java.net.URL;
 
 public class ComicStage extends LinearLayout {
     private Comic comic;
@@ -71,24 +69,23 @@ public class ComicStage extends LinearLayout {
             // Adapted from http://stackoverflow.com/a/6621552/1275092
 
             try {
-                URL url = new URL(c.getUrl());
 
-                if (url.getProtocol().equals("file")) {
+                if (c.getUrl().getProtocol().equals("file")) {
                     // Local file, no need to make any HTTP requests
-                    return BitmapFactory.decodeStream(url.openStream());
+                    return BitmapFactory.decodeStream(c.getUrl().openStream());
                 }
 
-                HttpGet request = new HttpGet(url.toURI());
+                HttpGet request = new HttpGet(c.getUrl().toURI());
                 HttpClient client = new DefaultHttpClient();
                 HttpResponse response = client.execute(request);
                 BufferedHttpEntity entity = new BufferedHttpEntity(response.getEntity());
 
                 return BitmapFactory.decodeStream(entity.getContent());
-            } catch (URISyntaxException | MalformedURLException e) {
-                Log.e(CyanideViewer.TAG, "Malformed URL: " + c.getUrl());
+            } catch (URISyntaxException e) {
+                Log.e(CyanideViewer.TAG, "URISyntaxException: " + c.getUrl(), e);
                 return null;
             } catch (IOException e) {
-                Log.e(CyanideViewer.TAG, "IOException while trying to decode the image from URL " + c.getUrl());
+                Log.e(CyanideViewer.TAG, "IOException while trying to decode the image from URL " + c.getUrl(), e);
                 return null;
             }
         }

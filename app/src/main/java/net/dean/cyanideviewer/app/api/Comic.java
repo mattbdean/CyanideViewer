@@ -12,6 +12,7 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
 
@@ -20,9 +21,9 @@ import java.util.concurrent.ExecutionException;
  */
 public class Comic implements Parcelable {
     private long id;
-    private String url;
+    private URL url;
 
-    public Comic(long id, String url) {
+    public Comic(long id, URL url) {
         this.url = url;
         this.id = id;
     }
@@ -30,14 +31,20 @@ public class Comic implements Parcelable {
     public Comic(Parcel in) {
         in.readBundle();
         this.id = in.readLong();
-        this.url = in.readString();
+        String urlString = in.readString();
+        try {
+            this.url = new URL(urlString);
+        } catch (MalformedURLException e) {
+            Log.e(CyanideViewer.TAG, "Malformed URL while creating Parcelable Comic: " + urlString, e);
+        }
+
     }
 
-    public String getUrl() {
+    public URL getUrl() {
         return url;
     }
 
-    public void setUrl(String url) {
+    public void setUrl(URL url) {
         this.url = url;
     }
 
@@ -57,7 +64,7 @@ public class Comic implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(id);
-        dest.writeString(url);
+        dest.writeString(url.toExternalForm());
     }
 
     public static final Creator CREATOR = new Creator() {
@@ -77,7 +84,7 @@ public class Comic implements Parcelable {
     public String toString() {
         return "Comic{" +
                 "id=" + id +
-                ", url='" + url + '\'' +
+                ", url='" + url.toExternalForm() + '\'' +
                 '}';
     }
 
@@ -87,12 +94,13 @@ public class Comic implements Parcelable {
                 @Override
                 protected Boolean doInBackground(Void... params) {
                     try {
-                        InputStream input = new URL(getUrl()).openStream();
+                        InputStream input = getUrl().openStream();
 
                         // "/sdcard/CyanideViewer"
                         CyanideApi.IMAGE_DIR.mkdirs();
 
-                        String ext = getUrl().substring(getUrl().lastIndexOf('.'));
+                        String urlString = getUrl().toExternalForm();
+                        String ext = urlString.substring(urlString.lastIndexOf('.'));
                         File dest = new File(CyanideApi.IMAGE_DIR, getId() + ext);
                         if (!dest.exists()) {
                             // Only download it if the file doesn't already exist

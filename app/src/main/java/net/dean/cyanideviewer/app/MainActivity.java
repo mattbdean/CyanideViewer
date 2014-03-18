@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import net.dean.cyanideviewer.app.api.Comic;
@@ -57,7 +58,10 @@ public class MainActivity extends FragmentActivity {
         }
 
         viewPager.setCurrentItem(1);
-        // There are currently two items in the adapter. Set it to the right-most one. (the newest comic)
+        // Disable the Download button if the file already exists
+        Comic currentComic = ((ComicStage) pagerAdapter.getComic(viewPager.getCurrentItem())).getComic();
+        boolean hasLocal = CyanideApi.instance.hasLocal(currentComic.getId());
+        ((ImageButton) findViewById(R.id.download)).setEnabled(!hasLocal);
 
         viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -66,13 +70,16 @@ public class MainActivity extends FragmentActivity {
             @Override
             public void onPageSelected(int position) {
                 Log.v(CyanideViewer.TAG, "At position: " + position);
+                Comic currentComic = ((ComicStage) pagerAdapter.getComic(position)).getComic();
 
                 if (position == 0) { // At the very left
-                    Comic comicToShow = ((ComicStage)pagerAdapter.getComic(position)).getComic();
-                    Comic comicToShowNext = api.getComicPrevious(comicToShow.getId());
+                    Comic comicToShowNext = api.getComicPrevious(currentComic.getId());
                     pagerAdapter.addView(comicToShowNext, 0);
-                    System.out.println();
                 }
+
+                // Disable the Download button if the file already exists
+                boolean hasLocal = CyanideApi.instance.hasLocal(currentComic.getId());
+                ((ImageButton) findViewById(R.id.download)).setEnabled(!hasLocal);
             }
 
             @Override

@@ -5,8 +5,8 @@ package net.dean.cyanideviewer.app.api;
  */
 public class RetrievePreviousComicTask extends AbstractComicTask<Long> {
 
-    @Override
-    protected Comic doInBackground(Long... params) {
-        return CyanideApi.getPrevious(params[0]);
-    }
+	@Override
+	protected Comic doInBackground(Long... params) {
+		return CyanideApi.getPrevious(params[0]);
+	}
 }

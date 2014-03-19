@@ -5,13 +5,13 @@ package net.dean.cyanideviewer.app.api;
  */
 public class RetrieveRandomComicTask extends AbstractComicTask<Void> {
 
-    /** Instantiates a new RetrieveRandomComicTask */
-    public RetrieveRandomComicTask() {
-        super();
-    }
+	/** Instantiates a new RetrieveRandomComicTask */
+	public RetrieveRandomComicTask() {
+		super();
+	}
 
-    @Override
-    protected Comic doInBackground(Void... params) {
-        return CyanideApi.getRandom();
-    }
+	@Override
+	protected Comic doInBackground(Void... params) {
+		return CyanideApi.getRandom();
+	}
 }

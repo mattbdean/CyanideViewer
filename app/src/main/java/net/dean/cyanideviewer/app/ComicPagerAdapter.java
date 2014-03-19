@@ -13,91 +13,91 @@ import java.util.ArrayList;
  * http://stackoverflow.com/a/13671777/1275092
  */
 public class ComicPagerAdapter extends PagerAdapter {
-    /** A list of ComicStages that this adapter holds. */
-    private ArrayList<ComicStage> views = new ArrayList<>();
+	/** A list of ComicStages that this adapter holds. */
+	private ArrayList<ComicStage> views = new ArrayList<>();
 
-    @Override
-    public int getItemPosition(Object object) {
-        int index = views.indexOf(object);
-        if (index == -1) {
-            return POSITION_NONE;
-        } else {
-            return index;
-        }
-    }
+	@Override
+	public int getItemPosition(Object object) {
+		int index = views.indexOf(object);
+		if (index == -1) {
+			return POSITION_NONE;
+		} else {
+			return index;
+		}
+	}
 
-    @Override
-    public Object instantiateItem(ViewGroup container, int position) {
-        View v = views.get(position);
-        container.addView(v);
-        return v;
-    }
+	@Override
+	public Object instantiateItem(ViewGroup container, int position) {
+		View v = views.get(position);
+		container.addView(v);
+		return v;
+	}
 
-    @Override
-    public void destroyItem(ViewGroup container, int position, Object object) {
-        container.removeView(views.get(position));
-    }
+	@Override
+	public void destroyItem(ViewGroup container, int position, Object object) {
+		container.removeView(views.get(position));
+	}
 
-    @Override
-    public int getCount() {
-        return views.size();
-    }
+	@Override
+	public int getCount() {
+		return views.size();
+	}
 
-    @Override
-    public boolean isViewFromObject(View view, Object object) {
-        return view == object;
-    }
+	@Override
+	public boolean isViewFromObject(View view, Object object) {
+		return view == object;
+	}
 
-    /**
-     * Instantiates a new ComicStage with a given Comic and adds it to the list of views.
-     * @param c The comic to use to create a new ComicStage with
-     * @return The position at which this view was added
-     */
-    public int addView(Comic c) {
-        return addView(c, views.size());
-    }
+	/**
+	 * Instantiates a new ComicStage with a given Comic and adds it to the list of views.
+	 * @param c The comic to use to create a new ComicStage with
+	 * @return The position at which this view was added
+	 */
+	public int addView(Comic c) {
+		return addView(c, views.size());
+	}
 
-    /**
-     * Instantiates a new ComicStage with a given Comic and adds it to the list of views.
-     * @param c The comic to use to create a new ComicStage with
-     * @param position The position at which to insert the new View at
-     * @return The position at which this view was added
-     */
-    public int addView(Comic c, int position) {
-        views.add(position, ComicStage.newInstance(c));
-        notifyDataSetChanged();
-        return position;
-    }
+	/**
+	 * Instantiates a new ComicStage with a given Comic and adds it to the list of views.
+	 * @param c The comic to use to create a new ComicStage with
+	 * @param position The position at which to insert the new View at
+	 * @return The position at which this view was added
+	 */
+	public int addView(Comic c, int position) {
+		views.add(position, ComicStage.newInstance(c));
+		notifyDataSetChanged();
+		return position;
+	}
 
-    /**
-     * Removes a ComicStage
-     * @param v The view to remove
-     * @return The index at which this view was removed
-     */
-    public int removeView(View v) {
-        return removeView(views.indexOf(v));
-    }
+	/**
+	 * Removes a ComicStage
+	 * @param v The view to remove
+	 * @return The index at which this view was removed
+	 */
+	public int removeView(View v) {
+		return removeView(views.indexOf(v));
+	}
 
-    /**
-     * Removes a ComicStage
-     * @param position The position at which to remove the view from
-     * @return The position the view was removed from
-     */
-    public int removeView(int position) {
-        //pager.setAdapter(null);
-        views.remove(position);
-        notifyDataSetChanged();
-        //pager.setAdapter(this);
+	/**
+	 * Removes a ComicStage
+	 * @param position The position at which to remove the view from
+	 * @return The position the view was removed from
+	 */
+	public int removeView(int position) {
+		//pager.setAdapter(null);
+		views.remove(position);
+		notifyDataSetChanged();
+		//pager.setAdapter(this);
 
-        return position;
-    }
+		return position;
+	}
 
-    /**
-     * Gets a ComicStage at a given position
-     * @param position
-     * @return
-     */
-    public ComicStage getComicStage(int position) {
-        return views.get(position);
-    }
+	/**
+	 * Gets a ComicStage at a given position
+	 * @param position
+	 * @return
+	 */
+	public ComicStage getComicStage(int position) {
+		return views.get(position);
+	}
 }

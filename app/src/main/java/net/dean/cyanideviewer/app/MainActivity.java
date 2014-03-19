@@ -22,133 +22,133 @@ import java.util.concurrent.ExecutionException;
  */
 public class MainActivity extends FragmentActivity {
 
-    /** The ViewPager used to scroll through comics */
-    private ViewPager viewPager;
+	/** The ViewPager used to scroll through comics */
+	private ViewPager viewPager;
 
-    /** The ComicPagerAdapter used to provide pages to the ViewPager */
-    private ComicPagerAdapter pagerAdapter;
+	/** The ComicPagerAdapter used to provide pages to the ViewPager */
+	private ComicPagerAdapter pagerAdapter;
 
-    /** The button that, when pressed, downloads the current comic */
-    private ImageButton downloadButton;
+	/** The button that, when pressed, downloads the current comic */
+	private ImageButton downloadButton;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
 
-        // Instantiate a ViewPager and a PagerAdapter
-        this.viewPager = (ViewPager) findViewById(R.id.comic_pager);
+		// Instantiate a ViewPager and a PagerAdapter
+		this.viewPager = (ViewPager) findViewById(R.id.comic_pager);
 
-        this.pagerAdapter = new ComicPagerAdapter();
-        viewPager.setAdapter(pagerAdapter);
+		this.pagerAdapter = new ComicPagerAdapter();
+		viewPager.setAdapter(pagerAdapter);
 
-        try {
-            new AsyncTask<Void, Void, Void>() {
+		try {
+			new AsyncTask<Void, Void, Void>() {
 
-                @Override
-                protected Void doInBackground(Void... params) {
-                    // Add the newest
-                    pagerAdapter.addView(CyanideApi.getNewest());
+				@Override
+				protected Void doInBackground(Void... params) {
+					// Add the newest
+					pagerAdapter.addView(CyanideApi.getNewest());
 
-                    // Add the second newest
-                    ComicStage cs = pagerAdapter.getComicStage(pagerAdapter.getCount() - 1);
-                    pagerAdapter.addView(CyanideApi.getPrevious(cs.getComic().getId()), 0);
+					// Add the second newest
+					ComicStage cs = pagerAdapter.getComicStage(pagerAdapter.getCount() - 1);
+					pagerAdapter.addView(CyanideApi.getPrevious(cs.getComic().getId()), 0);
 
-                    return null;
-                }
-            }.execute().get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
+					return null;
+				}
+			}.execute().get();
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
 
-        viewPager.setCurrentItem(1);
+		viewPager.setCurrentItem(1);
 
-        this.downloadButton = (ImageButton) findViewById(R.id.download);
-        // Disable the Download button if the file already exists
-        refreshDownloadButtonState();
+		this.downloadButton = (ImageButton) findViewById(R.id.download);
+		// Disable the Download button if the file already exists
+		refreshDownloadButtonState();
 
-        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { }
+		viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+			@Override
+			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { }
 
-            @Override
-            public void onPageSelected(int position) {
-                if (position == 0) { // At the very left
-                    try {
-                        Comic comicToShowNext = new RetrievePreviousComicTask()
-                                .execute(getCurrentComic().getId()).get();
-                        pagerAdapter.addView(comicToShowNext, 0);
-                    } catch (InterruptedException | ExecutionException e) {
-                        Log.e(CyanideViewer.TAG, "Failed to get the previous comic", e);
-                    }
-                }
+			@Override
+			public void onPageSelected(int position) {
+				if (position == 0) { // At the very left
+					try {
+						Comic comicToShowNext = new RetrievePreviousComicTask()
+								.execute(getCurrentComic().getId()).get();
+						pagerAdapter.addView(comicToShowNext, 0);
+					} catch (InterruptedException | ExecutionException e) {
+						Log.e(CyanideViewer.TAG, "Failed to get the previous comic", e);
+					}
+				}
 
-                // Disable the Download button if the file already exists
-                refreshDownloadButtonState();
-            }
+				// Disable the Download button if the file already exists
+				refreshDownloadButtonState();
+			}
 
-            @Override
-            public void onPageScrollStateChanged(int state) { }
-        });
+			@Override
+			public void onPageScrollStateChanged(int state) { }
+		});
 
-        downloadButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Download the comic at the current ID
-                boolean succeeded = pagerAdapter.getComicStage(viewPager.getCurrentItem())
-                        .getComic().download();
+		downloadButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// Download the comic at the current ID
+				boolean succeeded = pagerAdapter.getComicStage(viewPager.getCurrentItem())
+						.getComic().download();
 
-                String toastText;
-                if (succeeded) {
-                    toastText = "Comic downloaded";
-                } else {
-                    toastText = "Comic failed to download!";
-                }
+				String toastText;
+				if (succeeded) {
+					toastText = "Comic downloaded";
+				} else {
+					toastText = "Comic failed to download!";
+				}
 
-                refreshDownloadButtonState();
-                Toast.makeText(CyanideViewer.getContext(), toastText, Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
+				refreshDownloadButtonState();
+				Toast.makeText(CyanideViewer.getContext(), toastText, Toast.LENGTH_SHORT).show();
+			}
+		});
+	}
 
-    private void refreshDownloadButtonState() {
-        boolean hasLocal = CyanideApi.hasLocal(getCurrentComic().getId());
-        downloadButton.setEnabled(!hasLocal);
-    }
+	private void refreshDownloadButtonState() {
+		boolean hasLocal = CyanideApi.hasLocal(getCurrentComic().getId());
+		downloadButton.setEnabled(!hasLocal);
+	}
 
-    private Comic getCurrentComic() {
-        return pagerAdapter.getComicStage(viewPager.getCurrentItem()).getComic();
-    }
+	private Comic getCurrentComic() {
+		return pagerAdapter.getComicStage(viewPager.getCurrentItem()).getComic();
+	}
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
+		int id = item.getItemId();
 
-        return id == R.id.action_settings || super.onOptionsItemSelected(item);
+		return id == R.id.action_settings || super.onOptionsItemSelected(item);
 
-    }
+	}
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        // TODO: Go to last viewed
-    }
+	@Override
+	public void onBackPressed() {
+		super.onBackPressed();
+		// TODO: Go to last viewed
+	}
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
 
-    /**
-     * Called when the 'Random' button is called. Shows a random comic to the user.
-     * @param v The view that contained the 'Random' button
-     */
-    public void onRandomClicked(View v) {
-        //new RetrieveRandomComicTask().execute();
-    }
+	/**
+	 * Called when the 'Random' button is called. Shows a random comic to the user.
+	 * @param v The view that contained the 'Random' button
+	 */
+	public void onRandomClicked(View v) {
+		//new RetrieveRandomComicTask().execute();
+	}
 }

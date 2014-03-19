@@ -26,14 +26,27 @@ public class Comic implements Parcelable {
     /** The URL of the comic's image */
     private URL url;
 
+    private boolean isFavorite;
+
     /**
-     * Instantiates a new Comic
+     * Instantiates a new Comic assuming the comic is not a favorite
      * @param id The ID of the comic
      * @param url The URL of the comic's image
      */
     public Comic(long id, URL url) {
+        this(id, url, false);
+    }
+
+    /**
+     * Instantiates a new Comic
+     * @param id The ID of the comic
+     * @param url The URL of the comic's image
+     * @param isFavorite If this comic is one of the user's favorites
+     */
+    public Comic(long id, URL url, boolean isFavorite) {
         this.url = url;
         this.id = id;
+        this.isFavorite = isFavorite;
     }
 
     /**
@@ -76,6 +89,14 @@ public class Comic implements Parcelable {
      */
     public void setId(long id) {
         this.id = id;
+    }
+
+    public boolean isFavorite() {
+        return isFavorite;
+    }
+
+    public void setFavorite(boolean isFavorite) {
+        this.isFavorite = isFavorite;
     }
 
     @Override

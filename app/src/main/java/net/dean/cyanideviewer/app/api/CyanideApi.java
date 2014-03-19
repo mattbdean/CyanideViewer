@@ -6,8 +6,10 @@ import android.os.Looper;
 import android.os.NetworkOnMainThreadException;
 import android.util.Log;
 
+import net.dean.cyanideviewer.app.CyanideUtils;
 import net.dean.cyanideviewer.app.CyanideViewer;
 import net.dean.cyanideviewer.app.R;
+import net.dean.cyanideviewer.app.db.ComicDaoImpl;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpHost;
@@ -55,6 +57,8 @@ public class CyanideApi {
     /** The directory that this app will download comics to. Sample value: "/sdcard/CyanideViewer/" */
     public static final File IMAGE_DIR = new File(Environment.getExternalStorageDirectory(),
             CyanideViewer.getContext().getResources().getString(R.string.app_name));
+
+    private static ComicDaoImpl comicDao = new ComicDaoImpl(CyanideViewer.getContext());
 
     private CyanideApi() {
         // Prevent instances
@@ -265,17 +269,32 @@ public class CyanideApi {
     }
 
     /**
-     * Gets a comic based on ID. Will check for a local copy before going on the internet and getting
-     * a copy.
+     * Gets a Comic object based on the given ID. If the comic exists in the database, it will
+     * return the data stored in that row. If a row for that particular comic does not exist,
+     * one will be added. If a file
      * @param id The ID of the comic to find
      * @return A new Comic based on the current ID, or null if that comic does not exist.
      */
     public static Comic getComic(long id) {
-        // Check locally first
+        Comic c = new Comic(id, null, false);
+
+        if (comicDao.comicExists(id)) {
+            // The comic was found in the database
+            Log.i(CyanideViewer.TAG, "Comic #" + id + " was found on the database, using it's info");
+            c = comicDao.getComic(id);
+        } else {
+            // The wasn't in the database, add it
+            c.setUrl(CyanideUtils.newUrl(getComicUrl(id)));
+            comicDao.addComic(c);
+        }
+
+
+        // Check if the comic exists locally
         File localComic = getLocalComic(id);
         if (localComic != null) {
             try {
                 URL url = localComic.toURI().toURL();
+                c.setUrl(url);
                 Log.i(CyanideViewer.TAG, "Using comic on filesystem for #" + id + ": " + url.toExternalForm());
                 return new Comic(id, url);
             } catch (MalformedURLException e) {
@@ -283,36 +302,7 @@ public class CyanideApi {
             }
         }
 
-        Log.i(CyanideViewer.TAG, "Local comic not found for #" + id + ", using internet");
-        // The comic wasn't download already, get it from the internets
-        checkMainThread();
-
-        String img = null;
-        long time = System.nanoTime();
-
-        try {
-            Document doc = Jsoup.connect(BASE_URL + id).get();
-            Elements images = doc.select("#maincontent img[src]");
-
-            // Iterate through the images to find the correct one
-            for (Element e : images) {
-                if (e.hasAttr("src")) {
-                    if (e.attr("src").contains("/db/files/Comics/")) {
-                        img = e.attr("src");
-                    }
-                }
-            }
-
-            Log.i(CyanideViewer.TAG, String.format("Retrieved comic #%s in %s milliseconds", id, (System.nanoTime() - time) / 1_000_000));
-            currentId = id;
-            return new Comic(id, new URL(img));
-        } catch (MalformedURLException e) {
-            Log.e(CyanideViewer.TAG, "Malformed URL while trying to get #" + id + ": " + img, e);
-            return null;
-        } catch (IOException e) {
-            Log.e(CyanideViewer.TAG, "Unable to get the image for id of " + id, e);
-            return null;
-        }
+        return c;
     }
 
     public static void initIdRanges() {

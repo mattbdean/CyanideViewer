@@ -254,6 +254,7 @@ public class CyanideApi {
 	 * @return A File pointing to the comic represented by the given ID
 	 */
 	private static File getLocalComic(long id) {
+		IMAGE_DIR.mkdir(); // Prevent IllegalArgumentException by making sure this location is a directory
 		List<File> files = (List) FileUtils.listFiles(IMAGE_DIR, new String[] {"jpg", "jpeg", "png"}, false);
 		for (File f : files) {
 			// ex: 3496

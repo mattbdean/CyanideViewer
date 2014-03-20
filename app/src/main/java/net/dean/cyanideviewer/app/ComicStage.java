@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.PointF;
-import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 import android.util.AttributeSet;
 import android.util.FloatMath;
@@ -26,6 +25,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -226,7 +226,7 @@ public class ComicStage extends LinearLayout implements View.OnTouchListener {
 					return BitmapFactory.decodeFile(URLDecoder.decode(c.getUrl().getPath(), "UTF-8"));
 				}
 
-				HttpClient client = AndroidHttpClient.newInstance("Cyanide Viewer");
+				HttpClient client = new DefaultHttpClient();
 				HttpGet request = new HttpGet(c.getUrl().toURI());
 				HttpResponse response = client.execute(request);
 				if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {

@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.PointF;
+import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 import android.util.AttributeSet;
 import android.util.FloatMath;
@@ -20,14 +21,16 @@ import android.widget.TextView;
 
 import net.dean.cyanideviewer.app.api.Comic;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.entity.BufferedHttpEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
 
 /**
  * Represents the main component of this application: where the comic is presented. It contains three
@@ -198,7 +201,7 @@ public class ComicStage extends LinearLayout implements View.OnTouchListener {
 		}
 
 		sb.append("]");
-		Log.d("Touch Events ---------", sb.toString());
+		Log.d(CyanideViewer.TAG, sb.toString());
 	}
 
 	/** Represents the task of loading a Comic's URL into a Bitmap usable by an ImageView */
@@ -220,15 +223,30 @@ public class ComicStage extends LinearLayout implements View.OnTouchListener {
 			try {
 				if (c.getUrl().getProtocol().equals("file")) {
 					// Local file, no need to make any HTTP requests
-					return BitmapFactory.decodeStream(c.getUrl().openStream());
+					return BitmapFactory.decodeFile(URLDecoder.decode(c.getUrl().getPath(), "UTF-8"));
 				}
 
+				HttpClient client = AndroidHttpClient.newInstance("Cyanide Viewer");
 				HttpGet request = new HttpGet(c.getUrl().toURI());
-				HttpClient client = new DefaultHttpClient();
 				HttpResponse response = client.execute(request);
-				BufferedHttpEntity entity = new BufferedHttpEntity(response.getEntity());
+				if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+					Log.w(CyanideViewer.TAG, "Failed to fetch comic at " + c.getUrl().toExternalForm());
+					return null;
+				}
+				HttpEntity entity = response.getEntity();
+				if (entity != null) {
+					InputStream is = null;
+					try {
+						is = entity.getContent();
+						return BitmapFactory.decodeStream(is);
+					} finally {
+						if (is != null) {
+							is.close();
+						}
+						entity.consumeContent();
+					}
+				}
 
-				return BitmapFactory.decodeStream(entity.getContent());
 			} catch (URISyntaxException e) {
 				Log.e(CyanideViewer.TAG, "URISyntaxException: " + c.getUrl(), e);
 				return null;
@@ -236,6 +254,8 @@ public class ComicStage extends LinearLayout implements View.OnTouchListener {
 				Log.e(CyanideViewer.TAG, "IOException while trying to decode the image from URL " + c.getUrl(), e);
 				return null;
 			}
+
+			return null;
 		}
 
 		@Override

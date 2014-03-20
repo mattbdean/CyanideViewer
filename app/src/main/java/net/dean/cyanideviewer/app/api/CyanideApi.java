@@ -214,7 +214,13 @@ public class CyanideApi {
 	 * @return The newest comic
 	 */
 	public static Comic getNewest() {
-		return getComic(newestId);
+		if (getComicUrl(newestId) != null) {
+			// The newest comic is an image
+			return getComic(newestId);
+		}
+		// The newest comic is an short or does not exist
+		return getPrevious(newestId);
+
 	}
 
 	/**
@@ -279,6 +285,7 @@ public class CyanideApi {
 		} else {
 			// The wasn't in the database, add it
 			Log.i(CyanideViewer.TAG, "Comic #" + id + " was not found in the database.");
+			String str = getComicUrl(id);
 			c.setUrl(CyanideUtils.newUrl(getComicUrl(id)));
 			CyanideViewer.getComicDao().addComic(c);
 		}

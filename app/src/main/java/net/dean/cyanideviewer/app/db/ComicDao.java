@@ -12,6 +12,6 @@ public interface ComicDao {
 	public List<Comic> getFavoriteComics();
 	public Comic getComic(long id);
 	public void addComic(Comic c);
-	public void updateComicFavorite(Comic c);
+	public void updateComicAsFavorite(Comic c);
 	public void deleteComic(Comic c);
 }

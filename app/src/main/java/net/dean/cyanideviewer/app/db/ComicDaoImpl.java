@@ -15,15 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ComicDaoImpl implements ComicDao {
-	private ComicDatabaseHelper dbHelper;
 	private SQLiteDatabase db;
 
 	private static final String TABLE_NAME = "comics";
 	private static final String[] COLUMNS = new String[] {"id", "url", "is_favorite"};
 
 	public ComicDaoImpl(Context context) {
-		this.dbHelper = new ComicDatabaseHelper(context);
-		this.db = dbHelper.getWritableDatabase();
+		this.db = new ComicDatabaseHelper(context).getWritableDatabase();
 	}
 
 	@Override
@@ -37,6 +35,7 @@ public class ComicDaoImpl implements ComicDao {
 			comics.add(parseComic(cursor));
 			cursor.moveToNext();
 		}
+		cursor.close();
 
 		return comics;
 	}
@@ -55,17 +54,21 @@ public class ComicDaoImpl implements ComicDao {
 	@Override
 	public Comic getComic(long id) {
 		// SELECT * FROM TABLE_NAME WHERE id=$id
-		Cursor cursor = db.query(true, TABLE_NAME, COLUMNS, "?=?", new String[] {COLUMNS[0], Long.toString(id)},
-				null, null, null, null);
+		Cursor cursor = db.query(true, TABLE_NAME, COLUMNS, COLUMNS[0] + "=?",
+				new String[] {Long.toString(id)}, null, null, null, null);
 
 		cursor.moveToFirst();
-		return parseComic(cursor);
+		Comic c = parseComic(cursor);
+		cursor.close();
+		return c;
 	}
 
 	public boolean comicExists(long id) {
-		Cursor cursor = db.query(true, TABLE_NAME, COLUMNS, "?=?", new String[] {COLUMNS[0],
-						Long.toString(id)}, null, null, null, null);
-		return cursor.getCount() > 0;
+		Cursor cursor = db.query(true, TABLE_NAME, COLUMNS, COLUMNS[0] + "=?",
+				new String[] {Long.toString(id)}, null, null, null, null);
+		boolean exists = cursor.getCount() > 0;
+		cursor.close();
+		return exists;
 	}
 
 	@Override
@@ -73,6 +76,8 @@ public class ComicDaoImpl implements ComicDao {
 		if (comicExists(c.getId())) {
 			return;
 		}
+
+		Log.v(CyanideViewer.TAG, "Adding comic to the database: " + c);
 
 		ContentValues values = new ContentValues();
 		values.put(COLUMNS[0], c.getId());
@@ -83,7 +88,7 @@ public class ComicDaoImpl implements ComicDao {
 	}
 
 	@Override
-	public void updateComicFavorite(Comic c) {
+	public void updateComicAsFavorite(Comic c) {
 		ContentValues values = new ContentValues();
 		values.put(COLUMNS[2], c.isFavorite());
 
@@ -98,6 +103,9 @@ public class ComicDaoImpl implements ComicDao {
 
 	private Comic parseComic(Cursor c) {
 		Comic comic = new Comic(-1, null);
+		if (c.isAfterLast()) {
+			return null;
+		}
 		comic.setId(c.getLong(c.getColumnIndex(COLUMNS[0])));
 		try {
 			comic.setUrl(new URL(c.getString(c.getColumnIndex(COLUMNS[1]))));

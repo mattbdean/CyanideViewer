@@ -9,7 +9,6 @@ import android.util.Log;
 import net.dean.cyanideviewer.app.CyanideUtils;
 import net.dean.cyanideviewer.app.CyanideViewer;
 import net.dean.cyanideviewer.app.R;
-import net.dean.cyanideviewer.app.db.ComicDaoImpl;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpHost;
@@ -48,17 +47,12 @@ public class CyanideApi {
 	/** The ID of the newest C&H comic */
 	public static long newestId;
 
-	/** The ID of the last comic that was retrieved */
-	public static long currentId = -1;
-
 	/** The HttpClient that will be used to host requests */
 	private static HttpClient client = new DefaultHttpClient();
 
 	/** The directory that this app will download comics to. Sample value: "/sdcard/CyanideViewer/" */
 	public static final File IMAGE_DIR = new File(Environment.getExternalStorageDirectory(),
 			CyanideViewer.getContext().getResources().getString(R.string.app_name));
-
-	private static ComicDaoImpl comicDao = new ComicDaoImpl(CyanideViewer.getContext());
 
 	private CyanideApi() {
 		// Prevent instances
@@ -278,14 +272,15 @@ public class CyanideApi {
 	public static Comic getComic(long id) {
 		Comic c = new Comic(id, null, false);
 
-		if (comicDao.comicExists(id)) {
+		if (CyanideViewer.getComicDao().comicExists(id)) {
 			// The comic was found in the database
 			Log.i(CyanideViewer.TAG, "Comic #" + id + " was found on the database, using it's info");
-			c = comicDao.getComic(id);
+			c = CyanideViewer.getComicDao().getComic(id);
 		} else {
 			// The wasn't in the database, add it
+			Log.i(CyanideViewer.TAG, "Comic #" + id + " was not found in the database.");
 			c.setUrl(CyanideUtils.newUrl(getComicUrl(id)));
-			comicDao.addComic(c);
+			CyanideViewer.getComicDao().addComic(c);
 		}
 
 

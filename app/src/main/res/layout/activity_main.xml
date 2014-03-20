@@ -18,16 +18,17 @@
         android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:id="@+id/navigationButtons">
 
-        <ImageButton
+        <ToggleButton
             android:id="@+id/action_favorite"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_action_favorite"/>
+            android:onClick="onFavoriteClicked"/>
         <ImageButton
             android:id="@+id/download"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_action_download"/>
+            android:src="@drawable/ic_action_download"
+            android:onClick="onDownloadClicked"/>
         <ImageButton
             android:id="@+id/action_random"
             android:layout_width="wrap_content"

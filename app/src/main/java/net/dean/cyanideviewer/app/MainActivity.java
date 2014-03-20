@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import net.dean.cyanideviewer.app.api.Comic;
 import net.dean.cyanideviewer.app.api.CyanideApi;
@@ -30,6 +31,9 @@ public class MainActivity extends FragmentActivity {
 
 	/** The button that, when pressed, downloads the current comic */
 	private ImageButton downloadButton;
+
+	/** The button that, when pressed, toggles whether the current comic is a favorite */
+	private ToggleButton favoriteButton;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -63,9 +67,11 @@ public class MainActivity extends FragmentActivity {
 
 		viewPager.setCurrentItem(1);
 
+		this.favoriteButton = (ToggleButton) findViewById(R.id.action_favorite);
 		this.downloadButton = (ImageButton) findViewById(R.id.download);
-		// Disable the Download button if the file already exists
+		// Refresh button states
 		refreshDownloadButtonState();
+		refreshFavoriteButtonState();
 
 		viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 			@Override
@@ -83,31 +89,13 @@ public class MainActivity extends FragmentActivity {
 					}
 				}
 
-				// Disable the Download button if the file already exists
+				// Refresh button states
 				refreshDownloadButtonState();
+				refreshFavoriteButtonState();
 			}
 
 			@Override
 			public void onPageScrollStateChanged(int state) { }
-		});
-
-		downloadButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				// Download the comic at the current ID
-				boolean succeeded = pagerAdapter.getComicStage(viewPager.getCurrentItem())
-						.getComic().download();
-
-				String toastText;
-				if (succeeded) {
-					toastText = "Comic downloaded";
-				} else {
-					toastText = "Comic failed to download!";
-				}
-
-				refreshDownloadButtonState();
-				Toast.makeText(CyanideViewer.getContext(), toastText, Toast.LENGTH_SHORT).show();
-			}
 		});
 	}
 
@@ -118,6 +106,42 @@ public class MainActivity extends FragmentActivity {
 
 	private Comic getCurrentComic() {
 		return pagerAdapter.getComicStage(viewPager.getCurrentItem()).getComic();
+	}
+
+	/** Called when the 'Favorite' button is clicked */
+	public void onFavoriteClicked(View view) {
+		Comic currentDbComic = getCurrentDbComic();
+		// Flip it
+		Log.v(CyanideViewer.TAG, "Current is favorite: " + currentDbComic.isFavorite());
+		currentDbComic.setFavorite(!currentDbComic.isFavorite());
+		CyanideViewer.getComicDao().updateComicAsFavorite(currentDbComic);
+
+		refreshFavoriteButtonState();
+	}
+
+	private Comic getCurrentDbComic() {
+		return CyanideViewer.getComicDao().getComic(getCurrentComic().getId());
+	}
+
+	private void refreshFavoriteButtonState() {
+		favoriteButton.setChecked(getCurrentDbComic().isFavorite());
+	}
+
+	/**  Called when the 'Download' button is clicked */
+	public void onDownloadClicked(View view) {
+		// Download the comic at the current ID
+		boolean succeeded = pagerAdapter.getComicStage(viewPager.getCurrentItem())
+				.getComic().download();
+
+		String toastText;
+		if (succeeded) {
+			toastText = "Comic downloaded";
+		} else {
+			toastText = "Comic failed to download!";
+		}
+
+		refreshDownloadButtonState();
+		Toast.makeText(CyanideViewer.getContext(), toastText, Toast.LENGTH_SHORT).show();
 	}
 
 	@Override

@@ -11,9 +11,9 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ToggleButton;
 
+import net.dean.cyanideviewer.app.api.AbstractComicTask;
 import net.dean.cyanideviewer.app.api.Comic;
 import net.dean.cyanideviewer.app.api.CyanideApi;
-import net.dean.cyanideviewer.app.api.RetrievePreviousComicTask;
 
 import java.util.concurrent.ExecutionException;
 
@@ -79,13 +79,7 @@ public class MainActivity extends FragmentActivity {
 			@Override
 			public void onPageSelected(int position) {
 				if (position == 0) { // At the very left
-					try {
-						Comic comicToShowNext = new RetrievePreviousComicTask()
-								.execute(getCurrentComic().getId()).get();
-						pagerAdapter.addView(comicToShowNext, 0);
-					} catch (InterruptedException | ExecutionException e) {
-						Log.e(CyanideViewer.TAG, "Failed to get the previous comic", e);
-					}
+					new RetrievePreviousComicTask().execute(getCurrentComic().getId());
 				}
 
 				// Refresh button states
@@ -164,5 +158,18 @@ public class MainActivity extends FragmentActivity {
 	 */
 	public void onRandomClicked(View v) {
 		//new RetrieveRandomComicTask().execute();
+	}
+
+	public class RetrievePreviousComicTask extends AbstractComicTask<Long> {
+
+		@Override
+		protected Comic doInBackground(Long... params) {
+			return CyanideApi.getPrevious(params[0]);
+		}
+
+		@Override
+		protected void onPostExecute(Comic comic) {
+			pagerAdapter.addView(comic, 0);
+		}
 	}
 }

@@ -4,8 +4,10 @@ import android.os.AsyncTask;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
+import android.widget.Toast;
 
 import net.dean.cyanideviewer.app.CyanideViewer;
+import net.dean.cyanideviewer.app.MainActivity;
 
 import org.apache.commons.io.FileUtils;
 
@@ -14,7 +16,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Represents an Cyanide and Happiness comic.
@@ -138,36 +139,42 @@ public class Comic implements Parcelable {
 	 * "/sdard/Cyanide Viewer/$id.$extension
 	 * @return Whether or not the download succeeded.
 	 */
-	public boolean download() {
-		try {
-			return new AsyncTask<Void, Void, Boolean>() {
-				@Override
-				protected Boolean doInBackground(Void... params) {
-					try {
-						InputStream input = getUrl().openStream();
+	public void download(final MainActivity mainActivity) {
+		new AsyncTask<Void, Void, Boolean>() {
+			@Override
+			protected Boolean doInBackground(Void... params) {
+				try {
+					InputStream input = getUrl().openStream();
 
-						// "/sdcard/CyanideViewer"
-						CyanideApi.IMAGE_DIR.mkdirs();
-
+					// "/sdcard/CyanideViewer"
+					CyanideApi.IMAGE_DIR.mkdirs();
 						String urlString = getUrl().toExternalForm();
-						String ext = urlString.substring(urlString.lastIndexOf('.'));
-						File dest = new File(CyanideApi.IMAGE_DIR, getId() + ext);
-						if (!dest.exists()) {
-							// Only download it if the file doesn't already exist
-							FileUtils.copyInputStreamToFile(input, dest);
-						}
-
-						Log.i(CyanideViewer.TAG, "Downloaded comic #" + id + " to " + dest.getAbsolutePath());
-						return true;
-					} catch (IOException e) {
-						Log.e(CyanideViewer.TAG, "Failed to download #" + id, e);
-						return false;
+					String ext = urlString.substring(urlString.lastIndexOf('.'));
+					File dest = new File(CyanideApi.IMAGE_DIR, getId() + ext);
+					if (!dest.exists()) {
+						// Only download it if the file doesn't already exist
+						FileUtils.copyInputStreamToFile(input, dest);
 					}
+					Log.i(CyanideViewer.TAG, "Downloaded comic #" + id + " to " + dest.getAbsolutePath());
+					return true;
+				} catch (IOException e) {
+					Log.e(CyanideViewer.TAG, "Failed to download #" + id, e);
+					return false;
 				}
-			}.execute().get();
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
-			return false;
-		}
+			}
+
+			@Override
+			protected void onPostExecute(Boolean success) {
+				String toastText;
+				if (success) {
+					toastText = "Comic downloaded";
+				} else {
+					toastText = "Comic failed to download!";
+				}
+
+				Toast.makeText(CyanideViewer.getContext(), toastText, Toast.LENGTH_SHORT).show();
+				mainActivity.refreshDownloadButtonState();
+			}
+		}.execute();
 	}
 }

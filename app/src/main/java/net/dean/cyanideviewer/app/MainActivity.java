@@ -9,7 +9,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import net.dean.cyanideviewer.app.api.Comic;
@@ -99,7 +98,7 @@ public class MainActivity extends FragmentActivity {
 		});
 	}
 
-	private void refreshDownloadButtonState() {
+	public void refreshDownloadButtonState() {
 		boolean hasLocal = CyanideApi.hasLocal(getCurrentComic().getId());
 		downloadButton.setEnabled(!hasLocal);
 	}
@@ -130,18 +129,9 @@ public class MainActivity extends FragmentActivity {
 	/**  Called when the 'Download' button is clicked */
 	public void onDownloadClicked(View view) {
 		// Download the comic at the current ID
-		boolean succeeded = pagerAdapter.getComicStage(viewPager.getCurrentItem())
-				.getComic().download();
-
-		String toastText;
-		if (succeeded) {
-			toastText = "Comic downloaded";
-		} else {
-			toastText = "Comic failed to download!";
-		}
+		pagerAdapter.getComicStage(viewPager.getCurrentItem()).getComic().download(this);
 
 		refreshDownloadButtonState();
-		Toast.makeText(CyanideViewer.getContext(), toastText, Toast.LENGTH_SHORT).show();
 	}
 
 	@Override

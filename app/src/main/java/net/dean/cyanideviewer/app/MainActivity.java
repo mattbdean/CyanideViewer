@@ -1,5 +1,6 @@
 package net.dean.cyanideviewer.app;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -135,8 +136,17 @@ public class MainActivity extends FragmentActivity {
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
 
-		return id == R.id.action_settings || super.onOptionsItemSelected(item);
+		switch (id) {
+			case R.id.action_settings:
+				// Show settings
+				return true;
+			case R.id.menu_favorites:
+				startActivity(new Intent(this, FavoritesActivity.class));
+				// TODO Show the favorites list view
+				return true;
+		}
 
+		return super.onOptionsItemSelected(item);
 	}
 
 	@Override

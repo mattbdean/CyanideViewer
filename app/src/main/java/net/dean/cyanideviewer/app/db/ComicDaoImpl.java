@@ -41,12 +41,18 @@ public class ComicDaoImpl implements ComicDao {
 	}
 
 	@Override
-	public List<Comic> getFavoriteComics() {
-		List<Comic> favorites = new ArrayList<>();
+	public ArrayList<Comic> getFavoriteComics() {
+		// SELECT * FROM TABLE_NAME WHERE is_favorite>0
+		Cursor cursor = db.query(true, TABLE_NAME, COLUMNS, COLUMNS[2] + ">0",
+				null, null, null, COLUMNS[0]+" DESC", null);
 
-		for (Comic c : getAllComics())
-			if (c.isFavorite())
-				favorites.add(c);
+		ArrayList<Comic> favorites = new ArrayList<>();
+
+		cursor.moveToFirst();
+		while (!cursor.isAfterLast()) {
+			favorites.add(parseComic(cursor));
+			cursor.moveToNext();
+		}
 
 		return favorites;
 	}

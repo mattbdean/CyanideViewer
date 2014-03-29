@@ -23,8 +23,6 @@ import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.io.File;
 import java.io.IOException;
@@ -128,14 +126,10 @@ public class CyanideApi {
 		try {
 			Document doc = Jsoup.connect(BASE_URL + id).get();
 
-			// TODO Use CSS queries to weed out the <img> tags we don't want
-			Elements images = doc.select("#maincontent img[src]");
-
-			for (Element e : images) {
-				if (e.attr("src").contains("/db/files/Comics/")) {
-					return e.attr("src");
-				}
-			}
+			// Return the one image that contains "/db/files/Comics/" in the src attribute
+			return doc.select("#maincontent img[src*=/db/files/Comics/]").get(0).attr("src");
+		} catch (IndexOutOfBoundsException e) {
+			Log.w(CyanideViewer.TAG, "Could not find the comic's image for #" + id);
 		} catch (IOException e) {
 			Log.e(CyanideViewer.TAG, "IOException while testing if comic #" + id + " was a comic page or not", e);
 		}

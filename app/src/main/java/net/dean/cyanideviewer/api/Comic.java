@@ -1,4 +1,4 @@
-package net.dean.cyanideviewer.app.api;
+package net.dean.cyanideviewer.api;
 
 import android.os.AsyncTask;
 import android.os.Parcel;
@@ -7,8 +7,8 @@ import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import net.dean.cyanideviewer.app.CyanideUtils;
-import net.dean.cyanideviewer.app.CyanideViewer;
+import net.dean.cyanideviewer.CyanideUtils;
+import net.dean.cyanideviewer.CyanideViewer;
 
 import org.apache.commons.io.FileUtils;
 

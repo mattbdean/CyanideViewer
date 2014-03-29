@@ -1,11 +1,11 @@
-package net.dean.cyanideviewer.app;
+package net.dean.cyanideviewer;
 
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
 
-import net.dean.cyanideviewer.app.api.Comic;
+import net.dean.cyanideviewer.api.Comic;
 
 import java.util.ArrayList;
 

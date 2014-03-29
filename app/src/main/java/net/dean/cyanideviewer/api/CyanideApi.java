@@ -1,4 +1,4 @@
-package net.dean.cyanideviewer.app.api;
+package net.dean.cyanideviewer.api;
 
 import android.os.AsyncTask;
 import android.os.Environment;
@@ -6,9 +6,9 @@ import android.os.Looper;
 import android.os.NetworkOnMainThreadException;
 import android.util.Log;
 
-import net.dean.cyanideviewer.app.CyanideUtils;
-import net.dean.cyanideviewer.app.CyanideViewer;
-import net.dean.cyanideviewer.app.R;
+import net.dean.cyanideviewer.CyanideUtils;
+import net.dean.cyanideviewer.CyanideViewer;
+import net.dean.cyanideviewer.R;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpHost;

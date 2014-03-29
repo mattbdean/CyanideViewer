@@ -1,6 +1,6 @@
-package net.dean.cyanideviewer.app.db;
+package net.dean.cyanideviewer.db;
 
-import net.dean.cyanideviewer.app.api.Comic;
+import net.dean.cyanideviewer.api.Comic;
 
 import java.util.List;
 

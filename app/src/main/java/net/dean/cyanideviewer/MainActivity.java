@@ -1,4 +1,4 @@
-package net.dean.cyanideviewer.app;
+package net.dean.cyanideviewer;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -12,8 +12,8 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ToggleButton;
 
-import net.dean.cyanideviewer.app.api.Comic;
-import net.dean.cyanideviewer.app.api.CyanideApi;
+import net.dean.cyanideviewer.api.Comic;
+import net.dean.cyanideviewer.api.CyanideApi;
 
 import java.util.concurrent.ExecutionException;
 

@@ -1,4 +1,4 @@
-package net.dean.cyanideviewer.app;
+package net.dean.cyanideviewer;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -11,7 +11,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 
-import net.dean.cyanideviewer.app.api.Comic;
+import net.dean.cyanideviewer.api.Comic;
 
 import java.util.ArrayList;
 

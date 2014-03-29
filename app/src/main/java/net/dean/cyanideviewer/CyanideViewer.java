@@ -1,11 +1,11 @@
-package net.dean.cyanideviewer.app;
+package net.dean.cyanideviewer;
 
 import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
-import net.dean.cyanideviewer.app.api.CyanideApi;
-import net.dean.cyanideviewer.app.db.ComicDaoImpl;
+import net.dean.cyanideviewer.api.CyanideApi;
+import net.dean.cyanideviewer.db.ComicDaoImpl;
 
 /**
  * The main class for Cyanide Viewer.

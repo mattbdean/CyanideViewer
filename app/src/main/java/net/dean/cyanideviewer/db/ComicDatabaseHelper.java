@@ -1,11 +1,11 @@
-package net.dean.cyanideviewer.app.db;
+package net.dean.cyanideviewer.db;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import net.dean.cyanideviewer.app.CyanideViewer;
+import net.dean.cyanideviewer.CyanideViewer;
 
 /**
  * This class is used to open SQLite databases

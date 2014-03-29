@@ -1,4 +1,4 @@
-package net.dean.cyanideviewer.app;
+package net.dean.cyanideviewer;
 
 import android.util.Log;
 

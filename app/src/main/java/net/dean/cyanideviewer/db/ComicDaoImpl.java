@@ -1,4 +1,4 @@
-package net.dean.cyanideviewer.app.db;
+package net.dean.cyanideviewer.db;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -6,9 +6,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import net.dean.cyanideviewer.app.CyanideUtils;
-import net.dean.cyanideviewer.app.CyanideViewer;
-import net.dean.cyanideviewer.app.api.Comic;
+import net.dean.cyanideviewer.CyanideUtils;
+import net.dean.cyanideviewer.CyanideViewer;
+import net.dean.cyanideviewer.api.Comic;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package net.dean.cyanideviewer.app;
+package net.dean.cyanideviewer;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -11,8 +11,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import net.dean.cyanideviewer.app.api.Comic;
-import net.dean.cyanideviewer.app.api.CyanideApi;
+import net.dean.cyanideviewer.api.Comic;
+import net.dean.cyanideviewer.api.CyanideApi;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;

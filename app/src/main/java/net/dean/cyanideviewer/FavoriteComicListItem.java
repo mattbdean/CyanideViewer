@@ -1,4 +1,4 @@
-package net.dean.cyanideviewer.app;
+package net.dean.cyanideviewer;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import net.dean.cyanideviewer.app.api.Comic;
+import net.dean.cyanideviewer.api.Comic;
 
 /**
  * Represents an item found in the ListView in FavoritesActivity

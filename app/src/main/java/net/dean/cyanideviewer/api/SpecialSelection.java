@@ -1,4 +1,4 @@
-package net.dean.cyanideviewer.app.api;
+package net.dean.cyanideviewer.api;
 
 /**
  * Represents the "special" URLs available to the user.

@@ -4,10 +4,10 @@ import android.os.AsyncTask;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import net.dean.cyanideviewer.app.CyanideViewer;
-import net.dean.cyanideviewer.app.MainActivity;
 
 import org.apache.commons.io.FileUtils;
 
@@ -62,7 +62,6 @@ public class Comic implements Parcelable {
 		} catch (MalformedURLException e) {
 			Log.e(CyanideViewer.TAG, "Malformed URL while creating Parcelable Comic: " + urlString, e);
 		}
-
 	}
 
 	/** Gets the URL */
@@ -137,17 +136,27 @@ public class Comic implements Parcelable {
 	 * Tries to download this comic to the local file system. Will download to
 	 * "/sdard/Cyanide Viewer/$id.$extension
 	 * @return Whether or not the download succeeded.
+	 * @param downloadButton
 	 */
-	public void download(final MainActivity mainActivity) {
+	public void download(final ImageButton downloadButton) {
 		new AsyncTask<Void, Void, Boolean>() {
+			@Override
+			protected void onPreExecute() {
+				Toast.makeText(CyanideViewer.getContext(), "Download starting", Toast.LENGTH_SHORT).show();
+			}
+
 			@Override
 			protected Boolean doInBackground(Void... params) {
 				try {
 					InputStream input = getUrl().openStream();
 
 					// "/sdcard/CyanideViewer"
-					CyanideApi.IMAGE_DIR.mkdirs();
-						String urlString = getUrl().toExternalForm();
+					if (!(CyanideApi.IMAGE_DIR.mkdirs() || CyanideApi.IMAGE_DIR.isDirectory())) {
+						// The image dir is not a directory or there was an error creating the folder
+						Log.e(CyanideViewer.TAG, "Error while creating " + CyanideApi.IMAGE_DIR.getAbsolutePath()
+								+ ". Is it not a directory?");
+					}
+					String urlString = getUrl().toExternalForm();
 					String ext = urlString.substring(urlString.lastIndexOf('.'));
 					File dest = new File(CyanideApi.IMAGE_DIR, getId() + ext);
 					if (!dest.exists()) {
@@ -172,7 +181,7 @@ public class Comic implements Parcelable {
 				}
 
 				Toast.makeText(CyanideViewer.getContext(), toastText, Toast.LENGTH_SHORT).show();
-				mainActivity.refreshDownloadButtonState();
+				downloadButton.setEnabled(false);
 			}
 		}.execute();
 	}

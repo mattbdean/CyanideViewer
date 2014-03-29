@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -255,8 +256,14 @@ public class CyanideApi {
 	 * @return A File pointing to the comic represented by the given ID
 	 */
 	private static File getLocalComic(long id) {
-		IMAGE_DIR.mkdir(); // Prevent IllegalArgumentException by making sure this location is a directory
-		List<File> files = (List) FileUtils.listFiles(IMAGE_DIR, new String[] {"jpg", "jpeg", "png"}, false);
+
+		if (!(IMAGE_DIR.mkdir() || IMAGE_DIR.isDirectory())) {
+			// Prevent IllegalArgumentException by making sure this location is a directory
+			Log.e(CyanideViewer.TAG, "Unable to crate the directory " + IMAGE_DIR.getAbsolutePath() +
+					". Does it exist as a file?");
+		}
+		List<File> files = new ArrayList<>(FileUtils.listFiles(IMAGE_DIR,
+				new String[] {"jpg", "jpeg", "png", "gif"}, false));
 		for (File f : files) {
 			// ex: 3496
 			String lookingFor = f.getAbsolutePath().substring(f.getAbsolutePath().lastIndexOf('/') + 1, f.getAbsolutePath().indexOf('.'));

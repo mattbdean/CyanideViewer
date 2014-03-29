@@ -136,9 +136,7 @@ public class MainActivity extends FragmentActivity {
 	 */
 	public void onDownloadClicked(View view) {
 		// Download the comic at the current ID
-		pagerAdapter.getComicStage(viewPager.getCurrentItem()).getComic().download(this);
-
-		refreshDownloadButtonState();
+		pagerAdapter.getComicStage(viewPager.getCurrentItem()).getComic().download(downloadButton);
 	}
 
 	@Override

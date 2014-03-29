@@ -126,13 +126,13 @@ public class CyanideApi {
 
 		try {
 			Document doc = Jsoup.connect(BASE_URL + id).get();
+
+			// TODO Use CSS queries to weed out the <img> tags we don't want
 			Elements images = doc.select("#maincontent img[src]");
 
 			for (Element e : images) {
-				if (e.hasAttr("src")) {
-					if (e.attr("src").contains("/db/files/Comics/")) {
-						return e.attr("src");
-					}
+				if (e.attr("src").contains("/db/files/Comics/")) {
+					return e.attr("src");
 				}
 			}
 		} catch (IOException e) {
@@ -185,17 +185,17 @@ public class CyanideApi {
 	public static Comic getNext(long id) {
 		long newId = id + 1;
 
-		Log.i(CyanideViewer.TAG, "Getting the previous comic relative to #" + id);
+		Log.i(CyanideViewer.TAG, "Getting the next comic relative to #" + id);
 		if (newId < firstId) {
 			// The ID is less than the first comic's ID
 			Log.w(CyanideViewer.TAG, String.format("The given ID (%s) was lower than the minimum ID (%s)", newId, firstId));
-			return getComic(firstId);
+			return null;
 		}
 
 		if (newId > newestId) {
 			// The ID is greater than the newest comic's ID
 			Log.w(CyanideViewer.TAG, String.format("The given ID (%s) was greater than the maximum ID (%s)", newId, newestId));
-			return getComic(newestId);
+			return null;
 		}
 
 		if (getComicUrl(newId) != null) {

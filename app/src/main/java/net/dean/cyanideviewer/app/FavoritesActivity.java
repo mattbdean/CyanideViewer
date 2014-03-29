@@ -1,6 +1,7 @@
 package net.dean.cyanideviewer.app;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,9 +19,10 @@ import java.util.ArrayList;
 
 
 public class FavoritesActivity extends Activity {
+	public static final int RESULT_OK = 0;
+	public static final int RESULT_NONE = 1;
 
 	private FavoritesAdapter adapter;
-	private ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,19 +31,28 @@ public class FavoritesActivity extends Activity {
 
 	    ArrayList<Comic> comics = CyanideViewer.getComicDao().getFavoriteComics();
 	    this.adapter = new FavoritesAdapter(comics);
-	    this.listView = (ListView) findViewById(R.id.favorites_list);
+	    ListView listView = (ListView) findViewById(R.id.favorites_list);
 	    listView.setAdapter(adapter);
 
 	    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 		    @Override
 		    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-			    // TODO Show MainActivity at a certain comic ID
+			    Intent intent = new Intent();
+			    intent.putExtra("comic", (Comic) adapter.getItem(position));
+			    setResult(RESULT_OK, intent);
+			    finish();
 		    }
 	    });
     }
 
+	@Override
+	public void onBackPressed() {
+		// Tell the calling activity that no comic was chosen
+		setResult(RESULT_NONE);
+		super.onBackPressed();
+	}
 
-    @Override
+	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         
         // Inflate the menu; this adds items to the action bar if it is present.

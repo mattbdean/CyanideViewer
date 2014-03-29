@@ -55,7 +55,6 @@ public class Comic implements Parcelable {
 	 * @param in A Parcel created by {@link #CREATOR}
 	 */
 	public Comic(Parcel in) {
-		in.readBundle();
 		this.id = in.readLong();
 		String urlString = in.readString();
 		try {

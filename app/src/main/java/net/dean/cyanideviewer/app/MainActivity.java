@@ -23,16 +23,24 @@ import java.util.concurrent.ExecutionException;
  */
 public class MainActivity extends FragmentActivity {
 
-	/** The ViewPager used to scroll through comics */
+	/**
+	 * The ViewPager used to scroll through comics
+	 */
 	private ViewPager viewPager;
 
-	/** The ComicPagerAdapter used to provide pages to the ViewPager */
+	/**
+	 * The ComicPagerAdapter used to provide pages to the ViewPager
+	 */
 	private ComicPagerAdapter pagerAdapter;
 
-	/** The button that, when pressed, downloads the current comic */
+	/**
+	 * The button that, when pressed, downloads the current comic
+	 */
 	private ImageButton downloadButton;
 
-	/** The button that, when pressed, toggles whether the current comic is a favorite */
+	/**
+	 * The button that, when pressed, toggles whether the current comic is a favorite
+	 */
 	private ToggleButton favoriteButton;
 
 	@Override
@@ -40,48 +48,26 @@ public class MainActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		// Instantiate a ViewPager and a PagerAdapter
 		this.viewPager = (ViewPager) findViewById(R.id.comic_pager);
-
 		this.pagerAdapter = new ComicPagerAdapter();
-		viewPager.setAdapter(pagerAdapter);
-
-		try {
-			new AsyncTask<Void, Void, Void>() {
-
-				@Override
-				protected Void doInBackground(Void... params) {
-					// Add the newest
-					pagerAdapter.addView(CyanideApi.getNewest());
-
-					// Add the second newest
-					ComicStage cs = pagerAdapter.getComicStage(pagerAdapter.getCount() - 1);
-					pagerAdapter.addView(CyanideApi.getPrevious(cs.getComic().getId()), 0);
-
-					return null;
-				}
-			}.execute().get();
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
-		}
-
-		viewPager.setCurrentItem(1);
-
 		this.favoriteButton = (ToggleButton) findViewById(R.id.action_favorite);
 		this.downloadButton = (ImageButton) findViewById(R.id.download);
-		// Refresh button states
-		refreshDownloadButtonState();
-		refreshFavoriteButtonState();
 
 		viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 			@Override
-			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { }
+			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+			}
 
 			@Override
 			public void onPageSelected(int position) {
 				if (position == 0) { // At the very left
-					new RetrievePreviousComicTask().execute(getCurrentComic().getId());
+					new RetrievePreviousComicTask().execute(getCurrentComicId());
+				} else if (position == pagerAdapter.getCount() - 1) {
+					new RetrieveNextComicTask().execute(getCurrentComicId());
 				}
+
+				// It's been selected, start loading
+				pagerAdapter.getComicStage(position).loadComic();
 
 				// Refresh button states
 				refreshDownloadButtonState();
@@ -89,24 +75,48 @@ public class MainActivity extends FragmentActivity {
 			}
 
 			@Override
-			public void onPageScrollStateChanged(int state) { }
+			public void onPageScrollStateChanged(int state) {
+			}
 		});
+
+		setComic(CyanideApi.newestId);
+		viewPager.setCurrentItem(pagerAdapter.getCount() - 1);
+
+		// Refresh button states
+		refreshDownloadButtonState();
+		refreshFavoriteButtonState();
+	}
+
+	public void setComic(final long id) {
+		try {
+			viewPager.setAdapter(null);
+			int currentItemIndex = new SetComicTask().execute(id).get();
+			viewPager.setAdapter(pagerAdapter);
+			viewPager.setCurrentItem(currentItemIndex);
+		} catch (InterruptedException e) {
+			Log.e(CyanideViewer.TAG, "Interrupted trying to set the new comic to #" + id, e);
+		} catch (ExecutionException e) {
+			Log.e(CyanideViewer.TAG, "An error occurred while trying to set the new comic to #" + id, e);
+		}
 	}
 
 	public void refreshDownloadButtonState() {
-		boolean hasLocal = CyanideApi.hasLocal(getCurrentComic().getId());
+		boolean hasLocal = CyanideApi.hasLocal(getCurrentComicId());
 		downloadButton.setEnabled(!hasLocal);
 	}
 
-	private Comic getCurrentComic() {
-		return pagerAdapter.getComicStage(viewPager.getCurrentItem()).getComic();
+	private long getCurrentComicId() {
+		return pagerAdapter.getComicStage(viewPager.getCurrentItem()).getComicIdToLoad();
 	}
 
-	/** Called when the 'Favorite' button is clicked */
+	/**
+	 * Called when the 'Favorite' button is clicked
+	 */
 	public void onFavoriteClicked(View view) {
 		Comic currentDbComic = getCurrentDbComic();
-		// Flip it
 		Log.v(CyanideViewer.TAG, "Current is favorite: " + currentDbComic.isFavorite());
+
+		// Flip it
 		currentDbComic.setFavorite(!currentDbComic.isFavorite());
 		CyanideViewer.getComicDao().updateComicAsFavorite(currentDbComic);
 
@@ -114,14 +124,16 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	private Comic getCurrentDbComic() {
-		return CyanideViewer.getComicDao().getComic(getCurrentComic().getId());
+		return CyanideViewer.getComicDao().getComic(getCurrentComicId());
 	}
 
 	private void refreshFavoriteButtonState() {
 		favoriteButton.setChecked(getCurrentDbComic().isFavorite());
 	}
 
-	/**  Called when the 'Download' button is clicked */
+	/**
+	 * Called when the 'Download' button is clicked
+	 */
 	public void onDownloadClicked(View view) {
 		// Download the comic at the current ID
 		pagerAdapter.getComicStage(viewPager.getCurrentItem()).getComic().download(this);
@@ -141,12 +153,21 @@ public class MainActivity extends FragmentActivity {
 				// Show settings
 				return true;
 			case R.id.menu_favorites:
-				startActivity(new Intent(this, FavoritesActivity.class));
+				startActivityForResult(new Intent(this, FavoritesActivity.class), 0);
 				// TODO Show the favorites list view
 				return true;
 		}
 
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode == FavoritesActivity.RESULT_OK) {
+			// The user chose a comic to view
+			Comic theChosenOne = data.getExtras().getParcelable("comic");
+			setComic(theChosenOne.getId());
+		}
 	}
 
 	@Override
@@ -164,6 +185,7 @@ public class MainActivity extends FragmentActivity {
 
 	/**
 	 * Called when the 'Random' button is called. Shows a random comic to the user.
+	 *
 	 * @param v The view that contained the 'Random' button
 	 */
 	public void onRandomClicked(View v) {
@@ -179,7 +201,73 @@ public class MainActivity extends FragmentActivity {
 
 		@Override
 		protected void onPostExecute(Comic comic) {
-			pagerAdapter.addView(comic, 0);
+			if (comic != null) pagerAdapter.addView(comic, 0);
+		}
+	}
+
+	private class RetrieveNextComicTask extends AbstractComicTask<Long> {
+		@Override
+		protected Comic doInBackground(Long... params) {
+			return CyanideApi.getNext(params[0]);
+		}
+
+		@Override
+		protected void onPostExecute(Comic comic) {
+			if (comic != null) pagerAdapter.addView(comic);
+		}
+	}
+
+	private class SetComicTask extends AsyncTask<Long, Void, Integer> {
+
+		@Override
+		protected Integer doInBackground(Long... params) {
+			long id = params[0];
+
+			int curComicPagerIndex = -1;
+			Comic prevComic = CyanideApi.getPrevious(id);
+			Comic nextComic = CyanideApi.getNext(id);
+
+			// Reuse all the views to be more efficient
+			if (pagerAdapter.getCount() != 0) {
+				for (int i = 0; i < pagerAdapter.getCount(); i++) {
+					ComicStage stage = pagerAdapter.getComicStage(i);
+					if (stage.getComicIdToLoad() == id) {
+						// ComicStage already exists, return it's id
+						return i;
+					}
+				}
+				// Not the first time this has been called
+				int midway = pagerAdapter.getCount() / 2;
+				pagerAdapter.getComicStage(midway).setComic(id);
+				curComicPagerIndex = midway;
+				// From the midway to the beginning
+				for (int i = midway - 1; i >= 0; i--) {
+					pagerAdapter.getComicStage(i).setComic(prevComic.getId());
+					prevComic = CyanideApi.getPrevious(prevComic.getId());
+				}
+
+				// From the midway to the end
+				for (int i = midway + 1; i < pagerAdapter.getCount(); i++) {
+					pagerAdapter.getComicStage(i).setComic(nextComic.getId());
+					nextComic = CyanideApi.getNext(nextComic.getId());
+				}
+			} else {
+				// First time setup
+				if (prevComic != null) {
+					// Add the previous comic if it exists
+					pagerAdapter.addView(prevComic);
+				}
+				// Current comic
+				curComicPagerIndex = pagerAdapter.addView(CyanideApi.getComic(id));
+				pagerAdapter.getComicStage(curComicPagerIndex).loadComic();
+
+				if (nextComic != null) {
+					// Add the next comic if it exists
+					pagerAdapter.addView(nextComic);
+				}
+			}
+
+			return curComicPagerIndex;
 		}
 	}
 }

@@ -9,11 +9,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import net.dean.cyanideviewer.app.api.Comic;
+import net.dean.cyanideviewer.app.api.CyanideApi;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -37,55 +36,102 @@ import uk.co.senab.photoview.PhotoViewAttacher;
  * Panning/Zooming adapted from http://stackoverflow.com/a/6650484/1275092
  */
 public class ComicStage extends LinearLayout {
-	private static final float MIN_ZOOM = 1f, MAX_ZOOM = 1f;
 
 	/**
 	 * Creates a new instance of a ComicStage and its comic to the one given.
-	 * @param c The comic to use
+	 * @param comicId The ID of the comic to use
 	 * @return A new ComicStage
 	 */
-	public static ComicStage newInstance(Comic c) {
+	public static ComicStage newInstance(long comicId) {
 		LayoutInflater li = (LayoutInflater) CyanideViewer.getContext()
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 		ComicStage cs = (ComicStage) li.inflate(R.layout.comic_stage, null);
-		cs.setComic(c);
+		Log.d(CyanideViewer.TAG, "Creating a new ComicStage for #" + comicId);
+		cs.setComic(comicId);
 		return cs;
 	}
 
-	/** The comic that used to fill out this ComicStage */
+	private ImageView imageView;
+
+	private boolean hasLoaded;
+
+	private long idToLoad;
+
 	private Comic comic;
+
+	private PhotoViewAttacher photoViewAttacher;
 
 	/** Instantiates a new ComicStage */
 	public ComicStage(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		this.comic = null;
+		this.idToLoad = -1;
 	}
 
 	/** Sets the comic of this ComicStage. Will adjust the TextView and ImageView accordingly. */
-	public void setComic(Comic comic) {
-		this.comic = comic;
-		((TextView) findViewById(R.id.comic_id)).setText("#" + comic.getId());
-		new BitmapLoaderTask().execute(this.comic);
+	public void setComic(long id) {
+		this.idToLoad = id;
+		((TextView) findViewById(R.id.comic_id)).setText("#" + idToLoad);
+		hasLoaded = false;
+		// Set the ImageView to be clear if it has been set before
+		if (imageView != null)
+			imageView.setImageResource(android.R.color.transparent);
 	}
 
-	/** Gets the Comic associated with this ComicStage */
+	public void loadComic() {
+		if (idToLoad != -1) {
+			// The comic ID has been set
+			new BitmapLoaderTask().execute(idToLoad);
+			hasLoaded = true;
+		}
+	}
+
+	@Override
+	protected void onDetachedFromWindow() {
+		if (photoViewAttacher != null) photoViewAttacher.cleanup();
+		photoViewAttacher = null;
+		super.onDetachedFromWindow();
+	}
+
 	public Comic getComic() {
 		return comic;
 	}
 
+	public long getComicIdToLoad() {
+		return idToLoad;
+	}
+
+	public boolean hasLoaded() {
+		return hasLoaded;
+	}
+
+	@Override
+	public String toString() {
+		final StringBuffer sb = new StringBuffer("ComicStage{");
+		sb.append("idToLoad=").append(idToLoad);
+		sb.append(", comic=").append(comic);
+		sb.append(", imageView=").append(imageView);
+		sb.append(", hasLoaded=").append(hasLoaded);
+		sb.append(", photoViewAttacher=").append(photoViewAttacher);
+		sb.append('}');
+		return sb.toString();
+	}
+
 	/** Represents the task of loading a Comic's URL into a Bitmap usable by an ImageView */
-	public class BitmapLoaderTask extends AsyncTask<Comic, Void, Bitmap> {
+	public class BitmapLoaderTask extends AsyncTask<Long, Void, Bitmap> {
 
 		@Override
 		protected void onPreExecute() {
 			// TODO Show indeterminate progress bar/circle
 			TextView tv = (TextView) findViewById(R.id.comic_id);
-			tv.setText("#" + getComic().getId());
+			tv.setText("#" + idToLoad);
 		}
 
 		@Override
-		protected Bitmap doInBackground(Comic... params) {
-			Comic c = params[0];
+		protected Bitmap doInBackground(Long... params) {
+			Comic c = CyanideApi.getComic(params[0]);
+			comic = c;
 
 			// Adapted from http://stackoverflow.com/a/6621552/1275092
 
@@ -129,13 +175,18 @@ public class ComicStage extends LinearLayout {
 
 		@Override
 		protected void onPostExecute(Bitmap bitmap) {
-			if (bitmap != null) {
-				ImageView imageView = (ImageView) findViewById(R.id.image_view);
+			if (bitmap != null && !isCancelled()) {
+				imageView = (ImageView) findViewById(R.id.image_view);
 				imageView.setImageBitmap(bitmap);
-				new PhotoViewAttacher(imageView);
-				ProgressBar pb = (ProgressBar) findViewById(R.id.progress_bar);
-				// Remove the progress bar once the image is done loading
-				((RelativeLayout) pb.getParent()).removeView(pb);
+				if (photoViewAttacher == null) {
+					photoViewAttacher = new PhotoViewAttacher(imageView);
+				} else {
+					photoViewAttacher.update();
+				}
+//				ProgressBar pb = (ProgressBar) findViewById(R.id.progress_bar);
+//				// Remove the progress bar once the image is done loading
+//				RelativeLayout layout = (RelativeLayout) pb.getParent();
+//				layout.removeView(pb);
 			}
 		}
 	}

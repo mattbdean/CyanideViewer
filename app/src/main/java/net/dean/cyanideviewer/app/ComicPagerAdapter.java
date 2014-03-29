@@ -1,6 +1,7 @@
 package net.dean.cyanideviewer.app;
 
 import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -64,18 +65,18 @@ public class ComicPagerAdapter extends PagerAdapter {
 	 * @return The position at which this view was added
 	 */
 	public int addView(Comic c, int position) {
-		views.add(position, ComicStage.newInstance(c));
+		views.add(position, ComicStage.newInstance(c.getId()));
 		notifyDataSetChanged();
 		return position;
 	}
 
 	/**
 	 * Removes a ComicStage
-	 * @param v The view to remove
+	 * @param cs The view to remove
 	 * @return The index at which this view was removed
 	 */
-	public int removeView(View v) {
-		return removeView(views.indexOf(v));
+	public int removeView(ViewPager pager, ComicStage cs) {
+		return removeView(pager, views.indexOf(cs));
 	}
 
 	/**
@@ -83,11 +84,11 @@ public class ComicPagerAdapter extends PagerAdapter {
 	 * @param position The position at which to remove the view from
 	 * @return The position the view was removed from
 	 */
-	public int removeView(int position) {
-		//pager.setAdapter(null);
+	public int removeView(ViewPager pager, int position) {
+		pager.setAdapter(null);
 		views.remove(position);
+		pager.setAdapter(this);
 		notifyDataSetChanged();
-		//pager.setAdapter(this);
 
 		return position;
 	}

@@ -52,14 +52,30 @@ public class ComicStage extends LinearLayout {
 		return cs;
 	}
 
+	/**
+	 * The ImageView that will host the comic
+	 */
 	private ImageView imageView;
 
+	/**
+	 * Whether the comic has been fully loaded
+	 */
 	private boolean hasLoaded;
 
+	/**
+	 * The ID of the comic to load
+	 */
 	private long idToLoad;
 
+	/**
+	 * The Comic that is to be displayed on this stage
+	 */
 	private Comic comic;
 
+	/**
+	 * The PhotoViewAttacher that provides pinch/double tap zooming and panning functionality
+	 * to the ImageView
+	 */
 	private PhotoViewAttacher photoViewAttacher;
 
 	/** Instantiates a new ComicStage */
@@ -79,6 +95,9 @@ public class ComicStage extends LinearLayout {
 			imageView.setImageResource(android.R.color.transparent);
 	}
 
+	/**
+	 * Loads the comic through the use of a BitmapLoaderTask
+	 */
 	public void loadComic() {
 		if (idToLoad != -1) {
 			// The comic ID has been set
@@ -94,16 +113,20 @@ public class ComicStage extends LinearLayout {
 		super.onDetachedFromWindow();
 	}
 
+	/**
+	 * Gets the comic associated with this stage
+	 * @return The comic
+	 */
 	public Comic getComic() {
 		return comic;
 	}
 
+	/**
+	 * Gets the comic ID to load
+	 * @return The ID
+	 */
 	public long getComicIdToLoad() {
 		return idToLoad;
-	}
-
-	public boolean hasLoaded() {
-		return hasLoaded;
 	}
 
 	@Override
@@ -174,7 +197,7 @@ public class ComicStage extends LinearLayout {
 
 		@Override
 		protected void onPostExecute(Bitmap bitmap) {
-			if (bitmap != null && !isCancelled()) {
+			if (bitmap != null) {
 				imageView = (ImageView) findViewById(R.id.image_view);
 				imageView.setImageBitmap(bitmap);
 				if (photoViewAttacher == null) {

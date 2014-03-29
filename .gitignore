@@ -2,4 +2,4 @@
 /local.properties
 /.idea/workspace.xml
 .DS_Store
-/scripts/comics.db
+**/comics.db

@@ -1,6 +1,8 @@
-package net.dean.cyanideviewer.app.api;
+package net.dean.cyanideviewer.app;
 
 import android.os.AsyncTask;
+
+import net.dean.cyanideviewer.app.api.Comic;
 
 /**
  * Represents an background process to get a comic (whether that be from a URL or a file)

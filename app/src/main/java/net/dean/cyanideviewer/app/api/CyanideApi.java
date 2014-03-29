@@ -324,6 +324,9 @@ public class CyanideApi {
 		return firstId;
 	}
 
+	/**
+	 * Initializes firstId and newestId to their appropriate values
+	 */
 	public static void initIdRanges() {
 		// Get the first and last comics available
 

@@ -6,20 +6,40 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import net.dean.cyanideviewer.app.CyanideUtils;
 import net.dean.cyanideviewer.app.CyanideViewer;
 import net.dean.cyanideviewer.app.api.Comic;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implements the Comic data access object interface to provide the availability of CRUD operations
+ * on a database
+ */
 public class ComicDaoImpl implements ComicDao {
+	/**
+	 * The database that will be used to perform CRUD operations on
+	 */
 	private SQLiteDatabase db;
 
-	private static final String TABLE_NAME = "comics";
+	/**
+	 * The name of the table to use
+	 */
+	public static final String TABLE_NAME = "comics";
+
+	/**
+	 * An array of column names.
+	 * [0] => "id"
+	 * [1] => "url"
+	 * [2] => "is_favorite"
+	 */
 	private static final String[] COLUMNS = new String[] {"id", "url", "is_favorite"};
 
+	/**
+	 * Instantiates a new ComicDaoImpl
+	 * @param context The context to use
+	 */
 	public ComicDaoImpl(Context context) {
 		this.db = new ComicDatabaseHelper(context).getWritableDatabase();
 	}
@@ -69,6 +89,7 @@ public class ComicDaoImpl implements ComicDao {
 		return c;
 	}
 
+	@Override
 	public boolean comicExists(long id) {
 		Cursor cursor = db.query(true, TABLE_NAME, COLUMNS, COLUMNS[0] + "=?",
 				new String[] {Long.toString(id)}, null, null, null, null);
@@ -107,17 +128,18 @@ public class ComicDaoImpl implements ComicDao {
 		db.delete(TABLE_NAME, COLUMNS[0] + " = ?", new String[] {Long.toString(c.getId())});
 	}
 
+	/**
+	 * Parses a Comic given a Cursor from the 'comics' table of the database
+	 * @param c A new Comic parsed from the values of the row at which the cursor is pointing
+	 * @return A new comic from a cursor
+	 */
 	private Comic parseComic(Cursor c) {
 		Comic comic = new Comic(-1, null);
 		if (c.isAfterLast()) {
 			return null;
 		}
 		comic.setId(c.getLong(c.getColumnIndex(COLUMNS[0])));
-		try {
-			comic.setUrl(new URL(c.getString(c.getColumnIndex(COLUMNS[1]))));
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
+		comic.setUrl(CyanideUtils.newUrl(c.getString(c.getColumnIndex(COLUMNS[1]))));
 		comic.setFavorite(c.getInt(c.getColumnIndex(COLUMNS[2])) > 0);
 
 		return comic;

@@ -9,9 +9,14 @@ import android.widget.TextView;
 import net.dean.cyanideviewer.app.api.Comic;
 
 /**
- * Created by matthew on 3/23/14.
+ * Represents an item found in the ListView in FavoritesActivity
  */
 public class FavoriteComicListItem extends LinearLayout {
+	/**
+	 * Creates a new instance of FavoriteComicList item and sets the comic to the given one
+	 * @param comic The Comic to use
+	 * @return A new FavoriteComicListItem
+	 */
 	public static FavoriteComicListItem newInstance(Comic comic) {
 		LayoutInflater li = (LayoutInflater) CyanideViewer.getContext()
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -21,17 +26,33 @@ public class FavoriteComicListItem extends LinearLayout {
 		return item;
 	}
 
+	/**
+	 * The Comic this list item represents
+	 */
 	private Comic comic;
 
+	/**
+	 * Instantiates a new FavoriteComicListItem
+	 * @param context The context to use
+	 * @param attrs The attribute set to use
+	 */
 	public FavoriteComicListItem(Context context, AttributeSet attrs) {
 		super(context, attrs);
 	}
 
+	/**
+	 * Sets the comic of this item
+	 * @param comic The comic to use
+	 */
 	public void setComic(Comic comic) {
 		this.comic = comic;
 		((TextView) findViewById(R.id.comic_id)).setText("#" + comic.getId());
 	}
 
+	/**
+	 * Gets the comic represented by this item
+	 * @return The comic
+	 */
 	public Comic getComic() {
 		return comic;
 	}

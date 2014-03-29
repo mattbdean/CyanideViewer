@@ -12,7 +12,6 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ToggleButton;
 
-import net.dean.cyanideviewer.app.api.AbstractComicTask;
 import net.dean.cyanideviewer.app.api.Comic;
 import net.dean.cyanideviewer.app.api.CyanideApi;
 
@@ -59,10 +58,25 @@ public class MainActivity extends FragmentActivity {
 
 			@Override
 			public void onPageSelected(int position) {
-				if (position == 0) { // At the very left
-					new RetrievePreviousComicTask().execute(getCurrentComicId());
+				if (position == 0) {
+					// At the very left
+					new AbstractComicTask<Long>() {
+						@Override
+						protected Comic doInBackground(Long... params) { return CyanideApi.getPrevious(params[0]); }
+
+						@Override
+						protected void onPostExecute(Comic comic) { if (comic != null) pagerAdapter.addView(comic, 0); }
+					}.execute(getCurrentComicId());
+
 				} else if (position == pagerAdapter.getCount() - 1) {
-					new RetrieveNextComicTask().execute(getCurrentComicId());
+					// At the very right
+					new AbstractComicTask<Long>() {
+						@Override
+						protected Comic doInBackground(Long... params) { return CyanideApi.getNext(params[0]); }
+
+						@Override
+						protected void onPostExecute(Comic comic) { if (comic != null) pagerAdapter.addView(comic); }
+					}.execute(getCurrentComicId());
 				}
 
 				// It's been selected, start loading
@@ -85,6 +99,10 @@ public class MainActivity extends FragmentActivity {
 		refreshFavoriteButtonState();
 	}
 
+	/**
+	 * Shows a comic with the given ID to the user
+	 * @param id The ID to use
+	 */
 	public void setComic(final long id) {
 		try {
 			viewPager.setAdapter(null);
@@ -98,11 +116,26 @@ public class MainActivity extends FragmentActivity {
 		}
 	}
 
+	/**
+	 * Refreshes the state of the download button based on if the comic exists on the file system
+	 */
 	public void refreshDownloadButtonState() {
 		boolean hasLocal = CyanideApi.hasLocal(getCurrentComicId());
 		downloadButton.setEnabled(!hasLocal);
 	}
 
+	/**
+	 * Refreshes the state of the favorite button based on whether the database thinks the current
+	 * comic is a favorite or not
+	 */
+	private void refreshFavoriteButtonState() {
+		favoriteButton.setChecked(getCurrentDbComic().isFavorite());
+	}
+
+	/**
+	 * Gets the ID of the comic currently being shown to the user
+	 * @return
+	 */
 	private long getCurrentComicId() {
 		return pagerAdapter.getComicStage(viewPager.getCurrentItem()).getComicIdToLoad();
 	}
@@ -121,12 +154,12 @@ public class MainActivity extends FragmentActivity {
 		refreshFavoriteButtonState();
 	}
 
+	/**
+	 * Gets what the database knows about the current comic being shown to the user
+	 * @return A comic from the database
+	 */
 	private Comic getCurrentDbComic() {
 		return CyanideViewer.getComicDao().getComic(getCurrentComicId());
-	}
-
-	private void refreshFavoriteButtonState() {
-		favoriteButton.setChecked(getCurrentDbComic().isFavorite());
 	}
 
 	/**
@@ -198,31 +231,9 @@ public class MainActivity extends FragmentActivity {
 		}.execute();
 	}
 
-	public class RetrievePreviousComicTask extends AbstractComicTask<Long> {
-
-		@Override
-		protected Comic doInBackground(Long... params) {
-			return CyanideApi.getPrevious(params[0]);
-		}
-
-		@Override
-		protected void onPostExecute(Comic comic) {
-			if (comic != null) pagerAdapter.addView(comic, 0);
-		}
-	}
-
-	private class RetrieveNextComicTask extends AbstractComicTask<Long> {
-		@Override
-		protected Comic doInBackground(Long... params) {
-			return CyanideApi.getNext(params[0]);
-		}
-
-		@Override
-		protected void onPostExecute(Comic comic) {
-			if (comic != null) pagerAdapter.addView(comic);
-		}
-	}
-
+	/**
+	 * This class is used to set the current comic being displayed to the user to a specific comic
+	 */
 	private class SetComicTask extends AsyncTask<Long, Void, Integer> {
 
 		@Override

@@ -6,19 +6,25 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * Created by matthew on 3/19/14.
+ * A collection of utility methods commonly used throughout the application
  */
 public final class CyanideUtils {
 	private CyanideUtils() {
 		// No instances
 	}
 
+	/**
+	 * Instantiates a new URL, handling the MalformedURLException that java.net.URL's constructor
+	 * throws by logging it through Log.e()
+	 * @param href The String representation of the URL
+	 * @return A new URL if it is not malformed, null if it is malformed
+	 */
 	public static URL newUrl(String href) {
 		try {
 			return new URL(href);
 		} catch (MalformedURLException e) {
 			Log.e(CyanideViewer.TAG, "Malformed URL: " + href, e);
+			return null;
 		}
-		return null;
 	}
 }

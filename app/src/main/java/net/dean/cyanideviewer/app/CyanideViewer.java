@@ -17,6 +17,7 @@ public class CyanideViewer extends Application {
 	/** The application context */
 	private static Context context;
 
+	/** The data access object used to interact with the database */
 	private static ComicDaoImpl comicDao;
 
 	@Override

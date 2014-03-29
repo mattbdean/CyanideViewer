@@ -7,6 +7,7 @@ import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import net.dean.cyanideviewer.app.CyanideUtils;
 import net.dean.cyanideviewer.app.CyanideViewer;
 
 import org.apache.commons.io.FileUtils;
@@ -14,7 +15,6 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -27,6 +27,7 @@ public class Comic implements Parcelable {
 	/** The URL of the comic's image */
 	private URL url;
 
+	/** Whether this comic is a favorite of the user's */
 	private boolean isFavorite;
 
 	/**
@@ -56,12 +57,7 @@ public class Comic implements Parcelable {
 	 */
 	public Comic(Parcel in) {
 		this.id = in.readLong();
-		String urlString = in.readString();
-		try {
-			this.url = new URL(urlString);
-		} catch (MalformedURLException e) {
-			Log.e(CyanideViewer.TAG, "Malformed URL while creating Parcelable Comic: " + urlString, e);
-		}
+		this.url = CyanideUtils.newUrl(in.readString());
 	}
 
 	/** Gets the URL */
@@ -90,10 +86,15 @@ public class Comic implements Parcelable {
 		this.id = id;
 	}
 
+	/** Gets whether or not this comic is a favorite */
 	public boolean isFavorite() {
 		return isFavorite;
 	}
 
+	/**
+	 * Sets whether or not this comic is a favorite of the user's
+	 * @param isFavorite If the comic is a favorite
+	 */
 	public void setFavorite(boolean isFavorite) {
 		this.isFavorite = isFavorite;
 	}

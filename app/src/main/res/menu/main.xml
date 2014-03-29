@@ -4,7 +4,9 @@
 
     <item android:id="@+id/menu_favorites"
           android:title="@string/menu_favorites"
-          android:orderInCategory="10"/>
+          android:icon="@drawable/ic_action_favorite"
+          android:orderInCategory="10"
+          android:showAsAction="ifRoom"/>
 
     <item android:id="@+id/action_settings"
         android:title="@string/menu_settings"

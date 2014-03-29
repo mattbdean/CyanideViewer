@@ -42,10 +42,10 @@ public class CyanideApi {
 	public static final String BASE_URL = "http://explosm.net/comics/";
 
 	/** The ID of the very first publicly available C&H comic */
-	public static long firstId;
+	private static long firstId;
 
 	/** The ID of the newest C&H comic */
-	public static long newestId;
+	private static long newestId;
 
 	/** The HttpClient that will be used to host requests */
 	private static HttpClient client = new DefaultHttpClient();
@@ -307,6 +307,20 @@ public class CyanideApi {
 		}
 
 		return c;
+	}
+
+	/**
+	 * Gets the ID of the newest C&H comic
+	 */
+	public static long getNewestId() {
+		return newestId;
+	}
+
+	/**
+	 * Gets the ID of the very first C&H comic
+	 */
+	public static long getFirstId() {
+		return firstId;
 	}
 
 	public static void initIdRanges() {

@@ -79,7 +79,7 @@ public class MainActivity extends FragmentActivity {
 			}
 		});
 
-		setComic(CyanideApi.newestId);
+		setComic(CyanideApi.getNewestId());
 		viewPager.setCurrentItem(pagerAdapter.getCount() - 1);
 
 		// Refresh button states

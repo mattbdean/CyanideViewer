@@ -123,7 +123,6 @@ public class ComicStage extends LinearLayout {
 
 		@Override
 		protected void onPreExecute() {
-			// TODO Show indeterminate progress bar/circle
 			TextView tv = (TextView) findViewById(R.id.comic_id);
 			tv.setText("#" + idToLoad);
 		}

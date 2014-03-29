@@ -55,8 +55,7 @@ public class MainActivity extends FragmentActivity {
 
 		viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 			@Override
-			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-			}
+			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { }
 
 			@Override
 			public void onPageSelected(int position) {
@@ -75,8 +74,7 @@ public class MainActivity extends FragmentActivity {
 			}
 
 			@Override
-			public void onPageScrollStateChanged(int state) {
-			}
+			public void onPageScrollStateChanged(int state) { }
 		});
 
 		setComic(CyanideApi.getNewestId());
@@ -152,7 +150,6 @@ public class MainActivity extends FragmentActivity {
 				return true;
 			case R.id.menu_favorites:
 				startActivityForResult(new Intent(this, FavoritesActivity.class), 0);
-				// TODO Show the favorites list view
 				return true;
 		}
 

@@ -184,7 +184,18 @@ public class MainActivity extends FragmentActivity {
 	 * @param v The view that contained the 'Random' button
 	 */
 	public void onRandomClicked(View v) {
-		//new RetrieveRandomComicTask().execute();
+		new AbstractComicTask<Void>() {
+
+			@Override
+			protected Comic doInBackground(Void... params) {
+				return CyanideApi.getRandom();
+			}
+
+			@Override
+			protected void onPostExecute(Comic comic) {
+				setComic(comic.getId());
+			}
+		}.execute();
 	}
 
 	public class RetrievePreviousComicTask extends AbstractComicTask<Long> {

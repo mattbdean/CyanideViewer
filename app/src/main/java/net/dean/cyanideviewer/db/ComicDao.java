@@ -52,4 +52,9 @@ public interface ComicDao {
 	 * @param c The comic to use
 	 */
 	public void deleteComic(Comic c);
+
+	/**
+	 * Deletes all comics from the database
+	 */
+	public void deleteAllComics();
 }

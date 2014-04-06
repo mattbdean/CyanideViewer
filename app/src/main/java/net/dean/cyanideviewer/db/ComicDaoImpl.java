@@ -144,4 +144,11 @@ public class ComicDaoImpl implements ComicDao {
 
 		return comic;
 	}
+
+	@Override
+	public void deleteAllComics() {
+		// http://stackoverflow.com/a/6835115
+		db.execSQL("DELETE FROM " + TABLE_NAME);
+		db.execSQL("VACUUM");
+	}
 }

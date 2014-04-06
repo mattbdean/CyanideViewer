@@ -24,6 +24,11 @@
             android:name="net.dean.cyanideviewer.FavoritesActivity"
             android:label="@string/title_activity_favorites" >
         </activity>
+        <activity
+            android:name="net.dean.cyanideviewer.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:configChanges="keyboardHidden|orientation|screenSize">
+        </activity>
     </application>
 
 </manifest>

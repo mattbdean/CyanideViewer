@@ -180,6 +180,7 @@ public class MainActivity extends FragmentActivity {
 		switch (id) {
 			case R.id.action_settings:
 				// Show settings
+				startActivity(new Intent(this, SettingsActivity.class));
 				return true;
 			case R.id.menu_favorites:
 				startActivityForResult(new Intent(this, FavoritesActivity.class), 0);

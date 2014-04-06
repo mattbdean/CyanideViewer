@@ -8,7 +8,6 @@ import android.util.Log;
 
 import net.dean.cyanideviewer.CyanideUtils;
 import net.dean.cyanideviewer.CyanideViewer;
-import net.dean.cyanideviewer.R;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpHost;
@@ -50,8 +49,8 @@ public class CyanideApi {
 	private static HttpClient client = new DefaultHttpClient();
 
 	/** The directory that this app will download comics to. Sample value: "/sdcard/CyanideViewer/" */
-	public static final File IMAGE_DIR = new File(Environment.getExternalStorageDirectory(),
-			CyanideViewer.getContext().getResources().getString(R.string.app_name));
+	public static final File IMAGE_DIR = new File(Environment.getExternalStorageDirectory(), "CyanideViewer");
+
 
 	private CyanideApi() {
 		// Prevent instances
@@ -251,7 +250,7 @@ public class CyanideApi {
 	 */
 	private static File getLocalComic(long id) {
 
-		if (!(IMAGE_DIR.mkdir() || IMAGE_DIR.isDirectory())) {
+		if (!IMAGE_DIR.mkdir()) {
 			// Prevent IllegalArgumentException by making sure this location is a directory
 			Log.e(CyanideViewer.TAG, "Unable to crate the directory " + IMAGE_DIR.getAbsolutePath() +
 					". Does it exist as a file?");

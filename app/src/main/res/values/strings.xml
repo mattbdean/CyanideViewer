@@ -2,8 +2,42 @@
 <resources>
 
     <string name="app_name">Cyanide Viewer</string>
+
+    <!-- Menus -->
     <string name="menu_settings">Settings</string>
     <string name="menu_favorites">Favorites</string>
+
+    <!-- Activities -->
     <string name="title_activity_favorites">Favorites</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Preferences - Basic -->
+    <string name="pref_basic_settings_title">Basic</string>
+    <string name="pref_preserve_data_usage">Preserve data usage</string>
+    <string name="pref_preserve_data_usage_summary">
+        Downloads every comic you view, reducing data usage. This may, however, take up more storage
+        space on your phone
+    </string>
+    <string name="pref_night_mode">Night mode</string>
+    <string name="pref_night_mode_summary">
+        Change the main colors of the app to make it easier
+        to read during the night
+    </string>
+    <string name="pref_save_ext_sdcard">Use external SD card</string>
+    <string name="pref_save_ext_sdcard_summary">
+        External SD cards usually contain more storage space, so by keeping
+        your downloaded comics on here, you leave more space for other apps and games
+    </string>
+
+    <!-- Preferences - Advanced -->
+    <string name="pref_advanced_settings_title">Advanced</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="pref_delete_comics">Delete downloaded comics</string>
+    <string name="pref_delete_comics_summary">Deletes all the comics that you\'ve downloaded</string>
+    <string name="pref_delete_comic_icons">Delete comic icons</string>
+    <string name="pref_delete_comic_icons_summary">Delete comic icons</string>
+    <string name="pref_wipe_db">Wipe database</string>
+    <string name="pref_wipe_db_summary">Clears everything this app knows about the C&amp;H comics you\'ve seen</string>
 
 </resources>

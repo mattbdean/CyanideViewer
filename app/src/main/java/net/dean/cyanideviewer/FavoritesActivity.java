@@ -3,6 +3,7 @@ package net.dean.cyanideviewer;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,7 +32,12 @@ public class FavoritesActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_favorites);
 
-		ArrayList<Comic> comics = CyanideViewer.getComicDao().getFavoriteComics();
+		ArrayList<Parcelable> comicsData = getIntent().getParcelableArrayListExtra("comics");
+		ArrayList<Comic> comics = new ArrayList<>(comicsData.size());
+		for (Parcelable p : comicsData) {
+			comics.add((Comic) p);
+		}
+
 		this.adapter = new FavoritesAdapter(comics);
 		ListView listView = (ListView) findViewById(R.id.favorites_list);
 		listView.setAdapter(adapter);

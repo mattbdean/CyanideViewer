@@ -10,11 +10,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import net.dean.cyanideviewer.api.Comic;
 import net.dean.cyanideviewer.api.CyanideApi;
 
+import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -92,9 +94,6 @@ public class MainActivity extends FragmentActivity {
 						}
 					}.execute(getCurrentComicId());
 				}
-
-//				// It's been selected, start loading
-//				pagerAdapter.getComicStage(position).loadComic();
 
 				// Refresh button states
 				refreshDownloadButtonState();
@@ -197,7 +196,17 @@ public class MainActivity extends FragmentActivity {
 				startActivity(new Intent(this, SettingsActivity.class));
 				return true;
 			case R.id.menu_favorites:
-				startActivityForResult(new Intent(this, FavoritesActivity.class), 0);
+				ArrayList<Comic> comics = CyanideViewer.getComicDao().getFavoriteComics();
+				if (comics.isEmpty()) {
+					// Show a Toast instead of showing an empty activity
+					Toast.makeText(getApplicationContext(), "You don\'t have any favorites yet!",
+							Toast.LENGTH_SHORT).show();
+				} else {
+					Intent intent = new Intent(this, FavoritesActivity.class);
+					intent.putExtra("comics", comics);
+					startActivityForResult(intent, 0);
+				}
+
 				return true;
 		}
 

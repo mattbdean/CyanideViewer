@@ -52,20 +52,28 @@ public class MainActivity extends FragmentActivity {
 		this.favoriteButton = (ToggleButton) findViewById(R.id.action_favorite);
 		this.downloadButton = (ImageButton) findViewById(R.id.download);
 
+		int lastIndex;
 		viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 			@Override
 			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { }
 
 			@Override
-			public void onPageSelected(int position) {
+			public void onPageSelected(final int position) {
+
 				if (position == 0) {
 					// At the very left
 					new AbstractComicTask<Long>() {
 						@Override
-						protected Comic doInBackground(Long... params) { return CyanideApi.getPrevious(params[0]); }
+						protected Comic doInBackground(Long... params) {
+							return CyanideApi.getPrevious(params[0]); }
 
 						@Override
-						protected void onPostExecute(Comic comic) { if (comic != null) pagerAdapter.addView(comic, 0); }
+						protected void onPostExecute(Comic comic) {
+							if (comic != null) {
+								int index = pagerAdapter.addView(comic, 0);
+								pagerAdapter.getComicStage(index).loadComic();
+							}
+						}
 					}.execute(getCurrentComicId());
 
 				} else if (position == pagerAdapter.getCount() - 1) {
@@ -75,12 +83,18 @@ public class MainActivity extends FragmentActivity {
 						protected Comic doInBackground(Long... params) { return CyanideApi.getNext(params[0]); }
 
 						@Override
-						protected void onPostExecute(Comic comic) { if (comic != null) pagerAdapter.addView(comic); }
+						protected void onPostExecute(Comic comic) {
+							if (comic != null) {
+								int index = pagerAdapter.addView(comic);
+								pagerAdapter.getComicStage(index).loadComic();
+							}
+
+						}
 					}.execute(getCurrentComicId());
 				}
 
-				// It's been selected, start loading
-				pagerAdapter.getComicStage(position).loadComic();
+//				// It's been selected, start loading
+//				pagerAdapter.getComicStage(position).loadComic();
 
 				// Refresh button states
 				refreshDownloadButtonState();

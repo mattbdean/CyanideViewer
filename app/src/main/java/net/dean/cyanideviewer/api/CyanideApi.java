@@ -250,10 +250,13 @@ public class CyanideApi {
 	 */
 	private static File getLocalComic(long id) {
 
-		if (!IMAGE_DIR.mkdir()) {
-			// Prevent IllegalArgumentException by making sure this location is a directory
-			Log.e(CyanideViewer.TAG, "Unable to crate the directory " + IMAGE_DIR.getAbsolutePath() +
-					". Does it exist as a file?");
+		if (!IMAGE_DIR.isDirectory()) {
+			if (!IMAGE_DIR.mkdirs()) {
+				// Prevent IllegalArgumentException by making sure this location is a directory
+				Log.e(CyanideViewer.TAG, "Unable to create the directory " + IMAGE_DIR.getAbsolutePath() +
+						". Does it exist as a file?");
+			}
+
 		}
 		List<File> files = new ArrayList<>(FileUtils.listFiles(IMAGE_DIR,
 				new String[] {"jpg", "jpeg", "png", "gif"}, false));

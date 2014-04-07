@@ -58,6 +58,7 @@ public class Comic implements Parcelable {
 	public Comic(Parcel in) {
 		this.id = in.readLong();
 		this.url = CyanideUtils.newUrl(in.readString());
+		this.isFavorite = in.readByte() != 0;
 	}
 
 	/** Gets the URL */
@@ -109,6 +110,7 @@ public class Comic implements Parcelable {
 	public void writeToParcel(Parcel dest, int flags) {
 		dest.writeLong(id);
 		dest.writeString(url.toExternalForm());
+		dest.writeByte((byte) (isFavorite ? 1 : 0));
 	}
 
 	/** The Creator used to create Comics using Parcels */
@@ -135,7 +137,7 @@ public class Comic implements Parcelable {
 
 	/**
 	 * Tries to download this comic to the local file system. Will download to
-	 * "/sdard/Cyanide Viewer/$id.$extension
+	 * "/sdcard/Cyanide Viewer/$id.$extension
 	 * @return Whether or not the download succeeded.
 	 * @param downloadButton
 	 */

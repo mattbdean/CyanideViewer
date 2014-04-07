@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">Cyanide Viewer</string>
 
     <!-- Menus -->
@@ -38,7 +37,7 @@
         Deletes all the comics that you\'ve downloaded. This process cannot be undone.
     </string>
     <string name="pref_delete_comic_icons">Delete comic icons</string>
-    <string name="pref_delete_comic_icons_summary">Delete comic icons</string>
+    <string name="pref_delete_comic_icons_summary">(not yet implemented)</string>
     <string name="pref_wipe_db">Wipe database</string>
     <string name="pref_wipe_db_summary">
         Clears everything this app knows about the C&amp;H comics you\'ve seen. This process can not

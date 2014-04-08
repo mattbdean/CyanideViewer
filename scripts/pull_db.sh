@@ -13,7 +13,7 @@ if adb pull $ANDROID_LOCATION $DIR/$DB_NAME; then
 
 	if command -v $PREFERRED_BROWSER 2>/dev/null; then
 		# SQLiteBrowser exists, use it
-        $PREFERRED_BROWSER $DIR/$DB_NAME
+		$PREFERRED_BROWSER $DIR/$DB_NAME
     elif command -v sqlite3 2>/dev/null; then
     	# Use the command line instead
         sqlite3 $DIR/$DB_NAME

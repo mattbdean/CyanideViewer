@@ -54,7 +54,6 @@ public class MainActivity extends FragmentActivity {
 		this.favoriteButton = (ToggleButton) findViewById(R.id.action_favorite);
 		this.downloadButton = (ImageButton) findViewById(R.id.download);
 
-		int lastIndex;
 		viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 			@Override
 			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { }
@@ -67,7 +66,7 @@ public class MainActivity extends FragmentActivity {
 					new AbstractComicTask<Long>() {
 						@Override
 						protected Comic doInBackground(Long... params) {
-							return CyanideApi.getPrevious(params[0]); }
+							return CyanideApi.instance().getPrevious(params[0]); }
 
 						@Override
 						protected void onPostExecute(Comic comic) {
@@ -82,7 +81,7 @@ public class MainActivity extends FragmentActivity {
 					// At the very right
 					new AbstractComicTask<Long>() {
 						@Override
-						protected Comic doInBackground(Long... params) { return CyanideApi.getNext(params[0]); }
+						protected Comic doInBackground(Long... params) { return CyanideApi.instance().getNext(params[0]); }
 
 						@Override
 						protected void onPostExecute(Comic comic) {
@@ -104,7 +103,7 @@ public class MainActivity extends FragmentActivity {
 			public void onPageScrollStateChanged(int state) { }
 		});
 
-		setComic(CyanideApi.getNewestId());
+		setComic(CyanideApi.instance().getNewestId());
 		viewPager.setCurrentItem(pagerAdapter.getCount() - 1);
 
 		// Refresh button states
@@ -133,7 +132,7 @@ public class MainActivity extends FragmentActivity {
 	 * Refreshes the state of the download button based on if the comic exists on the file system
 	 */
 	public void refreshDownloadButtonState() {
-		boolean hasLocal = CyanideApi.hasLocal(getCurrentComicId());
+		boolean hasLocal = CyanideApi.instance().hasLocalComic(getCurrentComicId());
 		downloadButton.setEnabled(!hasLocal);
 	}
 
@@ -245,7 +244,7 @@ public class MainActivity extends FragmentActivity {
 
 			@Override
 			protected Comic doInBackground(Void... params) {
-				return CyanideApi.getRandom();
+				return CyanideApi.instance().getRandom();
 			}
 
 			@Override
@@ -265,8 +264,8 @@ public class MainActivity extends FragmentActivity {
 			long id = params[0];
 
 			int curComicPagerIndex = -1;
-			Comic prevComic = CyanideApi.getPrevious(id);
-			Comic nextComic = CyanideApi.getNext(id);
+			Comic prevComic = CyanideApi.instance().getPrevious(id);
+			Comic nextComic = CyanideApi.instance().getNext(id);
 
 			// Reuse all the views to be more efficient
 			if (pagerAdapter.getCount() != 0) {
@@ -284,13 +283,13 @@ public class MainActivity extends FragmentActivity {
 				// From the midway to the beginning
 				for (int i = midway - 1; i >= 0; i--) {
 					pagerAdapter.getComicStage(i).setComic(prevComic.getId());
-					prevComic = CyanideApi.getPrevious(prevComic.getId());
+					prevComic = CyanideApi.instance().getPrevious(prevComic.getId());
 				}
 
 				// From the midway to the end
 				for (int i = midway + 1; i < pagerAdapter.getCount(); i++) {
 					pagerAdapter.getComicStage(i).setComic(nextComic.getId());
-					nextComic = CyanideApi.getNext(nextComic.getId());
+					nextComic = CyanideApi.instance().getNext(nextComic.getId());
 				}
 			} else {
 				// First time setup
@@ -299,7 +298,7 @@ public class MainActivity extends FragmentActivity {
 					pagerAdapter.addView(prevComic);
 				}
 				// Current comic
-				curComicPagerIndex = pagerAdapter.addView(CyanideApi.getComic(id));
+				curComicPagerIndex = pagerAdapter.addView(CyanideApi.instance().getComic(id));
 				pagerAdapter.getComicStage(curComicPagerIndex).loadComic();
 
 				if (nextComic != null) {

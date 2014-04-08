@@ -104,13 +104,13 @@ public class Comic implements Parcelable {
 
 				String urlString = getUrl().toExternalForm();
 				String ext = urlString.substring(urlString.lastIndexOf('.'));
-				File dest = new File(CyanideApi.IMAGE_DIR, getId() + ext);
+				File dest = new File(CyanideApi.instance().getSavedImageDirectory(), getId() + ext);
 
 				try {
 					// "/sdcard/CyanideViewer"
-					if (!(CyanideApi.IMAGE_DIR.mkdirs() || CyanideApi.IMAGE_DIR.isDirectory())) {
+					if (!(CyanideApi.instance().getSavedImageDirectory().mkdirs() || CyanideApi.instance().getSavedImageDirectory().isDirectory())) {
 						// The image dir is not a directory or there was an error creating the folder
-						Log.e(CyanideViewer.TAG, "Error while creating " + CyanideApi.IMAGE_DIR.getAbsolutePath()
+						Log.e(CyanideViewer.TAG, "Error while creating " + CyanideApi.instance().getSavedImageDirectory().getAbsolutePath()
 								+ ". Is it not a directory?");
 					}
 					if (!dest.exists()) {
@@ -266,7 +266,7 @@ public class Comic implements Parcelable {
 
 		@Override
 		protected Bitmap doInBackground(Long... params) {
-			Comic c = CyanideApi.getComic(params[0]);
+			Comic c = CyanideApi.instance().getComic(params[0]);
 
 			// Adapted from http://stackoverflow.com/a/6621552/1275092
 

@@ -89,7 +89,7 @@ public class ComicStage extends LinearLayout {
 
 				@Override
 				protected Comic doInBackground(Long... params) {
-					return CyanideApi.getComic(params[0]);
+					return CyanideApi.instance().getComic(params[0]);
 				}
 
 				@Override

@@ -15,7 +15,7 @@ public enum SpecialSelection {
 	private String url;
 
 	private SpecialSelection(String urlAppendage) {
-		this.url = CyanideApi.BASE_URL + urlAppendage;
+		this.url = CyanideApi.instance().getBaseUrl() + urlAppendage;
 	}
 
 	/**

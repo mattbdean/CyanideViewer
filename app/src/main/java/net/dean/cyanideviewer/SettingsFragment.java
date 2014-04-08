@@ -105,7 +105,7 @@ public class SettingsFragment extends PreferenceFragment {
 			@Override
 			protected Number[] doInBackground(Void... params) {
 				// Get a list of files
-				List<File> potentialFiles = new ArrayList<>(FileUtils.listFiles(CyanideApi.IMAGE_DIR,
+				List<File> potentialFiles = new ArrayList<>(FileUtils.listFiles(CyanideApi.instance().getSavedImageDirectory(),
 						new String[]{"jpg", "jpeg", "png", "gif"}, false));
 
 				List<File> comicFiles = new ArrayList<>();

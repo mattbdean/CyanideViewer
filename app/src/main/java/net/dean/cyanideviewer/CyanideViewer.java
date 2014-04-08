@@ -4,7 +4,6 @@ import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
-import net.dean.cyanideviewer.api.CyanideApi;
 import net.dean.cyanideviewer.db.ComicDaoImpl;
 
 /**
@@ -26,7 +25,6 @@ public class CyanideViewer extends Application {
 		Log.i(TAG, "Starting application");
 		CyanideViewer.context = getApplicationContext();
 		CyanideViewer.comicDao = new ComicDaoImpl(context);
-		CyanideApi.initIdRanges();
 	}
 
 	/** Returns this application's context */

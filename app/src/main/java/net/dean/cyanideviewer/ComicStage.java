@@ -1,9 +1,6 @@
 package net.dean.cyanideviewer;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,18 +10,6 @@ import android.widget.TextView;
 
 import net.dean.cyanideviewer.api.Comic;
 import net.dean.cyanideviewer.api.CyanideApi;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.net.URLDecoder;
 
 import uk.co.senab.photoview.PhotoViewAttacher;
 
@@ -100,9 +85,22 @@ public class ComicStage extends LinearLayout {
 	 */
 	public void loadComic() {
 		if (idToLoad != -1) {
-			// The comic ID has been set
-			new BitmapLoaderTask().execute(idToLoad);
-			hasLoaded = true;
+			new AbstractComicTask<Long>() {
+
+				@Override
+				protected Comic doInBackground(Long... params) {
+					return CyanideApi.getComic(params[0]);
+				}
+
+				@Override
+				protected void onPostExecute(Comic comic) {
+					if (comic != null) {
+						comic.loadBitmap(ComicStage.this);
+						hasLoaded = true;
+						ComicStage.this.comic = comic;
+					}
+				}
+			}.execute(idToLoad);
 		}
 	}
 
@@ -141,75 +139,5 @@ public class ComicStage extends LinearLayout {
 		return sb.toString();
 	}
 
-	/** Represents the task of loading a Comic's URL into a Bitmap usable by an ImageView */
-	public class BitmapLoaderTask extends AsyncTask<Long, Void, Bitmap> {
 
-		@Override
-		protected void onPreExecute() {
-			TextView tv = (TextView) findViewById(R.id.comic_id);
-			tv.setText("#" + idToLoad);
-		}
-
-		@Override
-		protected Bitmap doInBackground(Long... params) {
-			Comic c = CyanideApi.getComic(params[0]);
-			comic = c;
-
-			// Adapted from http://stackoverflow.com/a/6621552/1275092
-
-			try {
-				if (c.getUrl().getProtocol().equals("file")) {
-					// Local file, no need to make any HTTP requests
-					return BitmapFactory.decodeFile(URLDecoder.decode(c.getUrl().getPath(), "UTF-8"));
-				}
-
-				HttpClient client = new DefaultHttpClient();
-				HttpGet request = new HttpGet(c.getUrl().toURI());
-				HttpResponse response = client.execute(request);
-				if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-					Log.w(CyanideViewer.TAG, "Failed to fetch comic at " + c.getUrl().toExternalForm());
-					return null;
-				}
-				HttpEntity entity = response.getEntity();
-				if (entity != null) {
-					InputStream is = null;
-					try {
-						is = entity.getContent();
-						return BitmapFactory.decodeStream(is);
-					} finally {
-						if (is != null) {
-							is.close();
-						}
-						entity.consumeContent();
-					}
-				}
-
-			} catch (URISyntaxException e) {
-				Log.e(CyanideViewer.TAG, "URISyntaxException: " + c.getUrl(), e);
-				return null;
-			} catch (IOException e) {
-				Log.e(CyanideViewer.TAG, "IOException while trying to decode the image from URL " + c.getUrl(), e);
-				return null;
-			}
-
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Bitmap bitmap) {
-			if (bitmap != null) {
-				imageView = (ImageView) findViewById(R.id.image_view);
-				imageView.setImageBitmap(bitmap);
-				if (photoViewAttacher == null) {
-					photoViewAttacher = new PhotoViewAttacher(imageView);
-				} else {
-					photoViewAttacher.update();
-				}
-//				ProgressBar pb = (ProgressBar) findViewById(R.id.progress_bar);
-//				// Remove the progress bar once the image is done loading
-//				RelativeLayout layout = (RelativeLayout) pb.getParent();
-//				layout.removeView(pb);
-			}
-		}
-	}
 }

@@ -131,6 +131,7 @@ public class CyanideApi {
 			Log.w(CyanideViewer.TAG, "Could not find the comic's image for #" + id);
 		} catch (IOException e) {
 			Log.e(CyanideViewer.TAG, "IOException while testing if comic #" + id + " was a comic page or not", e);
+			// TODO Error recovery. Notify the user somehow. Maybe a 'retry' button?
 		}
 
 		return null;

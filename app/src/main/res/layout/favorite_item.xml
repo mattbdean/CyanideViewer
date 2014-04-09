@@ -7,14 +7,26 @@
     android:layout_width="match_parent"
     android:layout_height="48dp">
 
-    <ImageView
-        android:id="@+id/favorite_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_launcher"
-        android:maxWidth="32dp"
-        android:maxHeight="32dp"
-        android:padding="@dimen/item_padding"/>
+    <RelativeLayout
+        android:layout_width="48dp"
+        android:layout_height="48dp">
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminateOnly="true"
+            android:indeterminate="true"
+            android:layout_alignParentLeft="true"/>
+
+        <ImageView
+            android:id="@+id/favorite_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxWidth="32dp"
+            android:maxHeight="32dp"
+            android:padding="@dimen/item_padding"/>
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/comic_id"

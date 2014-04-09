@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 import net.dean.cyanideviewer.ComicStage;
 import net.dean.cyanideviewer.CyanideUtils;
 import net.dean.cyanideviewer.CyanideViewer;
+import net.dean.cyanideviewer.FavoriteComicListItem;
 import net.dean.cyanideviewer.R;
 
 import org.apache.http.HttpEntity;
@@ -92,7 +94,11 @@ public class Comic implements Parcelable {
 	}
 
 	public void loadBitmap(ComicStage target) {
-		new BitmapLoaderTask(target).execute(id);
+		new BitmapLoaderTask(target).execute();
+	}
+
+	public void loadIcon(FavoriteComicListItem item) {
+		new IconLoaderTask(item).execute();
 	}
 
 	public void download(final ImageButton downloadButton) {
@@ -104,7 +110,6 @@ public class Comic implements Parcelable {
 	 * "/sdcard/Cyanide Viewer/$id.$extension
 	 *
 	 * @param downloadButton
-	 * @return Whether or not the download succeeded.
 	 */
 	public void download(final Bitmap bitmap, final ImageButton downloadButton) {
 		new AsyncTask<Void, Void, Boolean>() {
@@ -270,21 +275,19 @@ public class Comic implements Parcelable {
 
 		@Override
 		protected Bitmap doInBackground(Long... params) {
-			Comic c = CyanideApi.instance().getComic(params[0]);
-
 			// Adapted from http://stackoverflow.com/a/6621552/1275092
 
 			try {
-				if (c.getUrl().getProtocol().equals("file")) {
+				if (url.getProtocol().equals("file")) {
 					// Local file, no need to make any HTTP requests
-					return BitmapFactory.decodeFile(URLDecoder.decode(c.getUrl().getPath(), "UTF-8"));
+					return BitmapFactory.decodeFile(URLDecoder.decode(url.getPath(), "UTF-8"));
 				}
 
 				HttpClient client = new DefaultHttpClient();
-				HttpGet request = new HttpGet(c.getUrl().toURI());
+				HttpGet request = new HttpGet(url.toURI());
 				HttpResponse response = client.execute(request);
 				if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-					Log.w(CyanideViewer.TAG, "Failed to fetch comic at " + c.getUrl().toExternalForm());
+					Log.w(CyanideViewer.TAG, "Failed to fetch comic at " + url.toExternalForm());
 					return null;
 				}
 				HttpEntity entity = response.getEntity();
@@ -302,10 +305,10 @@ public class Comic implements Parcelable {
 				}
 
 			} catch (URISyntaxException e) {
-				Log.e(CyanideViewer.TAG, "URISyntaxException: " + c.getUrl(), e);
+				Log.e(CyanideViewer.TAG, "URISyntaxException: " + url, e);
 				return null;
 			} catch (IOException e) {
-				Log.e(CyanideViewer.TAG, "IOException while trying to decode the image from URL " + c.getUrl(), e);
+				Log.e(CyanideViewer.TAG, "IOException while trying to decode the image from URL " + url, e);
 				return null;
 			}
 
@@ -320,6 +323,39 @@ public class Comic implements Parcelable {
 				ImageView imageView = (ImageView) stage.findViewById(R.id.image_view);
 				imageView.setImageBitmap(bitmap);
 				new PhotoViewAttacher(imageView);
+			}
+		}
+	}
+
+	private class IconLoaderTask extends AsyncTask<Void, Void, Bitmap> {
+		private FavoriteComicListItem item;
+
+		public IconLoaderTask(FavoriteComicListItem item) {
+			this.item = item;
+		}
+
+		@Override
+		protected Bitmap doInBackground(Void... params) {
+			File iconFile = new File(CyanideApi.instance().getSavedIconDirectory(), generateFileName());
+			if (!iconFile.isFile()) {
+				return null;
+			}
+
+			return BitmapFactory.decodeFile(iconFile.getAbsolutePath());
+		}
+
+		@Override
+		protected void onPostExecute(Bitmap bitmap) {
+			// Hide the progress bar
+			item.findViewById(R.id.progress_bar).setVisibility(View.INVISIBLE);
+			ImageView favoriteIcon = (ImageView) item.findViewById(R.id.favorite_icon);
+
+			if (bitmap != null) {
+				// Bitmap was found and loaded
+				favoriteIcon.setImageBitmap(bitmap);
+			} else {
+				// There was a problem
+				favoriteIcon.setImageResource(R.drawable.ic_action_error);
 			}
 		}
 	}

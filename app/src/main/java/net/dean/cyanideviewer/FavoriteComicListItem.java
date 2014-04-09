@@ -23,6 +23,7 @@ public class FavoriteComicListItem extends LinearLayout {
 
 		FavoriteComicListItem item = (FavoriteComicListItem) li.inflate(R.layout.favorite_item, null);
 		item.setComic(comic);
+		item.getComic().loadIcon(item);
 		return item;
 	}
 

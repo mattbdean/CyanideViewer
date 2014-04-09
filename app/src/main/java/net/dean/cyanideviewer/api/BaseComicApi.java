@@ -26,6 +26,7 @@ public abstract class BaseComicApi implements ComicApi {
 	// Since getSavedImageDirectory() is called a lot, create one instance of the image directory
 	// to speed things up, since it relies on a potentially expensive call (Environment.getExternalStorageDirectory())
 	private static final File IMAGE_DIR = new File(Environment.getExternalStorageDirectory(), "CyanideViewer");
+	private static final File ICON_DIR = new File(IMAGE_DIR, "icons");
 
 	/** The HttpClient that will be used to host requests */
 	protected HttpClient client;
@@ -82,5 +83,10 @@ public abstract class BaseComicApi implements ComicApi {
 	@Override
 	public File getSavedImageDirectory() {
 		return IMAGE_DIR;
+	}
+
+	@Override
+	public File getSavedIconDirectory() {
+		return ICON_DIR;
 	}
 }

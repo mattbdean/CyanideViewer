@@ -15,6 +15,9 @@ public interface ComicApi {
 	/** Gets the directory that this app will download comics to. Sample value: "/sdcard/CyanideViewer/" */
 	public File getSavedImageDirectory();
 
+	/** Gets the directory that this app will download comic icons to. */
+	public File getSavedIconDirectory();
+
 	/**
 	 * Parses an ID from a URL. For example, http://explosm.net/comics/1234 would return 1234.
 	 * @param url The URL to parse

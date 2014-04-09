@@ -38,20 +38,29 @@ import uk.co.senab.photoview.PhotoViewAttacher;
  * Represents an Cyanide and Happiness comic.
  */
 public class Comic implements Parcelable {
-	/** The ID of the comic. */
+	public static final int ICON_DIMENS = 144;
+
+	/**
+	 * The ID of the comic.
+	 */
 	private long id;
 
-	/** The URL of the comic's image */
+	/**
+	 * The URL of the comic's image
+	 */
 	private URL url;
 
-	/** Whether this comic is a favorite of the user's */
+	/**
+	 * Whether this comic is a favorite of the user's
+	 */
 	private boolean isFavorite;
 
 	private Bitmap bitmap;
 
 	/**
 	 * Instantiates a new Comic assuming the comic is not a favorite
-	 * @param id The ID of the comic
+	 *
+	 * @param id  The ID of the comic
 	 * @param url The URL of the comic's image
 	 */
 	public Comic(long id, URL url) {
@@ -60,8 +69,9 @@ public class Comic implements Parcelable {
 
 	/**
 	 * Instantiates a new Comic
-	 * @param id The ID of the comic
-	 * @param url The URL of the comic's image
+	 *
+	 * @param id         The ID of the comic
+	 * @param url        The URL of the comic's image
 	 * @param isFavorite If this comic is one of the user's favorites
 	 */
 	public Comic(long id, URL url, boolean isFavorite) {
@@ -72,6 +82,7 @@ public class Comic implements Parcelable {
 
 	/**
 	 * Instanties a new Comic with a Parcel.
+	 *
 	 * @param in A Parcel created by {@link #CREATOR}
 	 */
 	public Comic(Parcel in) {
@@ -84,13 +95,18 @@ public class Comic implements Parcelable {
 		new BitmapLoaderTask(target).execute(id);
 	}
 
+	public void download(final ImageButton downloadButton) {
+		download(bitmap, downloadButton);
+	}
+
 	/**
 	 * Tries to download this comic to the local file system. Will download to
 	 * "/sdcard/Cyanide Viewer/$id.$extension
-	 * @return Whether or not the download succeeded.
+	 *
 	 * @param downloadButton
+	 * @return Whether or not the download succeeded.
 	 */
-	public void download(final ImageButton downloadButton) {
+	public void download(final Bitmap bitmap, final ImageButton downloadButton) {
 		new AsyncTask<Void, Void, Boolean>() {
 			@Override
 			protected void onPreExecute() {
@@ -99,64 +115,8 @@ public class Comic implements Parcelable {
 
 			@Override
 			protected Boolean doInBackground(Void... params) {
-				ByteArrayOutputStream bos = null;
-				FileOutputStream fos = null;
-
-				String urlString = getUrl().toExternalForm();
-				String ext = urlString.substring(urlString.lastIndexOf('.'));
-				File dest = new File(CyanideApi.instance().getSavedImageDirectory(), getId() + ext);
-
-				try {
-					// "/sdcard/CyanideViewer"
-					if (!(CyanideApi.instance().getSavedImageDirectory().mkdirs() || CyanideApi.instance().getSavedImageDirectory().isDirectory())) {
-						// The image dir is not a directory or there was an error creating the folder
-						Log.e(CyanideViewer.TAG, "Error while creating " + CyanideApi.instance().getSavedImageDirectory().getAbsolutePath()
-								+ ". Is it not a directory?");
-					}
-					if (!dest.exists()) {
-						bos = new ByteArrayOutputStream();
-
-						// Copy the contents of the Bitmap to a file
-						// http://stackoverflow.com/a/7780289/1275092
-						Bitmap.CompressFormat targetFormat;
-
-						// Decide on the compression format
-						if (ext.equalsIgnoreCase("jpeg") || ext.equalsIgnoreCase("jpg")) {
-							targetFormat = Bitmap.CompressFormat.JPEG;
-						} else if (ext.equalsIgnoreCase("webp")) {
-							// You never know...
-							targetFormat = Bitmap.CompressFormat.WEBP;
-						} else {
-							// Assume PNG, because most comics are
-							targetFormat = Bitmap.CompressFormat.PNG;
-						}
-
-						// Compress the bitmap for best quality
-						bitmap.compress(targetFormat, 100, bos);
-						byte[] bitmapData = bos.toByteArray();
-
-						// Write the data to the file
-						fos = new FileOutputStream(dest);
-						fos.write(bitmapData);
-					}
-					Log.i(CyanideViewer.TAG, "Downloaded comic #" + id + " to " + dest.getAbsolutePath());
-					return true;
-				} catch (IOException e) {
-					Log.e(CyanideViewer.TAG, "Failed to download #" + id, e);
-					return false;
-				} finally {
-					// Close the resources
-					try {
-						if (bos != null) {
-							bos.close();
-						}
-						if (fos != null) {
-							fos.close();
-						}
-					} catch (IOException e) {
-						Log.e(CyanideViewer.TAG, "Unable to close either the ByteOutputStream or the FileOutputStream", e);
-					}
-				}
+				File dest = new File(CyanideApi.instance().getSavedImageDirectory(), generateFileName());
+				return writeBitmap(bitmap, dest);
 			}
 
 			@Override
@@ -174,39 +134,78 @@ public class Comic implements Parcelable {
 		}.execute();
 	}
 
-	/** Gets the URL */
+
+	public void downloadIcon() {
+		new AsyncTask<Void, Void, Boolean>() {
+
+			@Override
+			protected Boolean doInBackground(Void... params) {
+				// http://stackoverflow.com/a/6909144/1275092
+				Bitmap icon;
+
+				if (bitmap.getWidth() >= bitmap.getHeight()) {
+					icon = Bitmap.createBitmap(bitmap, bitmap.getWidth() / 2 - bitmap.getHeight() / 2, 0, ICON_DIMENS, ICON_DIMENS);
+				} else {
+					icon = Bitmap.createBitmap(bitmap, 0, bitmap.getHeight() / 2 - bitmap.getWidth() / 2, bitmap.getWidth(), bitmap.getWidth());
+				}
+
+				File dest = new File(CyanideApi.instance().getSavedIconDirectory(), generateFileName());
+				return writeBitmap(icon, dest);
+			}
+
+			@Override
+			protected void onPostExecute(Boolean success) {
+				if (success) {
+					Log.i(CyanideViewer.TAG, "Downloaded icon for #" + id);
+				} else {
+					Log.w(CyanideViewer.TAG, "Could not download icon for #" + id);
+				}
+			}
+		}.execute();
+	}
+
+	/**
+	 * Gets the URL
+	 */
 	public URL getUrl() {
 		return url;
 	}
 
 	/**
 	 * Sets the URL
+	 *
 	 * @param url The new URL
 	 */
 	public void setUrl(URL url) {
 		this.url = url;
 	}
 
-	/** Gets the URL */
+	/**
+	 * Gets the URL
+	 */
 	public long getId() {
 		return id;
 	}
 
 	/**
 	 * Sets the ID
+	 *
 	 * @param id The new ID
 	 */
 	public void setId(long id) {
 		this.id = id;
 	}
 
-	/** Gets whether or not this comic is a favorite */
+	/**
+	 * Gets whether or not this comic is a favorite
+	 */
 	public boolean isFavorite() {
 		return isFavorite;
 	}
 
 	/**
 	 * Sets whether or not this comic is a favorite of the user's
+	 *
 	 * @param isFavorite If the comic is a favorite
 	 */
 	public void setFavorite(boolean isFavorite) {
@@ -226,7 +225,9 @@ public class Comic implements Parcelable {
 		dest.writeByte((byte) (isFavorite ? 1 : 0));
 	}
 
-	/** The Creator used to create Comics using Parcels */
+	/**
+	 * The Creator used to create Comics using Parcels
+	 */
 	public static final Creator CREATOR = new Creator() {
 
 		@Override
@@ -245,10 +246,13 @@ public class Comic implements Parcelable {
 		return "Comic{" +
 				"id=" + id +
 				", url='" + url.toExternalForm() + '\'' +
+				", isFavorite=" + isFavorite +
 				'}';
 	}
 
-	/** Represents the task of loading a Comic's URL into a Bitmap usable by an ImageView */
+	/**
+	 * Represents the task of loading a Comic's URL into a Bitmap usable by an ImageView
+	 */
 	private class BitmapLoaderTask extends AsyncTask<Long, Void, Bitmap> {
 		private ComicStage stage;
 
@@ -312,10 +316,81 @@ public class Comic implements Parcelable {
 		protected void onPostExecute(Bitmap bitmap) {
 			if (bitmap != null) {
 				Comic.this.bitmap = bitmap;
+
 				ImageView imageView = (ImageView) stage.findViewById(R.id.image_view);
 				imageView.setImageBitmap(bitmap);
 				new PhotoViewAttacher(imageView);
 			}
 		}
+	}
+
+	private boolean writeBitmap(Bitmap source, File dest) {
+		ByteArrayOutputStream bos = null;
+		FileOutputStream fos = null;
+
+		String ext = dest.getName().substring(dest.getName().lastIndexOf('.'));
+
+		try {
+			// If the destination is a directory, add the name to it
+			if (dest.isDirectory()) {
+				dest = new File(dest, generateFileName());
+			}
+			// Create the appropriate directories
+			if (!dest.getParentFile().isDirectory()) {
+				if (!dest.getParentFile().mkdirs()) {
+					Log.e(CyanideViewer.TAG, "Unable to create the parent directories for "
+							+ dest.getAbsolutePath());
+				}
+			}
+
+			bos = new ByteArrayOutputStream();
+
+			// Copy the contents of the Bitmap to a file
+			// http://stackoverflow.com/a/7780289/1275092
+			Bitmap.CompressFormat targetFormat;
+
+			// Decide on the compression format
+			if (ext.equalsIgnoreCase("jpeg") || ext.equalsIgnoreCase("jpg")) {
+				targetFormat = Bitmap.CompressFormat.JPEG;
+			} else if (ext.equalsIgnoreCase("webp")) {
+				// You never know...
+				targetFormat = Bitmap.CompressFormat.WEBP;
+			} else {
+				// Assume PNG, because most comics are
+				targetFormat = Bitmap.CompressFormat.PNG;
+			}
+
+			// Compress the bitmap for best quality
+			source.compress(targetFormat, 100, bos);
+			byte[] bitmapData = bos.toByteArray();
+
+			// Write the data to the file
+			fos = new FileOutputStream(dest);
+			fos.write(bitmapData);
+
+			Log.i(CyanideViewer.TAG, "Wrote bitmap to " + dest.getAbsolutePath());
+			return true;
+		} catch (IOException e) {
+			Log.e(CyanideViewer.TAG, "Failed to write the bitmap to " + dest.getAbsolutePath(), e);
+			return false;
+		} finally {
+			// Close the resources
+			try {
+				if (bos != null) {
+					bos.close();
+				}
+				if (fos != null) {
+					fos.close();
+				}
+			} catch (IOException e) {
+				Log.e(CyanideViewer.TAG, "Unable to close either the ByteOutputStream or the FileOutputStream", e);
+			}
+		}
+	}
+
+	public String generateFileName() {
+		String urlString = url.toExternalForm();
+		String ext = urlString.substring(urlString.lastIndexOf(".") + 1);
+		return (id + "." + ext);
 	}
 }

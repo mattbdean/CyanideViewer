@@ -161,7 +161,6 @@ public class CyanideApi extends BaseComicApi {
 				Log.e(CyanideViewer.TAG, "Unable to create the directory " + getSavedImageDirectory().getAbsolutePath() +
 						". Does it exist as a file?");
 			}
-
 		}
 		List<File> files = new ArrayList<>(FileUtils.listFiles(getSavedImageDirectory(),
 				new String[] {"jpg", "jpeg", "png", "gif"}, false));

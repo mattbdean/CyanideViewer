@@ -34,11 +34,6 @@
             android:summary="@string/pref_delete_comics_summary" />
 
         <Preference
-            android:key="pref_delete_comic_icons"
-            android:title="@string/pref_delete_comic_icons"
-            android:summary="@string/pref_delete_comic_icons_summary" />
-
-        <Preference
             android:key="pref_wipe_db"
             android:title="@string/pref_wipe_db"
             android:summary="@string/pref_wipe_db_summary" />

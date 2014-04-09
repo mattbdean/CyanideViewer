@@ -88,81 +88,105 @@ public class SettingsFragment extends PreferenceFragment {
 	}
 
 	private void onDeleteImages() {
-		final NotificationCompat.Builder builder = new NotificationCompat.Builder(this.getActivity());
-		builder.setContentTitle("Deleting saved comics")
-				.setSmallIcon(R.drawable.ic_action_delete)
-				.setOngoing(true)
-				.setAutoCancel(true);
-
 		// Start removing files
-		new AsyncTask<Void, Number, Number[]>() {
+		new ImageDeletionTask(CyanideApi.instance().getSavedImageDirectory(),
+				"Deleting saved comics", DELETE_COMIC_NOTIF_ID).execute();
+	}
 
-			@Override
-			protected void onPreExecute() {
-				notificationManager.notify(DELETE_COMIC_NOTIF_ID, builder.build());
-			}
+	private class ImageDeletionTask extends AsyncTask<Void, Number, Number[]> {
+		private static final String PROGRESS_TEMPLATE = "Deleted %s file%s (%s)";
 
-			@Override
-			protected Number[] doInBackground(Void... params) {
-				// Get a list of files
-				List<File> potentialFiles = new ArrayList<>(FileUtils.listFiles(CyanideApi.instance().getSavedImageDirectory(),
-						new String[]{"jpg", "jpeg", "png", "gif"}, false));
+		private File baseDir;
+		private NotificationCompat.Builder builder;
+		private int notifId;
 
-				List<File> comicFiles = new ArrayList<>();
-				long totalBytes = 0;
+		public ImageDeletionTask(File baseDir, String contentTitle, int notifId) {
+			this.baseDir = baseDir;
+			this.notifId = notifId;
+			this.builder = new NotificationCompat.Builder(SettingsFragment.this.getActivity());
+			builder.setSmallIcon(R.drawable.ic_action_delete)
+					.setContentTitle(contentTitle)
+					.setOngoing(true)
+					.setAutoCancel(true);
+		}
 
-				// Filter out files that don't fit the format of files downloaded by this app
-				// (the comic id + the original extension, ex: "4321.jpg")
-				for (File f : potentialFiles) {
-					// Test if they fit the format
-					String name = f.getName();
-					if (name.substring(0, name.lastIndexOf(".")).matches("\\d+(\\d+)?")) {
-						// Numeric string
-						comicFiles.add(f);
-					}
+		@Override
+		protected void onPreExecute() {
+			updateBuilderProgress(0, 0);
+			notifyManager();
+		}
+
+		@Override
+		protected Number[] doInBackground(Void... params) {
+			// Get a list of files
+			List<File> potentialFiles = new ArrayList<>(FileUtils.listFiles(baseDir,
+					new String[]{"jpg", "jpeg", "png", "gif"}, false));
+
+			List<File> comicFiles = new ArrayList<>();
+			long totalBytes = 0;
+
+			// Filter out files that don't fit the format of files downloaded by this app
+			// (the comic id + the original extension, ex: "4321.jpg")
+			for (File f : potentialFiles) {
+				// Test if they fit the format
+				String name = f.getName();
+				if (name.substring(0, name.lastIndexOf(".")).matches("\\d+(\\d+)?")) {
+					// Numeric string
+					comicFiles.add(f);
 				}
+			}
 
-				int deletionCount = 0;
-				int totalFilesForDeletion = comicFiles.size();
+			int deletionCount = 0;
+			int totalFilesForDeletion = comicFiles.size();
 
-				for (File f : comicFiles) {
-					// Get the length before it's deleted
-					long size = f.length();
-					if (!f.delete()) { // TODO !f.delete()
-						Log.w(CyanideViewer.TAG, "Unable to delete " + f.getAbsolutePath());
-					} else {
-						// Update the notification progress
-						deletionCount++;
-						totalBytes += size;
-						onProgressUpdate(deletionCount, totalFilesForDeletion, totalBytes);
-					}
+			for (File f : comicFiles) {
+				// Get the length before it's deleted
+				long size = f.length();
+				if (!f.delete()) {
+					Log.w(CyanideViewer.TAG, "Unable to delete " + f.getAbsolutePath());
+				} else {
+					// Update the notification progress
+					deletionCount++;
+					totalBytes += size;
+					onProgressUpdate(deletionCount, totalFilesForDeletion, totalBytes);
+					Log.d(CyanideViewer.TAG, "Deleted " + f.getAbsolutePath());
 				}
-
-				// Done
-				return new Number[] {deletionCount, totalBytes};
 			}
 
-			@Override
-			protected void onProgressUpdate(Number... values) {
-				int deletionCount = (int) values[0];
-				int totalFilesForDeletion = (int) values[1];
-				long totalBytes = (long) values[2];
+			// Done
+			return new Number[] {deletionCount, totalBytes};
+		}
 
-				// Update the progress bar and textual progress
-				builder.setProgress(totalFilesForDeletion, deletionCount, false);
-				builder.setContentText(String.format("Deleted %s comics (%s)", deletionCount,
-								FileUtils.byteCountToDisplaySize(totalBytes)));
-				notificationManager.notify(DELETE_COMIC_NOTIF_ID, builder.build());
-			}
+		@Override
+		protected void onProgressUpdate(Number... values) {
+			int deletionCount = (int) values[0];
+			int totalFilesForDeletion = (int) values[1];
+			long totalBytes = (long) values[2];
 
-			@Override
-			protected void onPostExecute(Number[] data) {
-				builder.setOngoing(false);
-				// Hide the progress bar
-				builder.setProgress(0, 0, false);
-				notificationManager.notify(DELETE_COMIC_NOTIF_ID, builder.build());
-			}
-		}.execute();
+			// Update the progress bar and textual progress
+			builder.setProgress(totalFilesForDeletion, deletionCount, false);
+			updateBuilderProgress(deletionCount, totalBytes);
+			notifyManager();
+		}
+
+		@Override
+		protected void onPostExecute(Number[] data) {
+			builder.setOngoing(false);
+			// Hide the progress bar
+			builder.setProgress(0, 0, false);
+			notifyManager();
+		}
+
+		private void updateBuilderProgress(int deletionCount, long totalBytes) {
+			// One file: "Deleted 1 file (62 KB)"
+			// Multiple or no files: "Deleted 2 files (87 KB)"
+			builder.setContentText(String.format(PROGRESS_TEMPLATE, deletionCount, deletionCount != 1 ? "s" : "",
+					FileUtils.byteCountToDisplaySize(totalBytes)));
+		}
+
+		private void notifyManager() {
+			notificationManager.notify(notifId, builder.build());
+		}
 	}
 
 	/**

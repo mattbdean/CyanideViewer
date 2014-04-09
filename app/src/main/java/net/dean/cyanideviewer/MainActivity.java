@@ -94,9 +94,7 @@ public class MainActivity extends FragmentActivity {
 					}.execute(getCurrentComicId());
 				}
 
-				// Refresh button states
-				refreshDownloadButtonState();
-				refreshFavoriteButtonState();
+				refreshButtonStates();
 			}
 
 			@Override
@@ -108,9 +106,7 @@ public class MainActivity extends FragmentActivity {
 		// Load second newest comic
 		pagerAdapter.getComicStage(viewPager.getCurrentItem() - 1).loadComic();
 
-		// Refresh button states
-		refreshDownloadButtonState();
-		refreshFavoriteButtonState();
+		refreshButtonStates();
 	}
 
 	/**
@@ -133,7 +129,7 @@ public class MainActivity extends FragmentActivity {
 	/**
 	 * Refreshes the state of the download button based on if the comic exists on the file system
 	 */
-	public void refreshDownloadButtonState() {
+	private void refreshDownloadButtonState() {
 		boolean hasLocal = CyanideApi.instance().hasLocalComic(getCurrentComicId());
 		downloadButton.setEnabled(!hasLocal);
 	}
@@ -144,6 +140,11 @@ public class MainActivity extends FragmentActivity {
 	 */
 	private void refreshFavoriteButtonState() {
 		favoriteButton.setChecked(getCurrentDbComic().isFavorite());
+	}
+
+	private void refreshButtonStates() {
+		refreshDownloadButtonState();
+		refreshFavoriteButtonState();
 	}
 
 	/**
@@ -236,6 +237,12 @@ public class MainActivity extends FragmentActivity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		refreshButtonStates();
 	}
 
 	/**

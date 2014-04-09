@@ -104,8 +104,9 @@ public class SettingsFragment extends PreferenceFragment {
 			this.baseDir = baseDir;
 			this.notifId = notifId;
 			this.builder = new NotificationCompat.Builder(SettingsFragment.this.getActivity());
-			builder.setSmallIcon(R.drawable.ic_action_delete)
+			builder.setSmallIcon(R.drawable.ic_notif)
 					.setContentTitle(contentTitle)
+					.setTicker(contentTitle)
 					.setOngoing(true)
 					.setAutoCancel(true);
 		}

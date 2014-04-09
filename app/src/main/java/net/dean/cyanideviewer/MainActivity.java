@@ -105,6 +105,8 @@ public class MainActivity extends FragmentActivity {
 
 		setComic(CyanideApi.instance().getNewestId());
 		viewPager.setCurrentItem(pagerAdapter.getCount() - 1);
+		// Load second newest comic
+		pagerAdapter.getComicStage(viewPager.getCurrentItem() - 1).loadComic();
 
 		// Refresh button states
 		refreshDownloadButtonState();

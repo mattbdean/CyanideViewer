@@ -10,7 +10,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -125,18 +124,15 @@ public class SettingsFragment extends PreferenceFragment {
 		private static final String PROGRESS_TEMPLATE = "Deleted %s file%s (%s)";
 
 		/**
-		 * The directory that will be scanned (excluding
+		 * The directory that will be scanned (excluding subdirectories)
 		 */
 		private File baseDir;
-		private NotificationCompat.Builder builder;
-		private int notifId;
+		private NotificationHelper helper;
 
 		public ImageDeletionTask(File baseDir, String contentTitle, int notifId) {
 			this.baseDir = baseDir;
-			this.notifId = notifId;
-			this.builder = new NotificationCompat.Builder(SettingsFragment.this.getActivity());
-			builder.setSmallIcon(R.drawable.ic_notif)
-					.setContentTitle(contentTitle)
+			this.helper = NotificationHelper.getInstance(getActivity().getApplicationContext(), notifId);
+			helper.builder().setContentTitle(contentTitle)
 					.setTicker(contentTitle)
 					.setOngoing(true)
 					.setAutoCancel(true);
@@ -145,7 +141,7 @@ public class SettingsFragment extends PreferenceFragment {
 		@Override
 		protected void onPreExecute() {
 			updateBuilderProgress(0, 0);
-			notifyManager();
+			helper.notifyManager();
 		}
 
 		@Override
@@ -195,17 +191,17 @@ public class SettingsFragment extends PreferenceFragment {
 			long totalBytes = (long) values[2];
 
 			// Update the progress bar and textual progress
-			builder.setProgress(totalFilesForDeletion, deletionCount, false);
+			helper.builder().setProgress(totalFilesForDeletion, deletionCount, false);
 			updateBuilderProgress(deletionCount, totalBytes);
-			notifyManager();
+			helper.notifyManager();
 		}
 
 		@Override
 		protected void onPostExecute(Number[] data) {
-			builder.setOngoing(false);
+			helper.builder().setOngoing(false);
 			// Hide the progress bar
-			builder.setProgress(0, 0, false);
-			notifyManager();
+			helper.builder().setProgress(0, 0, false);
+			helper.notifyManager();
 		}
 
 		/**
@@ -216,15 +212,8 @@ public class SettingsFragment extends PreferenceFragment {
 		private void updateBuilderProgress(int deletionCount, long totalBytes) {
 			// One file: "Deleted 1 file (62 KB)"
 			// Multiple or no files: "Deleted 2 files (87 KB)"
-			builder.setContentText(String.format(PROGRESS_TEMPLATE, deletionCount, deletionCount != 1 ? "s" : "",
+			helper.builder().setContentText(String.format(PROGRESS_TEMPLATE, deletionCount, deletionCount != 1 ? "s" : "",
 					FileUtils.byteCountToDisplaySize(totalBytes)));
-		}
-
-		/**
-		 * Convenience method for calling notificationManager.notify()
-		 */
-		private void notifyManager() {
-			notificationManager.notify(notifId, builder.build());
 		}
 	}
 

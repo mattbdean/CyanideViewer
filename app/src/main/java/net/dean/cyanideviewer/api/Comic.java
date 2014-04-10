@@ -1,5 +1,9 @@
 package net.dean.cyanideviewer.api;
 
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -10,12 +14,12 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import net.dean.cyanideviewer.ComicStage;
 import net.dean.cyanideviewer.CyanideUtils;
 import net.dean.cyanideviewer.CyanideViewer;
 import net.dean.cyanideviewer.FavoriteComicListItem;
+import net.dean.cyanideviewer.NotificationHelper;
 import net.dean.cyanideviewer.R;
 
 import org.apache.http.HttpEntity;
@@ -33,6 +37,7 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.ArrayList;
 
 import uk.co.senab.photoview.PhotoViewAttacher;
 
@@ -40,6 +45,12 @@ import uk.co.senab.photoview.PhotoViewAttacher;
  * Represents an Cyanide and Happiness comic.
  */
 public class Comic implements Parcelable {
+	private static final int DOWNLOAD_NOTIF_ID = 1;
+
+	private static final ArrayList<Integer> DOWNLOADED_IDS = new ArrayList<>();
+
+	private NotificationHelper notifHelper;
+
 	/** The width and height of all generated icons */
 	public static final int ICON_DIMENS = 144;
 
@@ -130,10 +141,6 @@ public class Comic implements Parcelable {
 	 */
 	public void download(final Bitmap bitmap, final ImageButton downloadButton) {
 		new AsyncTask<Void, Void, Boolean>() {
-			@Override
-			protected void onPreExecute() {
-				Toast.makeText(CyanideViewer.getContext(), "Download starting", Toast.LENGTH_SHORT).show();
-			}
 
 			@Override
 			protected Boolean doInBackground(Void... params) {
@@ -143,14 +150,39 @@ public class Comic implements Parcelable {
 
 			@Override
 			protected void onPostExecute(Boolean success) {
-				String toastText;
-				if (success) {
-					toastText = "Comic downloaded";
-				} else {
-					toastText = "Comic failed to download!";
+				// TODO use 'success' variable
+				if (notifHelper == null) {
+					// Lazy initialize the helper since not all Comic objects will use this, since
+					// not all comics will be downloaded
+
+					notifHelper = NotificationHelper.getInstance(downloadButton.getContext(), DOWNLOAD_NOTIF_ID);
+
+					Intent intent = new Intent(downloadButton.getContext(), NotificationReceiver.class);
+					intent.putIntegerArrayListExtra("downloaded_ids", DOWNLOADED_IDS);
+
+					PendingIntent resetDownloadIntent = PendingIntent.getBroadcast(downloadButton.getContext(),
+							0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+					notifHelper.builder()
+							.setContentTitle("Downloaded comics")
+							.setDeleteIntent(resetDownloadIntent);
+				}
+				DOWNLOADED_IDS.add((int) id);
+
+				String content = "#" + id;
+				if (DOWNLOADED_IDS.size() > 1) {
+					content += " and " + (DOWNLOADED_IDS.size() - 1) + " other";
+				}
+				if (DOWNLOADED_IDS.size() > 2) {
+					// Make 'other' plural
+					content += "s";
 				}
 
-				Toast.makeText(CyanideViewer.getContext(), toastText, Toast.LENGTH_SHORT).show();
+				notifHelper.builder().setNumber(DOWNLOADED_IDS.size())
+						.setContentText(content)
+						.setTicker("Download comic #" + id);
+				notifHelper.notifyManager(); // Show the notification
+
 				downloadButton.setEnabled(false);
 			}
 		}.execute();
@@ -483,5 +515,13 @@ public class Comic implements Parcelable {
 
 	public static interface OnComplete {
 		public void onComplete();
+	}
+
+	public static class NotificationReceiver extends BroadcastReceiver {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			DOWNLOADED_IDS.clear();
+		}
 	}
 }

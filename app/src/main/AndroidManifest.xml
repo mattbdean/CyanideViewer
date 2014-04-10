@@ -29,6 +29,8 @@
             android:label="@string/title_activity_settings"
             android:configChanges="keyboardHidden|orientation|screenSize">
         </activity>
+
+        <receiver android:name="net.dean.cyanideviewer.api.Comic$NotificationReceiver" />
     </application>
 
 </manifest>

@@ -16,6 +16,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.params.ClientPNames;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.IOException;
@@ -56,6 +57,7 @@ class BitmapLoaderTask extends AsyncTask<Long, Void, Bitmap> {
 			}
 
 			HttpClient client = new DefaultHttpClient();
+			client.getParams().setParameter(ClientPNames.ALLOW_CIRCULAR_REDIRECTS, false);
 			HttpGet request = new HttpGet(comic.getUrl().toURI());
 			HttpResponse response = client.execute(request);
 			if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {

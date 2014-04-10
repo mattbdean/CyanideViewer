@@ -4,6 +4,7 @@ import android.os.Environment;
 import android.util.Log;
 
 import net.dean.cyanideviewer.CyanideViewer;
+import net.dean.cyanideviewer.api.comic.Comic;
 
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;

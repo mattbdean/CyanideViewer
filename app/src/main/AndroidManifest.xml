@@ -30,7 +30,7 @@
             android:configChanges="keyboardHidden|orientation|screenSize">
         </activity>
 
-        <receiver android:name="net.dean.cyanideviewer.api.Comic$NotificationReceiver" />
+        <receiver android:name=".api.comic.BitmapDownloadTask$NotificationReceiver" />
     </application>
 
 </manifest>

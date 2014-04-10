@@ -13,8 +13,9 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import net.dean.cyanideviewer.api.Comic;
 import net.dean.cyanideviewer.api.CyanideApi;
+import net.dean.cyanideviewer.api.comic.Comic;
+import net.dean.cyanideviewer.api.comic.OnComplete;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
@@ -190,7 +191,7 @@ public class MainActivity extends FragmentActivity {
 		final Comic c = pagerAdapter.getComicStage(viewPager.getCurrentItem()).getComic();
 		// Use a callback approach because the user might have pressed the button before the bitmap
 		// was loaded, causing a NullPointerException
-		c.setOnBitmapLoaded(new Comic.OnComplete() {
+		c.setOnBitmapLoaded(new OnComplete() {
 			@Override
 			public void onComplete() {
 				c.download(downloadButton);

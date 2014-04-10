@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import net.dean.cyanideviewer.api.Comic;
+import net.dean.cyanideviewer.api.comic.Comic;
 
 /**
  * Represents an item found in the ListView in FavoritesActivity

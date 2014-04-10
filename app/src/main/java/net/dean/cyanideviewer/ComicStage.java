@@ -8,7 +8,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import net.dean.cyanideviewer.api.Comic;
+import net.dean.cyanideviewer.api.comic.Comic;
 import net.dean.cyanideviewer.api.CyanideApi;
 
 import uk.co.senab.photoview.PhotoViewAttacher;
@@ -91,8 +91,8 @@ public class ComicStage extends LinearLayout {
 				@Override
 				protected void onPostExecute(Comic comic) {
 					if (comic != null) {
-						comic.loadBitmap(ComicStage.this);
 						ComicStage.this.comic = comic;
+						comic.loadBitmap(ComicStage.this);
 					}
 				}
 			}.execute(idToLoad);

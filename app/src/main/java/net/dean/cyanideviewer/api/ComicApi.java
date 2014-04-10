@@ -1,5 +1,7 @@
 package net.dean.cyanideviewer.api;
 
+import net.dean.cyanideviewer.api.comic.Comic;
+
 import java.io.File;
 
 public interface ComicApi {

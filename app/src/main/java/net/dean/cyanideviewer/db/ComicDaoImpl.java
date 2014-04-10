@@ -8,7 +8,7 @@ import android.util.Log;
 
 import net.dean.cyanideviewer.CyanideUtils;
 import net.dean.cyanideviewer.CyanideViewer;
-import net.dean.cyanideviewer.api.Comic;
+import net.dean.cyanideviewer.api.comic.Comic;
 
 import java.util.ArrayList;
 import java.util.List;

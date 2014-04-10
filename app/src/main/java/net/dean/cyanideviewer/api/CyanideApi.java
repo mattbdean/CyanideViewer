@@ -5,6 +5,7 @@ import android.util.Log;
 
 import net.dean.cyanideviewer.CyanideUtils;
 import net.dean.cyanideviewer.CyanideViewer;
+import net.dean.cyanideviewer.api.comic.Comic;
 
 import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;

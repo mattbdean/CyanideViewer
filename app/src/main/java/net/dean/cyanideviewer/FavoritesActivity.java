@@ -12,7 +12,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 
-import net.dean.cyanideviewer.api.Comic;
+import net.dean.cyanideviewer.api.comic.Comic;
 
 import java.util.ArrayList;
 

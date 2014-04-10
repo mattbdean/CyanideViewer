@@ -56,6 +56,13 @@ public class Comic implements Parcelable {
 	private Bitmap bitmap;
 
 	/**
+	 * Whether the comic has been fully loaded
+	 */
+	private boolean hasLoaded;
+
+	private OnComplete onBitmapLoaded;
+
+	/**
 	 * Instantiates a new Comic assuming the comic is not a favorite
 	 *
 	 * @param id  The ID of the comic
@@ -76,6 +83,7 @@ public class Comic implements Parcelable {
 		this.url = url;
 		this.id = id;
 		this.isFavorite = isFavorite;
+		this.hasLoaded = false;
 	}
 
 	/**
@@ -310,6 +318,16 @@ public class Comic implements Parcelable {
 		this.isFavorite = isFavorite;
 	}
 
+	public void setOnBitmapLoaded(OnComplete action) {
+		// Execute it if it has already been loaded
+		if (hasLoaded) {
+			// Don't assign onBitmapLoaded because we want it null so it only executes once
+			action.onComplete();
+		} else {
+			onBitmapLoaded = action;
+		}
+	}
+
 	@Override
 	public int describeContents() {
 		// I don't know what I'm doing here
@@ -416,6 +434,13 @@ public class Comic implements Parcelable {
 				ImageView imageView = (ImageView) stage.findViewById(R.id.image_view);
 				imageView.setImageBitmap(bitmap);
 				new PhotoViewAttacher(imageView);
+
+				hasLoaded = true;
+
+				if (onBitmapLoaded != null) {
+					onBitmapLoaded.onComplete();
+					onBitmapLoaded = null;
+				}
 			}
 		}
 	}
@@ -454,5 +479,9 @@ public class Comic implements Parcelable {
 				favoriteIcon.setImageResource(R.drawable.ic_action_error);
 			}
 		}
+	}
+
+	public static interface OnComplete {
+		public void onComplete();
 	}
 }

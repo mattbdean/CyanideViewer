@@ -42,10 +42,6 @@ public class ComicStage extends LinearLayout {
 	 */
 	private ImageView imageView;
 
-	/**
-	 * Whether the comic has been fully loaded
-	 */
-	private boolean hasLoaded;
 
 	/**
 	 * The ID of the comic to load
@@ -63,6 +59,7 @@ public class ComicStage extends LinearLayout {
 	 */
 	private PhotoViewAttacher photoViewAttacher;
 
+
 	/** Instantiates a new ComicStage */
 	public ComicStage(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -74,7 +71,6 @@ public class ComicStage extends LinearLayout {
 	public void setComic(long id) {
 		this.idToLoad = id;
 		((TextView) findViewById(R.id.comic_id)).setText("#" + idToLoad);
-		hasLoaded = false;
 		// Set the ImageView to be clear if it has been set before
 		if (imageView != null)
 			imageView.setImageResource(android.R.color.transparent);
@@ -96,7 +92,6 @@ public class ComicStage extends LinearLayout {
 				protected void onPostExecute(Comic comic) {
 					if (comic != null) {
 						comic.loadBitmap(ComicStage.this);
-						hasLoaded = true;
 						ComicStage.this.comic = comic;
 					}
 				}
@@ -127,17 +122,15 @@ public class ComicStage extends LinearLayout {
 		return idToLoad;
 	}
 
+
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder("ComicStage {");
 		sb.append("idToLoad=").append(idToLoad);
 		sb.append(", comic=").append(comic);
 		sb.append(", imageView=").append(imageView);
-		sb.append(", hasLoaded=").append(hasLoaded);
 		sb.append(", photoViewAttacher=").append(photoViewAttacher);
 		sb.append('}');
 		return sb.toString();
 	}
-
-
 }

@@ -60,13 +60,13 @@ public class MainActivity extends FragmentActivity {
 
 			@Override
 			public void onPageSelected(final int position) {
-
 				if (position == 0) {
 					// At the very left
 					new AbstractComicTask<Long>() {
 						@Override
 						protected Comic doInBackground(Long... params) {
-							return CyanideApi.instance().getPrevious(params[0]); }
+							return CyanideApi.instance().getPrevious(params[0]);
+						}
 
 						@Override
 						protected void onPostExecute(Comic comic) {
@@ -142,6 +142,9 @@ public class MainActivity extends FragmentActivity {
 		favoriteButton.setChecked(getCurrentDbComic().isFavorite());
 	}
 
+	/**
+	 * Refreshes the download button and favorite button states
+	 */
 	private void refreshButtonStates() {
 		refreshDownloadButtonState();
 		refreshFavoriteButtonState();
@@ -184,7 +187,15 @@ public class MainActivity extends FragmentActivity {
 	 */
 	public void onDownloadClicked(View view) {
 		// Download the comic at the current ID
-		pagerAdapter.getComicStage(viewPager.getCurrentItem()).getComic().download(downloadButton);
+		final Comic c = pagerAdapter.getComicStage(viewPager.getCurrentItem()).getComic();
+		// Use a callback approach because the user might have pressed the button before the bitmap
+		// was loaded, causing a NullPointerException
+		c.setOnBitmapLoaded(new Comic.OnComplete() {
+			@Override
+			public void onComplete() {
+				c.download(downloadButton);
+			}
+		});
 	}
 
 	@Override

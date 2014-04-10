@@ -129,7 +129,7 @@ public class ComicStage extends LinearLayout {
 
 	@Override
 	public String toString() {
-		final StringBuffer sb = new StringBuffer("ComicStage{");
+		final StringBuilder sb = new StringBuilder("ComicStage {");
 		sb.append("idToLoad=").append(idToLoad);
 		sb.append(", comic=").append(comic);
 		sb.append(", imageView=").append(imageView);

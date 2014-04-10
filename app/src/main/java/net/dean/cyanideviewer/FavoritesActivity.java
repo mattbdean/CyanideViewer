@@ -16,7 +16,9 @@ import net.dean.cyanideviewer.api.Comic;
 
 import java.util.ArrayList;
 
-
+/**
+ * This activity is responsible for showing the user all his/her favorites in a ListView
+ */
 public class FavoritesActivity extends Activity {
 	/** Returned when the user picked a comic */
 	public static final int RESULT_OK = 0;

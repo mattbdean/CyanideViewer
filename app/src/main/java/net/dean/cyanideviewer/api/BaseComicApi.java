@@ -22,19 +22,40 @@ import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+/**
+ * This is a basic implementation of ComicApi that provides some default methods that should work
+ * for all comics. This class comes equipped with an HttpClient and fills out hasLocalComic(),
+ * getSavedImageDirectory(), and getSavedIconDirectory(). It also contains a few utility methods.
+ */
 public abstract class BaseComicApi implements ComicApi {
-	// Since getSavedImageDirectory() is called a lot, create one instance of the image directory
-	// to speed things up, since it relies on a potentially expensive call (Environment.getExternalStorageDirectory())
+	/** The directory that will be used to write images to */
 	private static final File IMAGE_DIR = new File(Environment.getExternalStorageDirectory(), "CyanideViewer");
+
+	/**
+	 * The directory taht will be used to write icons to. This is a subdirectory of {@link #IMAGE_DIR}
+	 * called "icons"
+	 */
 	private static final File ICON_DIR = new File(IMAGE_DIR, "icons");
 
-	/** The HttpClient that will be used to host requests */
+	/** The HttpClient that will be used to make requests */
 	protected HttpClient client;
 
+	/**
+	 * Instantiates a new BaseComicApi
+	 */
 	public BaseComicApi() {
 		this.client = new DefaultHttpClient();
 	}
 
+	/**
+	 * Gets the end result of an HTTP GET request. The URL provided is followed and the resulting
+	 * location is returned. For example, if "http://explosm.net/comics/random" redirected to
+	 * "http://explosm.net/comics/3123", then the latter value would be returned. If a URL does
+	 * not redirect, the original URL will be returned. For example, if "http://example.com" did
+	 * not redirect to another webpage, that value would be returned.
+	 * @param url The URL to follow
+	 * @return The destination of an HTTP GET request
+	 */
 	protected String followRedirect(String url) {
 		try {
 			new URL(url).toURI();
@@ -79,6 +100,9 @@ public abstract class BaseComicApi implements ComicApi {
 		// Generic function
 		return getComic(getNewestId());
 	}
+
+	// Since getSavedImageDirectory() is called a lot, create one instance of the image directory
+	// to speed things up, since it relies on a potentially expensive call (Environment.getExternalStorageDirectory())
 
 	@Override
 	public File getSavedImageDirectory() {

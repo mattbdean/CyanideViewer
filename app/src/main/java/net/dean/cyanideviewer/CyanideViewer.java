@@ -13,7 +13,7 @@ public class CyanideViewer extends Application {
 	/** The tag used by all Log.x methods in this app */
 	public static final String TAG = "CyanideViewer";
 
-	/** The application context */
+	/** This application's context */
 	private static Context context;
 
 	/** The data access object used to interact with the database */

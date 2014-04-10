@@ -22,10 +22,22 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This fragment is responsible for showing the user Preferences defined in res/xml/preferences.xml
+ */
 public class SettingsFragment extends PreferenceFragment {
+	/** The NotificationManager that will be used to send notifications to the OS */
 	private NotificationManager notificationManager;
+
+	/** The ID of the notification created by this app.*/
 	private static final int DELETE_COMIC_NOTIF_ID = 0;
 
+	/** The extensions to search and destroy */
+	private static final String[] EXTENSIONS = {"jpg", "jpeg", "png", "gif"};
+
+	/**
+	 * Instantiates a new SettingsFragment
+	 */
 	public SettingsFragment() {
 		super();
 	}
@@ -80,6 +92,9 @@ public class SettingsFragment extends PreferenceFragment {
 		}
 	}
 
+	/**
+	 * Called when the user has confirmed that they want to wipe the database
+	 */
 	private void onWipeDatabase() {
 		// Truncate the database
 		Log.w(CyanideViewer.TAG, "Truncating the database after user request");
@@ -87,15 +102,31 @@ public class SettingsFragment extends PreferenceFragment {
 		Toast.makeText(getActivity().getApplicationContext(), "Database wiped.", Toast.LENGTH_SHORT).show();
 	}
 
+	/**
+	 * Called when the user has confirmed that they want to delete all comics
+	 */
 	private void onDeleteImages() {
 		// Start removing files
 		new ImageDeletionTask(CyanideApi.instance().getSavedImageDirectory(),
 				"Deleting saved comics", DELETE_COMIC_NOTIF_ID).execute();
 	}
 
+	/**
+	 * This class is responsible for deleting image files (*.png, *.jpeg, *.jpg, *.gif) from a certain
+	 * directory
+	 */
 	private class ImageDeletionTask extends AsyncTask<Void, Number, Number[]> {
+		/**
+		 * The template used to format the content text of the notification. It contains three
+		 * %s tags. The first represents the amount of files that have been deleted. The second
+		 * represents whether or not "files" should be plural. The third represents how many bytes
+		 * (in a human readable format) have been deleted.
+		 */
 		private static final String PROGRESS_TEMPLATE = "Deleted %s file%s (%s)";
 
+		/**
+		 * The directory that will be scanned (excluding
+		 */
 		private File baseDir;
 		private NotificationCompat.Builder builder;
 		private int notifId;
@@ -120,8 +151,7 @@ public class SettingsFragment extends PreferenceFragment {
 		@Override
 		protected Number[] doInBackground(Void... params) {
 			// Get a list of files
-			List<File> potentialFiles = new ArrayList<>(FileUtils.listFiles(baseDir,
-					new String[]{"jpg", "jpeg", "png", "gif"}, false));
+			List<File> potentialFiles = new ArrayList<>(FileUtils.listFiles(baseDir, EXTENSIONS, false));
 
 			List<File> comicFiles = new ArrayList<>();
 			long totalBytes = 0;
@@ -178,6 +208,11 @@ public class SettingsFragment extends PreferenceFragment {
 			notifyManager();
 		}
 
+		/**
+		 * Updates the Notification Builder's content text by formatting {@link #PROGRESS_TEMPLATE}
+		 * @param deletionCount How many files have been deleted so far
+		 * @param totalBytes How many bytes have been deleted so far
+		 */
 		private void updateBuilderProgress(int deletionCount, long totalBytes) {
 			// One file: "Deleted 1 file (62 KB)"
 			// Multiple or no files: "Deleted 2 files (87 KB)"
@@ -185,6 +220,9 @@ public class SettingsFragment extends PreferenceFragment {
 					FileUtils.byteCountToDisplaySize(totalBytes)));
 		}
 
+		/**
+		 * Convenience method for calling notificationManager.notify()
+		 */
 		private void notifyManager() {
 			notificationManager.notify(notifId, builder.build());
 		}
@@ -239,6 +277,7 @@ public class SettingsFragment extends PreferenceFragment {
 					.setPositiveButton(positiveButtonText, new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
+							// Confirmed
 							listener.onConfirmed();
 							dismiss();
 						}
@@ -246,6 +285,7 @@ public class SettingsFragment extends PreferenceFragment {
 					.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
+							// Canceled
 							dismiss();
 						}
 					});

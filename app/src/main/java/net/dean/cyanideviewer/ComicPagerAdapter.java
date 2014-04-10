@@ -10,7 +10,7 @@ import net.dean.cyanideviewer.api.Comic;
 import java.util.ArrayList;
 
 /**
- * A PagerAdapter to hold (in theory) an infinite amount of ComicStages. Adapted from
+ * A PagerAdapter to hold an infinite amount of ComicStages, given enough memory. Adapted from
  * http://stackoverflow.com/a/13671777/1275092
  */
 public class ComicPagerAdapter extends PagerAdapter {

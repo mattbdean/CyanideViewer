@@ -22,9 +22,10 @@ import java.util.concurrent.ExecutionException;
  * Provides high level access to the unofficial Cyanide and Happiness API.
  */
 public class CyanideApi extends BaseComicApi {
-	// Singleton
+	/** The one and only instance of CyanideApi  */
 	private static CyanideApi instance;
 
+	/** Retrieves the one and only instance of CyanideApi */
 	public static CyanideApi instance() {
 		if (instance == null) {
 			instance = new CyanideApi();

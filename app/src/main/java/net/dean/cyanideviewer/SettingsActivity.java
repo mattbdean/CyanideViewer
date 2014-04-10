@@ -3,6 +3,9 @@ package net.dean.cyanideviewer;
 import android.app.Activity;
 import android.os.Bundle;
 
+/**
+ * This activity is responsible for showing a SettingsFragment
+ */
 public class SettingsActivity extends Activity {
 
     @Override

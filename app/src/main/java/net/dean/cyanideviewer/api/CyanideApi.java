@@ -23,6 +23,8 @@ import java.util.concurrent.ExecutionException;
  * Provides high level access to the unofficial Cyanide and Happiness API.
  */
 public class CyanideApi extends BaseComicApi {
+	private static final String BASE_URL = "http://explosm.net/comics/";
+
 	/** The one and only instance of CyanideApi  */
 	private static CyanideApi instance;
 
@@ -53,20 +55,8 @@ public class CyanideApi extends BaseComicApi {
 	}
 
 	@Override
-	public String getComicUrl(long id) {
-		try {
-			Document doc = Jsoup.connect(getBaseUrl() + id).get();
-
-			// Return the one image that contains "/db/files/Comics/" in the src attribute
-			return doc.select("#maincontent img[src*=/db/files/Comics/]").get(0).attr("src");
-		} catch (IndexOutOfBoundsException e) {
-			Log.w(CyanideViewer.TAG, "Could not find the comic's image for #" + id);
-		} catch (IOException e) {
-			Log.e(CyanideViewer.TAG, "IOException while testing if comic #" + id + " was a comic page or not", e);
-			// TODO Error recovery. Notify the user somehow. Maybe a 'retry' button?
-		}
-
-		return null;
+	public String getBitmapUrl(long id) {
+		return getBitmapUrl(getBaseUrl() + id);
 	}
 
 	// TODO: getPrevious() and getNext() are pretty much the same method; they can be shortened
@@ -87,7 +77,7 @@ public class CyanideApi extends BaseComicApi {
 			return getComic(newestId);
 		}
 
-		if (getComicUrl(newId) != null) {
+		if (getBitmapUrl(newId) != null) {
 			// There is a comic associated with this page
 			// TODO: Add an optional param for getComic(), we already know what the comic URL is and
 			// getComic() is just going to get it again
@@ -116,7 +106,7 @@ public class CyanideApi extends BaseComicApi {
 			return null;
 		}
 
-		if (getComicUrl(newId) != null) {
+		if (getBitmapUrl(newId) != null) {
 			// There is a comic associated with this page
 			// TODO: Add an optional param for getComic(), we already know what the comic URL is and
 			// getComic() is just going to get it again
@@ -130,7 +120,7 @@ public class CyanideApi extends BaseComicApi {
 
 	@Override
 	public Comic getNewest() {
-		if (getComicUrl(newestId) != null) {
+		if (getBitmapUrl(newestId) != null) {
 			// The newest comic is an image
 			return getComic(newestId);
 		}
@@ -188,10 +178,13 @@ public class CyanideApi extends BaseComicApi {
 			Log.i(CyanideViewer.TAG, "Comic #" + id + " was found on the database, using it's info");
 			c = CyanideViewer.getComicDao().getComic(id);
 		} else {
-			// The wasn't in the database, add it
-			Log.i(CyanideViewer.TAG, "Comic #" + id + " was not found in the database.");
-			c.setUrl(CyanideUtils.newUrl(getComicUrl(id)));
-			CyanideViewer.getComicDao().addComic(c);
+			String url = getBitmapUrl(id);
+			if (url != null) {
+				// The wasn't in the database, add it
+				Log.i(CyanideViewer.TAG, "Comic #" + id + " was not found in the database.");
+				c.setUrl(CyanideUtils.newUrl(url));
+				CyanideViewer.getComicDao().addComic(c);
+			}
 		}
 
 
@@ -218,7 +211,7 @@ public class CyanideApi extends BaseComicApi {
 
 	@Override
 	public String getBaseUrl() {
-		return "http://explosm.net/comics/";
+		return BASE_URL;
 	}
 
 	@Override
@@ -231,7 +224,6 @@ public class CyanideApi extends BaseComicApi {
 			instance.firstId = new AsyncTask<Void, Void, Long>() {
 				@Override
 				protected Long doInBackground(Void... params) {
-					long id = instance().getIdFromUrl(SpecialSelection.FIRST.getUrl());
 					return instance().getIdFromUrl(SpecialSelection.FIRST.getUrl());
 				}
 			}.execute().get();
@@ -241,12 +233,41 @@ public class CyanideApi extends BaseComicApi {
 
 				@Override
 				protected Long doInBackground(Void... params) {
-					return instance().getIdFromUrl(SpecialSelection.NEWEST.getUrl());
+					long newestValidComicId = instance().getIdFromUrl(SpecialSelection.NEWEST.getUrl());
+					boolean needsToSearch = true;
+					while (needsToSearch) {
+						if (getBitmapUrl(BASE_URL + newestValidComicId) == null) {
+							// There was no comic on that page
+							newestValidComicId--;
+							continue;
+						}
+
+						// The comic page was valid, no need to search anymore
+						needsToSearch = false;
+					}
+
+					return newestValidComicId;
 				}
 			}.execute().get();
 			Log.i(CyanideViewer.TAG, "Found newest ID: " + instance.newestId);
 		} catch (InterruptedException | ExecutionException e) {
 			Log.e(CyanideViewer.TAG, "Failed to find the first or newest comic IDs", e);
 		}
+	}
+
+	private static String getBitmapUrl(String comicUrl) {
+		try {
+			Document doc = Jsoup.connect(comicUrl).get();
+
+			// Return the one image that contains "/db/files/Comics/" in the src attribute
+			return doc.select("#maincontent img[src*=/db/files/Comics/]").get(0).attr("src");
+		} catch (IndexOutOfBoundsException e) {
+			Log.w(CyanideViewer.TAG, "Could not find the comic's image on " + comicUrl);
+		} catch (IOException e) {
+			Log.e(CyanideViewer.TAG, "IOException while trying to find the bitmap URL of the comic at " + comicUrl, e);
+			// TODO Error recovery. Notify the user somehow. Maybe a 'retry' button?
+		}
+
+		return null;
 	}
 }

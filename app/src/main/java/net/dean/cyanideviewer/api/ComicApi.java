@@ -32,7 +32,7 @@ public interface ComicApi {
 	 * @param id The ID of the comic to look up
 	 * @return A String representing a URL, or null if the comic does not exist.
 	 */
-	public String getComicUrl(long id);
+	public String getBitmapUrl(long id);
 
 	/**
 	 * Gets a Comic object based on the given ID. If the comic exists in the database, it will

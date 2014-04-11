@@ -10,6 +10,13 @@ import net.dean.cyanideviewer.ComicStage;
 import net.dean.cyanideviewer.CyanideUtils;
 import net.dean.cyanideviewer.CyanideViewer;
 import net.dean.cyanideviewer.FavoriteComicListItem;
+import net.dean.cyanideviewer.api.CyanideApi;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -272,6 +279,37 @@ public class Comic implements Parcelable {
 		} else {
 			onBitmapLoaded = action;
 		}
+	}
+
+	public boolean isValid() {
+		return (id >= CyanideApi.instance().getFirstId()
+				&& id <= CyanideApi.instance().getNewestId()
+				&& url != null);
+	}
+
+	public boolean isValidExpensive() {
+		boolean isValidSimple = isValid();
+		if (!isValidSimple) {
+			// If the simple pass won't pass, this pass won't pass
+			return false;
+		}
+
+		// Get the status code of a get request to the bitmap's URL
+		try {
+			HttpClient client = new DefaultHttpClient();
+			HttpGet get = new HttpGet(url.toExternalForm());
+			HttpResponse response = client.execute(get);
+			if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+				// Was not a 200
+				return false;
+			}
+		} catch (IOException e) {
+			Log.e(CyanideViewer.TAG, "IOException while testing the validity of " + this);
+			return false;
+		}
+
+		return true;
+
 	}
 
 	public OnComplete getOnBitmapLoaded() {

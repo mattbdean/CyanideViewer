@@ -320,9 +320,13 @@ public class MainActivity extends FragmentActivity {
 					// Add the previous comic if it exists
 					pagerAdapter.addView(prevComic);
 				}
+
 				// Current comic
-				curComicPagerIndex = pagerAdapter.addView(CyanideApi.instance().getComic(id));
-				pagerAdapter.getComicStage(curComicPagerIndex).loadComic();
+				Comic curComic = CyanideApi.instance().getComic(id);
+				if (curComic != null) { // Current might be a short
+					curComicPagerIndex = pagerAdapter.addView(curComic);
+					pagerAdapter.getComicStage(curComicPagerIndex).loadComic();
+				}
 
 				if (nextComic != null) {
 					// Add the next comic if it exists

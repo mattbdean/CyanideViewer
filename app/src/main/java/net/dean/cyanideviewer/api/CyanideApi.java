@@ -48,7 +48,11 @@ public class CyanideApi extends BaseComicApi {
 	@Override
 	public long getIdFromUrl(String url) {
 		String currentUrl = followRedirect(url);
-		if (!currentUrl.contains("explosm.net/comics/")) {
+		// Regex for the explosm website. Possible matches:
+		// http://explosm.net/comics/3530
+		// http://explosm.net/comics/3530/
+		// http://www.explosm.net/comics/3530/
+		if (!currentUrl.matches("http(s)?://(www\\.)?explosm\\.net/comics/\\d*(/)?")) {
 			Log.e(CyanideViewer.TAG, "Cannot load comic: URL not in correct format: " + currentUrl);
 			return -1;
 		}
@@ -277,6 +281,10 @@ public class CyanideApi extends BaseComicApi {
 			if (bitmapUrl == null) {
 				// There was no comic on that page
 				newestValidComicId--;
+				if (newestValidComicId < 0) {
+					Log.e(CyanideViewer.TAG, "Search for the newest valid comic ID went negative, aborting.");
+					return -1;
+				}
 				continue;
 			}
 

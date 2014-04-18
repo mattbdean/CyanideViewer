@@ -95,10 +95,14 @@ public class ComicPagerAdapter extends PagerAdapter {
 
 	/**
 	 * Gets a ComicStage at a given position
-	 * @param position
-	 * @return
+	 * @param position The position at which to get the ComicStage
+	 * @return A ComicStage, if the position exists, or null if it does not
 	 */
 	public ComicStage getComicStage(int position) {
-		return views.get(position);
+		if (position >= 0 && position < views.size()) {
+			return views.get(position);
+		}
+		return null;
+
 	}
 }

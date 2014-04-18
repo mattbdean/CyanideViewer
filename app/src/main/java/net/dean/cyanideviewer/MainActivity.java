@@ -9,7 +9,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -17,7 +20,6 @@ import net.dean.cyanideviewer.api.CyanideApi;
 import net.dean.cyanideviewer.api.comic.Comic;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 /**
  * The main activity of Cyanide Viewer
@@ -44,6 +46,11 @@ public class MainActivity extends FragmentActivity {
 	 */
 	private ToggleButton favoriteButton;
 
+	private LinearLayout loadingView;
+
+	private Animation fadeIn;
+	private Animation fadeOut;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -53,11 +60,31 @@ public class MainActivity extends FragmentActivity {
 		this.pagerAdapter = new ComicPagerAdapter();
 		this.favoriteButton = (ToggleButton) findViewById(R.id.action_favorite);
 		this.downloadButton = (ImageButton) findViewById(R.id.download);
+		this.loadingView = (LinearLayout) findViewById(R.id.loading_view);
+		this.fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in);
+		fadeIn.setAnimationListener(new Animation.AnimationListener() {
+			@Override
+			public void onAnimationStart(Animation animation) {
+				if (loadingView.getVisibility() != View.VISIBLE) {
+					loadingView.setVisibility(View.VISIBLE);
+				}
+			}
+
+			@Override public void onAnimationEnd(Animation animation) { }
+			@Override public void onAnimationRepeat(Animation animation) { }
+		});
+		this.fadeOut = AnimationUtils.loadAnimation(this, R.anim.fade_out);
+		fadeOut.setAnimationListener(new Animation.AnimationListener() {
+			@Override public void onAnimationStart(Animation animation) {}
+
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				loadingView.setVisibility(View.INVISIBLE);
+			}
+			@Override public void onAnimationRepeat(Animation animation) {}
+		});
 
 		viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-			@Override
-			public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { }
-
 			@Override
 			public void onPageSelected(final int position) {
 				if (position == 0) {
@@ -97,34 +124,37 @@ public class MainActivity extends FragmentActivity {
 				refreshButtonStates();
 			}
 
-			@Override
-			public void onPageScrollStateChanged(int state) { }
+			@Override public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+			@Override public void onPageScrollStateChanged(int state) {}
+
 		});
 
-		setComic(CyanideApi.instance().getNewestId());
-		viewPager.setCurrentItem(pagerAdapter.getCount() - 1);
-		// Load second newest comic
-		pagerAdapter.getComicStage(viewPager.getCurrentItem() - 1).loadComic();
+		new SetComicTask() {
+			@Override
+			protected void onPostExecute(Integer currentItemIndex) {
+				super.onPostExecute(currentItemIndex);
+				// Load second newest comic
+				ComicStage before = pagerAdapter.getComicStage(currentItemIndex - 1);
+				if (before != null)
+					before.loadComic();
 
-		refreshButtonStates();
+				ComicStage after = pagerAdapter.getComicStage(currentItemIndex + 1);
+				if (after != null)
+					after.loadComic();
+
+				refreshButtonStates();
+			}
+		}.execute(CyanideApi.instance().getNewestId());
 	}
 
-	/**
-	 * Shows a comic with the given ID to the user
-	 * @param id The ID to use
-	 */
-	public void setComic(final long id) {
-		try {
-			viewPager.setAdapter(null);
-			int currentItemIndex = new SetComicTask().execute(id).get();
-			viewPager.setAdapter(pagerAdapter);
-			viewPager.setCurrentItem(currentItemIndex);
-		} catch (InterruptedException e) {
-			Log.e(CyanideViewer.TAG, "Interrupted trying to set the new comic to #" + id, e);
-		} catch (ExecutionException e) {
-			Log.e(CyanideViewer.TAG, "An error occurred while trying to set the new comic to #" + id, e);
-		}
+	private void showLoading() {
+		loadingView.startAnimation(fadeIn);
 	}
+
+	private void showStage() {
+		loadingView.startAnimation(fadeOut);
+	}
+
 
 	/**
 	 * Refreshes the state of the download button based on if the comic exists on the file system
@@ -152,7 +182,6 @@ public class MainActivity extends FragmentActivity {
 
 	/**
 	 * Gets the ID of the comic currently being shown to the user
-	 * @return
 	 */
 	private long getCurrentComicId() {
 		return pagerAdapter.getComicStage(viewPager.getCurrentItem()).getComicIdToLoad();
@@ -280,8 +309,9 @@ public class MainActivity extends FragmentActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		refreshButtonStates();
+//		refreshButtonStates();
 	}
+
 
 	/**
 	 * Called when the 'Random' button is called. Shows a random comic to the user.
@@ -304,9 +334,25 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	/**
+	 * Shows a comic with the given ID to the user
+	 * @param id The ID to use
+	 */
+	public void setComic(final long id) {
+		new SetComicTask().execute(id);
+	}
+
+	/**
 	 * This class is used to set the current comic being displayed to the user to a specific comic
 	 */
 	private class SetComicTask extends AsyncTask<Long, Void, Integer> {
+
+		@Override
+		protected void onPreExecute() {
+			// Show the loading screen
+			showLoading();
+
+			viewPager.setAdapter(null);
+		}
 
 		@Override
 		protected Integer doInBackground(Long... params) {
@@ -362,6 +408,14 @@ public class MainActivity extends FragmentActivity {
 			}
 
 			return curComicPagerIndex;
+		}
+
+		@Override
+		protected void onPostExecute(Integer currentItemIndex) {
+			viewPager.setAdapter(pagerAdapter);
+			viewPager.setCurrentItem(currentItemIndex);
+
+			showStage();
 		}
 	}
 }

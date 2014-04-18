@@ -20,6 +20,7 @@ import org.apache.http.protocol.HttpContext;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.SocketException;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -33,7 +34,7 @@ public abstract class BaseComicApi implements ComicApi {
 	private static final File IMAGE_DIR = new File(Environment.getExternalStorageDirectory(), "CyanideViewer");
 
 	/**
-	 * The directory taht will be used to write icons to. This is a subdirectory of {@link #IMAGE_DIR}
+	 * The directory that will be used to write icons to. This is a subdirectory of {@link #IMAGE_DIR}
 	 * called "icons"
 	 */
 	private static final File ICON_DIR = new File(IMAGE_DIR, "icons");
@@ -78,6 +79,9 @@ public abstract class BaseComicApi implements ComicApi {
 			response.getEntity().consumeContent();
 			Log.i(CyanideViewer.TAG, "Followed \"" + url + "\" to \"" + currentUrl + "\"");
 			return currentUrl;
+		} catch (SocketException e) {
+			Log.e(CyanideViewer.TAG, "Server-side error when trying to get the latest comic ID", e);
+			return null;
 		} catch (IOException e) {
 			Log.e(CyanideViewer.TAG, "Unable to get the latest comic ID", e);
 			return null;

@@ -1,44 +1,73 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="net.dean.cyanideviewer.MainActivity"
-    android:orientation="vertical">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="fill_parent"
+             android:layout_height="fill_parent"
+             android:orientation="vertical">
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/comic_pager"
-        android:layout_width="match_parent"
-        android:layout_height="0px"
-        android:layout_weight="1"/>
 
+    <!-- ComicStage container -->
     <LinearLayout
-        style="@style/secondaryBackground"
-        android:gravity="center"
-        android:layout_width="fill_parent"
-        android:layout_height="72dp"
-        android:paddingBottom="@dimen/activity_vertical_margin"
-        android:paddingTop="8dp"
-        android:id="@+id/navigationButtons">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context="net.dean.cyanideviewer.MainActivity">
 
-        <ToggleButton
-            android:id="@+id/action_favorite"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawableTop="@drawable/ic_action_favorite_details"
-            android:textOn=""
-            android:textOff=""
-            android:onClick="onFavoriteClicked"/>
-        <ImageButton
-            android:id="@+id/download"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_action_download"
-            android:onClick="onDownloadClicked"/>
-        <ImageButton
-            android:id="@+id/action_random"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="onRandomClicked"
-            android:src="@drawable/ic_action_random"/>
+        <!-- ComicStage -->
+        <android.support.v4.view.ViewPager
+            android:id="@+id/comic_pager"
+            android:layout_width="match_parent"
+            android:layout_height="0px"
+            android:layout_weight="1"/>
+
+        <!-- Buttons (favorite, download, random) -->
+        <LinearLayout
+            android:id="@+id/navigationButtons"
+            style="@style/secondaryBackground"
+            android:layout_width="fill_parent"
+            android:layout_height="72dp"
+            android:gravity="center"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:paddingTop="8dp">
+
+            <ToggleButton
+                android:id="@+id/action_favorite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableTop="@drawable/ic_action_favorite_details"
+                android:onClick="onFavoriteClicked"
+                android:textOff=""
+                android:textOn=""/>
+
+            <ImageButton
+                android:id="@+id/download"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onDownloadClicked"
+                android:src="@drawable/ic_action_download"/>
+
+            <ImageButton
+                android:id="@+id/action_random"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onRandomClicked"
+                android:src="@drawable/ic_action_random"/>
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+
+
+    <!-- Progress bar -->
+    <LinearLayout
+        android:id="@+id/loading_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:background="#CCFFFFFF"
+        android:visibility="invisible"
+        android:clickable="true">
+
+        <ProgressBar
+            style="?android:progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+</FrameLayout>

@@ -31,7 +31,7 @@ class IconDownloadTask extends AsyncTask<Void, Void, Boolean> {
 		}
 
 		File dest = new File(CyanideApi.instance().getSavedIconDirectory(), c.generateFileName());
-		return c.writeBitmap(icon, dest);
+		return Comic.writeBitmap(icon, dest);
 	}
 
 	@Override

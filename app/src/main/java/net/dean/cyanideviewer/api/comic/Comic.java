@@ -42,11 +42,10 @@ public class Comic implements Parcelable {
 	/** The Bitmap that represents the comic */
 	private Bitmap bitmap;
 
-	/**
-	 * Whether the comic has been fully loaded
-	 */
+	/** Whether the comic has been fully loaded */
 	private boolean hasLoaded;
 
+	/** Called when the bitmap has finished loading */
 	private Callback<Void> onBitmapLoaded;
 
 	/**
@@ -102,29 +101,19 @@ public class Comic implements Parcelable {
 	}
 
 	/**
-	 * Copies the value of this comic's bitmap to a file called "<id>.<ext>"
+	 * Tries to download this comic to the local file system. Will download to
+	 * "/sdcard/Cyanide Viewer/$id.$extension
 	 *
 	 * @param downloadButton The button to disable after downloading
 	 */
 	public void download(final ImageButton downloadButton) {
-		download(bitmap, downloadButton);
-	}
-
-	/**
-	 * Tries to download this comic to the local file system. Will download to
-	 * "/sdcard/Cyanide Viewer/$id.$extension
-	 *
-	 * @param bitmap The Bitmap to save
-	 * @param downloadButton The button to disable after downloading
-	 */
-	public void download(final Bitmap bitmap, final ImageButton downloadButton) {
-		new BitmapDownloadTask(this, bitmap, downloadButton).execute();
+		new BitmapDownloadTask(this, downloadButton).execute();
 	}
 
 	/**
 	 * Creates an icon of the comic with the dimensions of
-	 * {@value net.dean.cyanideviewer.api.comic.IconDownloadTask#ICON_DIMENS}
-	 * {@value net.dean.cyanideviewer.api.comic.IconDownloadTask#ICON_DIMENS}
+	 * {@value net.dean.cyanideviewer.api.comic.IconDownloadTask#ICON_DIMENS} by
+	 * {@value net.dean.cyanideviewer.api.comic.IconDownloadTask#ICON_DIMENS} pixels
 	 * and saves it to the icon directory provided by CyanideApi.getSavedImageDirectory()
 	 */
 	public void downloadIcon() {
@@ -133,29 +122,38 @@ public class Comic implements Parcelable {
 
 	/**
 	 * Writes a Bitmap object to a file
-	 * @param source The Bitmap to use
 	 * @param dest The destination of the file
 	 * @return Whether or not this action succeeded
 	 */
-	boolean writeBitmap(Bitmap source, File dest) {
+	boolean writeBitmap(File dest) {
+		// If the destination is a directory, add the name to it
+		if (dest.isDirectory()) {
+			dest = new File(dest, generateFileName());
+		}
+		// Create the appropriate directories
+		if (!dest.getParentFile().isDirectory()) {
+			if (!dest.getParentFile().mkdirs()) {
+				Log.e(CyanideViewer.TAG, "Unable to create the parent directories for "
+						+ dest.getAbsolutePath());
+			}
+		}
+
+		return writeBitmap(bitmap, dest);
+	}
+
+	/**
+	 * Writes a Bitmap object to a file
+	 * @param source The Bitmap to write
+	 * @param dest The destination of the file
+	 * @return Whether or not this action succeeded
+	 */
+	static boolean writeBitmap(Bitmap source, File dest) {
 		ByteArrayOutputStream bos = null;
 		FileOutputStream fos = null;
 
 		String ext = dest.getName().substring(dest.getName().lastIndexOf('.'));
 
 		try {
-			// If the destination is a directory, add the name to it
-			if (dest.isDirectory()) {
-				dest = new File(dest, generateFileName());
-			}
-			// Create the appropriate directories
-			if (!dest.getParentFile().isDirectory()) {
-				if (!dest.getParentFile().mkdirs()) {
-					Log.e(CyanideViewer.TAG, "Unable to create the parent directories for "
-							+ dest.getAbsolutePath());
-				}
-			}
-
 			bos = new ByteArrayOutputStream();
 
 			// Copy the contents of the Bitmap to a file
@@ -260,18 +258,35 @@ public class Comic implements Parcelable {
 		this.isFavorite = isFavorite;
 	}
 
+	/**
+	 * Sets the bitmap
+	 * @param bitmap The new bitmap
+	 */
 	void setBitmap(Bitmap bitmap) {
 		this.bitmap = bitmap;
 	}
 
+	/**
+	 * Gets the bitmap
+	 * @return This comic's bitmap
+	 */
 	public Bitmap getBitmap() {
 		return bitmap;
 	}
 
+	/**
+	 * Sets if this comic's bitmap has loaded yet
+	 * @param hasLoaded If the comic has loaded yet
+	 */
 	void setHasLoaded(boolean hasLoaded) {
 		this.hasLoaded = hasLoaded;
 	}
 
+	/**
+	 * Sets the action to take place once the bitmap has loaded. If it has already loaded, the action
+	 * is called immediately.
+	 * @param action The action to do
+	 */
 	public void setOnBitmapLoaded(Callback<Void> action) {
 		// Execute it if it has already been loaded
 		if (hasLoaded) {
@@ -282,12 +297,24 @@ public class Comic implements Parcelable {
 		}
 	}
 
+	/**
+	 * A simple test to check the validity of this comic's fields. This method will only return true
+	 * if the ID is greater than or equal to the first ID, less than or equal to the newest ID, and
+	 * the URL is not null
+	 * @return Whether or not this comic is valid
+	 */
 	public boolean isValid() {
 		return (id >= CyanideApi.instance().getFirstId()
 				&& id <= CyanideApi.instance().getNewestId()
 				&& url != null);
 	}
 
+	/**
+	 * A more expensive test to check if this comic really is valid. In order to return true,
+	 * {@link #isValid()} must return true, and an HTTP request made to the comic's URL must return a
+	 * 200 status code.
+	 * @return If the comic is valid
+	 */
 	public boolean isValidExpensive() {
 		boolean isValidSimple = isValid();
 		if (!isValidSimple) {
@@ -312,10 +339,16 @@ public class Comic implements Parcelable {
 		return true;
 	}
 
-	public Callback getOnBitmapLoaded() {
+	/**
+	 * Gets the Callback to execute when the bitmap has finished loading
+	 */
+	public Callback<Void> getOnBitmapLoaded() {
 		return onBitmapLoaded;
 	}
 
+	/**
+	 * Resets the onBitmapLoaded field
+	 */
 	void resetOnBitmapLoaded() {
 		onBitmapLoaded = null;
 	}

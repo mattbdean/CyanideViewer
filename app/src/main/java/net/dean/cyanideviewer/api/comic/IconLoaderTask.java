@@ -16,9 +16,16 @@ import java.io.File;
  * Loads a Bitmap from the "icons" directory provided by CyanideApi.getSavedIconDirectory()
  */
 class IconLoaderTask extends AsyncTask<Void, Void, Bitmap> {
+	/** The comic to load the icon for */
 	private Comic comic;
+	/** The list item whose components will be changed when the comic's icon is loaded */
 	private FavoriteComicListItem item;
 
+	/**
+	 * Instantiates a new IconLoaderTask
+	 * @param item The item to use
+	 * @param comic The comic to use
+	 */
 	public IconLoaderTask(FavoriteComicListItem item, Comic comic) {
 		this.item = item;
 		this.comic = comic;

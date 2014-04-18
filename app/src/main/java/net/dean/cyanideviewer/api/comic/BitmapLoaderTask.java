@@ -30,12 +30,18 @@ import uk.co.senab.photoview.PhotoViewAttacher;
  * Represents the task of loading a Comic's URL into a Bitmap usable by an ImageView
  */
 class BitmapLoaderTask extends AsyncTask<Long, Void, Bitmap> {
+	/**
+	 * The ComicStage whose components will be altered after the bitmap and it's metadata have finished
+	 * loading
+	 */
 	private ComicStage stage;
-	private Comic comic;
 
+	/**
+	 * Instantiates a new BitmapLoaderTask
+	 * @param stage The ComicStage to use
+	 */
 	public BitmapLoaderTask(ComicStage stage) {
 		this.stage = stage;
-		this.comic = stage.getComic();
 	}
 
 	@Override
@@ -53,15 +59,15 @@ class BitmapLoaderTask extends AsyncTask<Long, Void, Bitmap> {
 		try {
 			if (stage.getComic().getUrl().getProtocol().equals("file")) {
 				// Local file, no need to make any HTTP requests
-				return BitmapFactory.decodeFile(URLDecoder.decode(comic.getUrl().getPath(), "UTF-8"));
+				return BitmapFactory.decodeFile(URLDecoder.decode(stage.getComic().getUrl().getPath(), "UTF-8"));
 			}
 
 			HttpClient client = new DefaultHttpClient();
 			client.getParams().setParameter(ClientPNames.ALLOW_CIRCULAR_REDIRECTS, false);
-			HttpGet request = new HttpGet(comic.getUrl().toURI());
+			HttpGet request = new HttpGet(stage.getComic().getUrl().toURI());
 			HttpResponse response = client.execute(request);
 			if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-				Log.w(CyanideViewer.TAG, "Failed to fetch comic at " + comic.getUrl().toExternalForm());
+				Log.w(CyanideViewer.TAG, "Failed to fetch comic at " + stage.getComic().getUrl().toExternalForm());
 				return null;
 			}
 			HttpEntity entity = response.getEntity();
@@ -79,10 +85,10 @@ class BitmapLoaderTask extends AsyncTask<Long, Void, Bitmap> {
 			}
 
 		} catch (URISyntaxException e) {
-			Log.e(CyanideViewer.TAG, "URISyntaxException: " + comic.getUrl(), e);
+			Log.e(CyanideViewer.TAG, "URISyntaxException: " + stage.getComic().getUrl(), e);
 			return null;
 		} catch (IOException e) {
-			Log.e(CyanideViewer.TAG, "IOException while trying to decode the image from URL " + comic.getUrl(), e);
+			Log.e(CyanideViewer.TAG, "IOException while trying to decode the image from URL " + stage.getComic().getUrl(), e);
 			return null;
 		}
 
@@ -92,17 +98,17 @@ class BitmapLoaderTask extends AsyncTask<Long, Void, Bitmap> {
 	@Override
 	protected void onPostExecute(Bitmap bitmap) {
 		if (bitmap != null) {
-			comic.setBitmap(bitmap);
+			stage.getComic().setBitmap(bitmap);
 
 			ImageView imageView = (ImageView) stage.findViewById(R.id.image_view);
 			imageView.setImageBitmap(bitmap);
 			new PhotoViewAttacher(imageView);
 
-			comic.setHasLoaded(true);
+			stage.getComic().setHasLoaded(true);
 
-			if (comic.getOnBitmapLoaded() != null) {
-				comic.getOnBitmapLoaded().onComplete(null);
-				comic.resetOnBitmapLoaded();
+			if (stage.getComic().getOnBitmapLoaded() != null) {
+				stage.getComic().getOnBitmapLoaded().onComplete(null);
+				stage.getComic().resetOnBitmapLoaded();
 			}
 		}
 	}

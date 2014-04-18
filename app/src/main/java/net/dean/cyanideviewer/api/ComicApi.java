@@ -76,6 +76,10 @@ public interface ComicApi {
 	 */
 	public Comic getRandom();
 
+	/**
+	 * Checks If this API supports random comics
+	 * @return If this API supports random comics
+	 */
 	public boolean getSupportsRandomComics();
 
 	/**
@@ -92,5 +96,10 @@ public interface ComicApi {
 	 */
 	public File getLocalComic(long id);
 
+	/**
+	 * Checks if a new comic is available
+	 * @param callback The callback that will be executed once the checking is complete. If there was
+	 *                 a newer comic, the result will be true, otherwise false
+	 */
 	public void checkForNewComic(Callback<Boolean> callback);
 }

@@ -244,6 +244,11 @@ public class CyanideApi extends BaseComicApi {
 		}
 	}
 
+	/**
+	 * Tries to find the bitmap URL from a URL such as "http://explosm.net/comics/1234"
+	 * @param comicUrl The URL to use
+	 * @return The URL of the comic's image
+	 */
 	private static String getBitmapUrl(String comicUrl) {
 		try {
 			Document doc = Jsoup.connect(comicUrl).get();
@@ -260,6 +265,10 @@ public class CyanideApi extends BaseComicApi {
 		return null;
 	}
 
+	/**
+	 * Gets the newest comic ID
+	 * @return The newest ID
+	 */
 	private static long getNewestComicId() {
 		long newestValidComicId = instance().getIdFromUrl(SpecialSelection.NEWEST.getUrl());
 		boolean needsToSearch = true;

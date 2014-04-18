@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import android.util.Log;
 import android.widget.ImageButton;
 
+import net.dean.cyanideviewer.Callback;
 import net.dean.cyanideviewer.ComicStage;
 import net.dean.cyanideviewer.CyanideUtils;
 import net.dean.cyanideviewer.CyanideViewer;
@@ -46,7 +47,7 @@ public class Comic implements Parcelable {
 	 */
 	private boolean hasLoaded;
 
-	private OnComplete onBitmapLoaded;
+	private Callback<Void> onBitmapLoaded;
 
 	/**
 	 * Instantiates a new Comic assuming the comic is not a favorite
@@ -271,11 +272,11 @@ public class Comic implements Parcelable {
 		this.hasLoaded = hasLoaded;
 	}
 
-	public void setOnBitmapLoaded(OnComplete action) {
+	public void setOnBitmapLoaded(Callback<Void> action) {
 		// Execute it if it has already been loaded
 		if (hasLoaded) {
 			// Don't assign onBitmapLoaded because we want it null so it only executes once
-			action.onComplete();
+			action.onComplete(null);
 		} else {
 			onBitmapLoaded = action;
 		}
@@ -309,10 +310,9 @@ public class Comic implements Parcelable {
 		}
 
 		return true;
-
 	}
 
-	public OnComplete getOnBitmapLoaded() {
+	public Callback getOnBitmapLoaded() {
 		return onBitmapLoaded;
 	}
 

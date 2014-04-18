@@ -15,7 +15,6 @@ import android.widget.ToggleButton;
 
 import net.dean.cyanideviewer.api.CyanideApi;
 import net.dean.cyanideviewer.api.comic.Comic;
-import net.dean.cyanideviewer.api.comic.OnComplete;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
@@ -191,12 +190,36 @@ public class MainActivity extends FragmentActivity {
 		final Comic c = pagerAdapter.getComicStage(viewPager.getCurrentItem()).getComic();
 		// Use a callback approach because the user might have pressed the button before the bitmap
 		// was loaded, causing a NullPointerException
-		c.setOnBitmapLoaded(new OnComplete() {
+		c.setOnBitmapLoaded(new Callback<Void>() {
 			@Override
-			public void onComplete() {
+			public void onComplete(Void result) {
 				c.download(downloadButton);
 			}
 		});
+	}
+
+	public void onLatestRequested() {
+		Log.i(CyanideViewer.TAG, "Latest comic requested");
+		new AsyncTask<Void, Void, Long>() {
+
+			@Override
+			protected Long doInBackground(Void... params) {
+				CyanideApi.instance().checkForNewComic(new Callback<Boolean>() {
+
+					@Override
+					public void onComplete(Boolean result) {
+						Log.i(CyanideViewer.TAG, "User requested latest comic (newer was " + (result ? "" : "not") + " found)");
+					}
+				});
+
+				return CyanideApi.instance().getNewestId();
+			}
+
+			@Override
+			protected void onPostExecute(Long id) {
+				setComic(id);
+			}
+		}.execute();
 	}
 
 	@Override
@@ -223,6 +246,9 @@ public class MainActivity extends FragmentActivity {
 					startActivityForResult(intent, 0);
 				}
 
+				return true;
+			case R.id.menu_go_to_latest:
+				onLatestRequested();
 				return true;
 		}
 
@@ -284,6 +310,7 @@ public class MainActivity extends FragmentActivity {
 
 		@Override
 		protected Integer doInBackground(Long... params) {
+			Log.d(CyanideViewer.TAG, "SetComicTask invoked for #" + params[0]);
 			long id = params[0];
 
 			int curComicPagerIndex = -1;

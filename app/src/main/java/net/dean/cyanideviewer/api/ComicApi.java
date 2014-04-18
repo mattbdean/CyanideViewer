@@ -1,5 +1,6 @@
 package net.dean.cyanideviewer.api;
 
+import net.dean.cyanideviewer.Callback;
 import net.dean.cyanideviewer.api.comic.Comic;
 
 import java.io.File;
@@ -74,6 +75,7 @@ public interface ComicApi {
 	 * @return A random comic
 	 */
 	public Comic getRandom();
+
 	public boolean getSupportsRandomComics();
 
 	/**
@@ -89,4 +91,6 @@ public interface ComicApi {
 	 * @return A File pointing to the comic represented by the given ID
 	 */
 	public File getLocalComic(long id);
+
+	public void checkForNewComic(Callback<Boolean> callback);
 }

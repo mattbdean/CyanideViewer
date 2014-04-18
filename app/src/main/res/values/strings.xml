@@ -41,5 +41,6 @@
         Clears everything this app knows about the C&amp;H comics you\'ve seen. This process can not
         be undone, nor is it recommended.
     </string>
+    <string name="menu_go_to_latest">Go to the latest comic</string>
 
 </resources>

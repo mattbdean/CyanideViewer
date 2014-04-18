@@ -101,7 +101,7 @@ class BitmapLoaderTask extends AsyncTask<Long, Void, Bitmap> {
 			comic.setHasLoaded(true);
 
 			if (comic.getOnBitmapLoaded() != null) {
-				comic.getOnBitmapLoaded().onComplete();
+				comic.getOnBitmapLoaded().onComplete(null);
 				comic.resetOnBitmapLoaded();
 			}
 		}

@@ -2,6 +2,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="net.dean.cyanideviewer.MainActivity" >
 
+    <item android:id="@+id/menu_go_to_latest"
+          android:title="@string/menu_go_to_latest"
+          android:icon="@drawable/ic_action_refresh"
+          android:orderInCategory="9"
+          android:showAsAction="ifRoom" />
+
     <item android:id="@+id/menu_favorites"
           android:title="@string/menu_favorites"
           android:icon="@drawable/ic_action_favorite"

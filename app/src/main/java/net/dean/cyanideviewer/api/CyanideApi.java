@@ -3,6 +3,7 @@ package net.dean.cyanideviewer.api;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import net.dean.cyanideviewer.Callback;
 import net.dean.cyanideviewer.CyanideUtils;
 import net.dean.cyanideviewer.CyanideViewer;
 import net.dean.cyanideviewer.api.comic.Comic;
@@ -233,23 +234,11 @@ public class CyanideApi extends BaseComicApi {
 
 				@Override
 				protected Long doInBackground(Void... params) {
-					long newestValidComicId = instance().getIdFromUrl(SpecialSelection.NEWEST.getUrl());
-					boolean needsToSearch = true;
-					while (needsToSearch) {
-						if (getBitmapUrl(BASE_URL + newestValidComicId) == null) {
-							// There was no comic on that page
-							newestValidComicId--;
-							continue;
-						}
-
-						// The comic page was valid, no need to search anymore
-						needsToSearch = false;
-					}
-
-					return newestValidComicId;
+					return getNewestComicId();
 				}
 			}.execute().get();
 			Log.i(CyanideViewer.TAG, "Found newest ID: " + instance.newestId);
+
 		} catch (InterruptedException | ExecutionException e) {
 			Log.e(CyanideViewer.TAG, "Failed to find the first or newest comic IDs", e);
 		}
@@ -269,5 +258,33 @@ public class CyanideApi extends BaseComicApi {
 		}
 
 		return null;
+	}
+
+	private static long getNewestComicId() {
+		long newestValidComicId = instance().getIdFromUrl(SpecialSelection.NEWEST.getUrl());
+		boolean needsToSearch = true;
+		while (needsToSearch) {
+			String bitmapUrl = getBitmapUrl(BASE_URL + newestValidComicId);
+			if (bitmapUrl == null) {
+				// There was no comic on that page
+				newestValidComicId--;
+				continue;
+			}
+
+			// The comic page was valid, no need to search anymore
+			needsToSearch = false;
+		}
+
+		return newestValidComicId;
+	}
+
+	@Override
+	public void checkForNewComic(Callback<Boolean> callback) {
+		long latest = getNewestComicId();
+		boolean hasNewer = latest > newestId && latest != -1;
+		if (latest != -1) {
+			newestId = latest;
+		}
+		callback.onComplete(hasNewer);
 	}
 }

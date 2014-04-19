@@ -100,7 +100,7 @@ class BitmapLoaderTask extends AsyncTask<Long, Void, Bitmap> {
 		if (bitmap != null) {
 			stage.getComic().setBitmap(bitmap);
 
-			ImageView imageView = (ImageView) stage.findViewById(R.id.image_view);
+			ImageView imageView = stage.getImageView();
 			imageView.setImageBitmap(bitmap);
 			new PhotoViewAttacher(imageView);
 

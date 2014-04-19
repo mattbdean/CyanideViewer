@@ -345,6 +345,15 @@ public class MainActivity extends FragmentActivity {
 	 * This class is used to set the current comic being displayed to the user to a specific comic
 	 */
 	private class SetComicTask extends AsyncTask<Long, Void, Integer> {
+		private boolean showStagePostExecute;
+
+		public SetComicTask() {
+			this(true);
+		}
+
+		public SetComicTask(boolean showStagePostExecute) {
+			this.showStagePostExecute = showStagePostExecute;
+		}
 
 		@Override
 		protected void onPreExecute() {
@@ -374,6 +383,13 @@ public class MainActivity extends FragmentActivity {
 				}
 				// Not the first time this has been called
 				int midway = pagerAdapter.getCount() / 2;
+				if (id == CyanideApi.instance().getNewestId()) {
+					// Make midway all the way to the right so that there are no views to the right of it
+					midway = pagerAdapter.getCount() - 1;
+				} else if (id == CyanideApi.instance().getFirstId()) {
+					// Shift it all the way to the left
+					midway = 0;
+				}
 				pagerAdapter.getComicStage(midway).setComic(id);
 				curComicPagerIndex = midway;
 				// From the midway to the beginning
@@ -387,6 +403,21 @@ public class MainActivity extends FragmentActivity {
 					pagerAdapter.getComicStage(i).setComic(nextComic.getId());
 					nextComic = CyanideApi.instance().getNext(nextComic.getId());
 				}
+
+				// Load the comics and remove the loading screen
+				pagerAdapter.getComicStage(curComicPagerIndex).loadComic(new Callback<Void>() {
+					@Override
+					public void onComplete(Void result) {
+						showStage();
+					}
+				});
+
+				ComicStage before = pagerAdapter.getComicStage(curComicPagerIndex - 1);
+				if (before != null)
+					before.loadComic();
+				ComicStage after = pagerAdapter.getComicStage(curComicPagerIndex + 1);
+				if (after != null)
+					after.loadComic();
 			} else {
 				// First time setup
 				if (prevComic != null) {
@@ -415,7 +446,10 @@ public class MainActivity extends FragmentActivity {
 			viewPager.setAdapter(pagerAdapter);
 			viewPager.setCurrentItem(currentItemIndex);
 
-			showStage();
+			if (showStagePostExecute) {
+				showStage();
+			}
+
 		}
 	}
 }

@@ -8,8 +8,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import net.dean.cyanideviewer.api.comic.Comic;
 import net.dean.cyanideviewer.api.CyanideApi;
+import net.dean.cyanideviewer.api.comic.Comic;
 
 import uk.co.senab.photoview.PhotoViewAttacher;
 
@@ -71,15 +71,23 @@ public class ComicStage extends LinearLayout {
 	public void setComic(long id) {
 		this.idToLoad = id;
 		((TextView) findViewById(R.id.comic_id)).setText("#" + idToLoad);
+		this.imageView = (ImageView) findViewById(R.id.image_view);
 		// Set the ImageView to be clear if it has been set before
-		if (imageView != null)
-			imageView.setImageResource(android.R.color.transparent);
+		imageView.setImageResource(android.R.color.transparent);
 	}
 
 	/**
 	 * Loads the comic through the use of a BitmapLoaderTask
 	 */
 	public void loadComic() {
+		loadComic(null);
+	}
+
+	/**
+	 * Loads the comic through the use of a BitmapLoaderTask
+	 * @param onBitmapLoaded Executed when the bitmap is finished loading
+	 */
+	public void loadComic(final Callback<Void> onBitmapLoaded) {
 		if (idToLoad != -1) {
 			new AbstractComicTask<Long>() {
 
@@ -92,6 +100,9 @@ public class ComicStage extends LinearLayout {
 				protected void onPostExecute(Comic comic) {
 					if (comic != null) {
 						ComicStage.this.comic = comic;
+						if (onBitmapLoaded != null) {
+							comic.setOnBitmapLoaded(onBitmapLoaded);
+						}
 						comic.loadBitmap(ComicStage.this);
 					}
 				}
@@ -120,6 +131,10 @@ public class ComicStage extends LinearLayout {
 	 */
 	public long getComicIdToLoad() {
 		return idToLoad;
+	}
+
+	public ImageView getImageView() {
+		return imageView;
 	}
 
 

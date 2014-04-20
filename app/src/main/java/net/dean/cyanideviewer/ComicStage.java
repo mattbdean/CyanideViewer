@@ -18,7 +18,6 @@ import uk.co.senab.photoview.PhotoViewAttacher;
  * main parts: an ImageView to hold the image, a ProgressBar to tell the user when the comic is
  * still loading, and a TextView to show the user the ID of the comic they are viewing.
  *
- * Panning/Zooming adapted from http://stackoverflow.com/a/6650484/1275092
  */
 public class ComicStage extends LinearLayout {
 

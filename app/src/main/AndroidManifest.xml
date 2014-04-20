@@ -32,6 +32,7 @@
         </activity>
 
         <receiver android:name=".api.comic.BitmapDownloadTask$NotificationReceiver" />
+        <meta-data android:name="com.crashlytics.ApiKey" android:value="f8263e4a0031e704a27934ca476ab309786a5529"/>
     </application>
 
 </manifest>

@@ -19,12 +19,16 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * Represents an Cyanide and Happiness comic.
  */
 public class Comic extends Model implements Parcelable {
+	private static final DateFormat dateFormat = new SimpleDateFormat("EEEE, MMMM d, yyyy", Locale.US);
 
 	/** The URL of the comic's image */
 	@DatabaseField(columnName = "url")
@@ -287,6 +291,10 @@ public class Comic extends Model implements Parcelable {
 
 	public Date getPublished() {
 		return published;
+	}
+
+	public String getPublishedFormatted() {
+		return dateFormat.format(published);
 	}
 
 	public void setPublished(Date published) {

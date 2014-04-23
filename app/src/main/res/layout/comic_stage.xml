@@ -2,29 +2,54 @@
 
 <net.dean.cyanideviewer.ComicStage
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/comic_id"
+    <RelativeLayout
+        style="@style/secondaryBackground"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
         android:gravity="center"
-        android:textSize="32sp"/>
+        android:paddingTop="@dimen/item_padding_small">
+
+        <ImageButton
+            android:id="@+id/author_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/item_padding"/>
+
+        <TextView
+            android:id="@+id/comic_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/author_button"
+            android:textSize="32sp"
+            android:textColor="#363636"/>
+
+        <TextView
+            android:id="@+id/comic_date_published"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/author_button"
+            android:layout_below="@id/comic_id"
+            android:textSize="14sp"
+            android:textColor="#363636"/>
+
+    </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
 
         <ProgressBar
-            style="?android:attr/progressBarStyleLarge"
             android:id="@+id/progress_bar"
+            style="?android:attr/progressBarStyleLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:indeterminateOnly="true"
+            android:layout_centerInParent="true"
             android:indeterminate="true"
-            android:layout_centerInParent="true"/>
+            android:indeterminateOnly="true"/>
 
         <ImageView
             android:id="@+id/image_view"

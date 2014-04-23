@@ -1,10 +1,10 @@
 package net.dean.cyanideviewer.api.comic;
 
-import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import net.dean.cyanideviewer.CyanideViewer;
+import net.dean.cyanideviewer.R;
 import net.dean.cyanideviewer.db.DatabaseField;
 import net.dean.cyanideviewer.db.Model;
 
@@ -21,7 +21,6 @@ public class Author extends Model implements Parcelable {
 	private String twitter;
 	@DatabaseField(columnName = "facebook")
 	private String facebook;
-	private Bitmap icon;
 
 	public Author(long id, String name, String twitter, String facebook) {
 		super(id);
@@ -69,12 +68,19 @@ public class Author extends Model implements Parcelable {
 		this.facebook = facebook;
 	}
 
-	public Bitmap getIcon() {
-		return icon;
-	}
+	public int getIconResource() {
+		switch (getFirstName().toLowerCase()) {
+			case "kris":
+				return R.drawable.ic_author_kris;
+			case "rob":
+				return R.drawable.ic_author_rob;
+			case "matt":
+				return R.drawable.ic_author_matt;
+			case "dave":
+				return R.drawable.ic_author_dave;
+		}
 
-	public void setIcon(Bitmap icon) {
-		this.icon = icon;
+		return -1;
 	}
 
 	public static final Creator CREATOR = new Creator() {
@@ -110,7 +116,6 @@ public class Author extends Model implements Parcelable {
 				", name='" + name + '\'' +
 				", twitter=" + twitter +
 				", facebook=" + facebook +
-				", icon=" + icon +
 				'}';
 	}
 

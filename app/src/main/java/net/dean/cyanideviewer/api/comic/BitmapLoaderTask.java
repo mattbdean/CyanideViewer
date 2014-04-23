@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -46,10 +47,9 @@ class BitmapLoaderTask extends AsyncTask<Long, Void, Bitmap> {
 
 	@Override
 	protected void onPreExecute() {
-		if (stage != null) {
-			TextView tv = (TextView) stage.findViewById(R.id.comic_id);
-			tv.setText("#" + stage.getComicIdToLoad());
-		}
+		((TextView) stage.findViewById(R.id.comic_id)).setText("#" + stage.getComic().getId());
+		((ImageButton) stage.findViewById(R.id.author_button)).setImageResource(stage.getComic().getAuthor().getIconResource());
+		((TextView) stage.findViewById(R.id.comic_date_published)).setText(stage.getComic().getPublishedFormatted());
 	}
 
 	@Override

@@ -12,7 +12,7 @@
         android:orientation="vertical"
         tools:context="net.dean.cyanideviewer.MainActivity">
 
-        <!-- ComicStage -->
+        <!-- ComicStage pager -->
         <android.support.v4.view.ViewPager
             android:id="@+id/comic_pager"
             android:layout_width="match_parent"

@@ -11,8 +11,6 @@ import android.widget.TextView;
 import net.dean.cyanideviewer.api.CyanideApi;
 import net.dean.cyanideviewer.api.comic.Comic;
 
-import uk.co.senab.photoview.PhotoViewAttacher;
-
 /**
  * Represents the main component of this application: where the comic is presented. It contains three
  * main parts: an ImageView to hold the image, a ProgressBar to tell the user when the comic is
@@ -51,12 +49,6 @@ public class ComicStage extends LinearLayout {
 	 * The Comic that is to be displayed on this stage
 	 */
 	private Comic comic;
-
-	/**
-	 * The PhotoViewAttacher that provides pinch/double tap zooming and panning functionality
-	 * to the ImageView
-	 */
-	private PhotoViewAttacher photoViewAttacher;
 
 
 	/** Instantiates a new ComicStage */
@@ -109,13 +101,6 @@ public class ComicStage extends LinearLayout {
 		}
 	}
 
-	@Override
-	protected void onDetachedFromWindow() {
-		if (photoViewAttacher != null) photoViewAttacher.cleanup();
-		photoViewAttacher = null;
-		super.onDetachedFromWindow();
-	}
-
 	/**
 	 * Gets the comic associated with this stage
 	 * @return The comic
@@ -143,7 +128,6 @@ public class ComicStage extends LinearLayout {
 		sb.append("idToLoad=").append(idToLoad);
 		sb.append(", comic=").append(comic);
 		sb.append(", imageView=").append(imageView);
-		sb.append(", photoViewAttacher=").append(photoViewAttacher);
 		sb.append('}');
 		return sb.toString();
 	}

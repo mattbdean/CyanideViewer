@@ -97,7 +97,7 @@ public class SettingsFragment extends PreferenceFragment {
 	private void onWipeDatabase() {
 		// Truncate the database
 		Log.w(CyanideViewer.TAG, "Truncating the database after user request");
-		CyanideViewer.getComicDao().deleteAllComics();
+		CyanideViewer.getComicDao().deleteAll();
 		Toast.makeText(getActivity().getApplicationContext(), "Database wiped.", Toast.LENGTH_SHORT).show();
 	}
 

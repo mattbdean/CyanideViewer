@@ -200,7 +200,7 @@ public class MainActivity extends FragmentActivity {
 
 		// Flip it
 		currentDbComic.setFavorite(!currentDbComic.isFavorite());
-		CyanideViewer.getComicDao().updateComicAsFavorite(currentDbComic);
+		CyanideViewer.getComicDao().update(currentDbComic);
 
 		pagerAdapter.getComicStage(viewPager.getCurrentItem()).getComic().downloadIcon();
 
@@ -212,7 +212,7 @@ public class MainActivity extends FragmentActivity {
 	 * @return A comic from the database
 	 */
 	private Comic getCurrentDbComic() {
-		return CyanideViewer.getComicDao().getComic(getCurrentComicId());
+		return CyanideViewer.getComicDao().get(getCurrentComicId());
 	}
 
 	/**

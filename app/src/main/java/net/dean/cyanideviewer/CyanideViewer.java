@@ -4,7 +4,9 @@ import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
-import net.dean.cyanideviewer.db.ComicDaoImpl;
+import net.dean.cyanideviewer.db.AuthorDao;
+import net.dean.cyanideviewer.db.ComicDao;
+import net.dean.cyanideviewer.db.CyanideDatabaseHelper;
 
 /**
  * The main class for Cyanide Viewer.
@@ -17,14 +19,25 @@ public class CyanideViewer extends Application {
 	private static Context context;
 
 	/** The data access object used to interact with the database */
-	private static ComicDaoImpl comicDao;
+	private static ComicDao comicDao;
+
+	private static AuthorDao authorDao;
+
+	private static CyanideDatabaseHelper helper;
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		Log.i(TAG, "Starting application");
 		CyanideViewer.context = getApplicationContext();
-		CyanideViewer.comicDao = new ComicDaoImpl(context);
+
+		if (helper == null) {
+			helper = new CyanideDatabaseHelper(context);
+		}
+
+		CyanideViewer.helper = new CyanideDatabaseHelper(context);
+		CyanideViewer.authorDao = new AuthorDao(helper);
+		CyanideViewer.comicDao = new ComicDao(helper,  authorDao);
 	}
 
 	/** Returns this application's context */
@@ -33,7 +46,11 @@ public class CyanideViewer extends Application {
 	}
 
 	/** Returns this application's ComicDao */
-	public static ComicDaoImpl getComicDao() {
+	public static ComicDao getComicDao() {
 		return comicDao;
+	}
+
+	public static AuthorDao getAuthorDao() {
+		return authorDao;
 	}
 }

@@ -6,6 +6,7 @@ import android.util.Log;
 import net.dean.cyanideviewer.Callback;
 import net.dean.cyanideviewer.CyanideUtils;
 import net.dean.cyanideviewer.CyanideViewer;
+import net.dean.cyanideviewer.api.comic.Author;
 import net.dean.cyanideviewer.api.comic.Comic;
 
 import org.apache.commons.io.FileUtils;
@@ -16,6 +17,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -28,6 +32,8 @@ public class CyanideApi extends BaseComicApi {
 
 	/** The one and only instance of CyanideApi  */
 	private static CyanideApi instance;
+
+	private static final DateFormat dateFormat = new SimpleDateFormat("MM.d.yyyy");
 
 	/** Retrieves the one and only instance of CyanideApi */
 	public static CyanideApi instance() {
@@ -176,19 +182,19 @@ public class CyanideApi extends BaseComicApi {
 
 	@Override
 	public Comic getComic(long id) {
-		Comic c = new Comic(id, null, false);
+		Comic c = new Comic(id, null, null, null);
 
-		if (CyanideViewer.getComicDao().comicExists(id)) {
+		if (CyanideViewer.getComicDao().exists(id)) {
 			// The comic was found in the database
 			Log.i(CyanideViewer.TAG, "Comic #" + id + " was found on the database, using it's info");
-			c = CyanideViewer.getComicDao().getComic(id);
+			c = CyanideViewer.getComicDao().get(id);
 		} else {
 			String url = getBitmapUrl(id);
 			if (url != null) {
 				// The wasn't in the database, add it
 				Log.i(CyanideViewer.TAG, "Comic #" + id + " was not found in the database.");
-				c.setUrl(CyanideUtils.newUrl(url));
-				CyanideViewer.getComicDao().addComic(c);
+				c = fillMetadata(c);
+				CyanideViewer.getComicDao().add(c);
 			}
 		}
 
@@ -200,7 +206,6 @@ public class CyanideApi extends BaseComicApi {
 				URL url = localComic.toURI().toURL();
 				c.setUrl(url);
 				Log.i(CyanideViewer.TAG, "Using comic on filesystem for #" + id + ": " + url.toExternalForm());
-				return new Comic(id, url);
 			} catch (MalformedURLException e) {
 				Log.e(CyanideViewer.TAG, "Malformed URL: " + localComic.getAbsolutePath(), e);
 			}
@@ -246,6 +251,46 @@ public class CyanideApi extends BaseComicApi {
 		} catch (InterruptedException | ExecutionException e) {
 			Log.e(CyanideViewer.TAG, "Failed to find the first or newest comic IDs", e);
 		}
+	}
+
+	/**
+	 * Sets a comic's bitmap URL, author, and date published if they have not been set already.
+	 * @param c The comic to fill
+	 * @return A variant of the given comic that has it's metadata filled out
+	 */
+	private Comic fillMetadata(Comic c) {
+		if (c.getUrl() == null || c.getAuthor() == null || c.getPublished() == null) {
+			try {
+				Document doc = Jsoup.connect(getBaseUrl() + c.getId()).get();
+				if (c.getUrl() == null) {
+					c.setUrl(CyanideUtils.newUrl(doc.select("#maincontent img[src*=/db/files/Comics/]").get(0).attr("src")));
+				}
+				if (c.getPublished() == null || c.getAuthor() == null) {
+					// "by", "Dave", "McElfatrick", "04.22.2014"
+					String[] parts = doc.select("nobr").get(0).text().split(" ");
+
+					if (c.getPublished() == null) {
+						String date = parts[3];
+						try {
+							// Parse the date
+							c.setPublished(dateFormat.parse(date));
+						} catch (ParseException e) {
+							Log.e(CyanideViewer.TAG, "Unable to parse " + date + " to a date.", e);
+						}
+					}
+
+					if (c.getAuthor() == null) {
+						// "Dave" + "McElfatrick"
+						c.setAuthor(Author.getByName(parts[1] + " " + parts[2]));
+					}
+				}
+			} catch (IOException e) {
+				Log.e(CyanideViewer.TAG, "Unable to fill in comic metadata for #" + c.getId());
+				return null;
+			}
+		}
+
+		return c;
 	}
 
 	/**

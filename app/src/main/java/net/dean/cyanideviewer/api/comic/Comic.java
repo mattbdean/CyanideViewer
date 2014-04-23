@@ -11,33 +11,36 @@ import net.dean.cyanideviewer.ComicStage;
 import net.dean.cyanideviewer.CyanideUtils;
 import net.dean.cyanideviewer.CyanideViewer;
 import net.dean.cyanideviewer.FavoriteComicListItem;
-import net.dean.cyanideviewer.api.CyanideApi;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import net.dean.cyanideviewer.db.DatabaseField;
+import net.dean.cyanideviewer.db.Model;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Date;
 
 /**
  * Represents an Cyanide and Happiness comic.
  */
-public class Comic implements Parcelable {
-
-	/** The ID of the comic. */
-	private long id;
+public class Comic extends Model implements Parcelable {
 
 	/** The URL of the comic's image */
+	@DatabaseField(columnName = "url")
 	private URL url;
 
+	// Must be Boolean (capital 'B') because it must be an object for the DatabaseField
+	// class to work properly
 	/**  Whether this comic is a favorite of the user's */
-	private boolean isFavorite;
+	@DatabaseField(columnName = "is_favorite", doesUpdate = true)
+	private Boolean isFavorite;
+
+	@DatabaseField(columnName = "published")
+	private Date published;
+
+	@DatabaseField(columnName = "author_id")
+	private Author author;
 
 	/** The Bitmap that represents the comic */
 	private Bitmap bitmap;
@@ -53,21 +56,19 @@ public class Comic implements Parcelable {
 	 *
 	 * @param id  The ID of the comic
 	 * @param url The URL of the comic's image
+	 * @param published The date the comic was published
+	 * @param author The author of the comic
 	 */
-	public Comic(long id, URL url) {
-		this(id, url, false);
+	public Comic(long id, URL url, Date published, Author author) {
+		this(id, url, published, author, false);
 	}
 
-	/**
-	 * Instantiates a new Comic
-	 *
-	 * @param id         The ID of the comic
-	 * @param url        The URL of the comic's image
-	 * @param isFavorite If this comic is one of the user's favorites
-	 */
-	public Comic(long id, URL url, boolean isFavorite) {
+
+	public Comic(long id, URL url, Date published, Author author, boolean isFavorite) {
+		super(id);
 		this.url = url;
-		this.id = id;
+		this.published = published;
+		this.author = author;
 		this.isFavorite = isFavorite;
 		this.hasLoaded = false;
 	}
@@ -78,9 +79,12 @@ public class Comic implements Parcelable {
 	 * @param in A Parcel created by {@link #CREATOR}
 	 */
 	public Comic(Parcel in) {
-		this.id = in.readLong();
+		super(in.readLong());
 		this.url = CyanideUtils.newUrl(in.readString());
 		this.isFavorite = in.readByte() != 0;
+		this.published = new Date(in.readLong());
+		this.author = in.readParcelable(Author.class.getClassLoader());
+		this.hasLoaded = false;
 	}
 
 	/**
@@ -227,22 +231,6 @@ public class Comic implements Parcelable {
 	}
 
 	/**
-	 * Gets the URL
-	 */
-	public long getId() {
-		return id;
-	}
-
-	/**
-	 * Sets the ID
-	 *
-	 * @param id The new ID
-	 */
-	public void setId(long id) {
-		this.id = id;
-	}
-
-	/**
 	 * Gets whether or not this comic is a favorite
 	 */
 	public boolean isFavorite() {
@@ -297,46 +285,20 @@ public class Comic implements Parcelable {
 		}
 	}
 
-	/**
-	 * A simple test to check the validity of this comic's fields. This method will only return true
-	 * if the ID is greater than or equal to the first ID, less than or equal to the newest ID, and
-	 * the URL is not null
-	 * @return Whether or not this comic is valid
-	 */
-	public boolean isValid() {
-		return (id >= CyanideApi.instance().getFirstId()
-				&& id <= CyanideApi.instance().getNewestId()
-				&& url != null);
+	public Date getPublished() {
+		return published;
 	}
 
-	/**
-	 * A more expensive test to check if this comic really is valid. In order to return true,
-	 * {@link #isValid()} must return true, and an HTTP request made to the comic's URL must return a
-	 * 200 status code.
-	 * @return If the comic is valid
-	 */
-	public boolean isValidExpensive() {
-		boolean isValidSimple = isValid();
-		if (!isValidSimple) {
-			// If the simple pass won't pass, this pass won't pass
-			return false;
-		}
+	public void setPublished(Date published) {
+		this.published = published;
+	}
 
-		// Get the status code of a get request to the bitmap's URL
-		try {
-			HttpClient client = new DefaultHttpClient();
-			HttpGet get = new HttpGet(url.toExternalForm());
-			HttpResponse response = client.execute(get);
-			if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-				// Was not a 200
-				return false;
-			}
-		} catch (IOException e) {
-			Log.e(CyanideViewer.TAG, "IOException while testing the validity of " + this);
-			return false;
-		}
+	public Author getAuthor() {
+		return author;
+	}
 
-		return true;
+	public void setAuthor(Author author) {
+		this.author = author;
 	}
 
 	/**
@@ -388,6 +350,8 @@ public class Comic implements Parcelable {
 				"id=" + id +
 				", url='" + url.toExternalForm() + '\'' +
 				", isFavorite=" + isFavorite +
+				", published=" + published +
+				", author=" + author +
 				'}';
 	}
 }

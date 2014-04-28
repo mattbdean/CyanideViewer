@@ -1,9 +1,11 @@
 package net.dean.cyanideviewer;
 
+import android.app.FragmentManager;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -24,13 +26,13 @@ public class ComicStage extends LinearLayout {
 	 * @param comicId The ID of the comic to use
 	 * @return A new ComicStage
 	 */
-	public static ComicStage newInstance(long comicId) {
+	public static ComicStage newInstance(long comicId, FragmentManager fragmentManager) {
 		LayoutInflater li = (LayoutInflater) CyanideViewer.getContext()
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 		ComicStage cs = (ComicStage) li.inflate(R.layout.comic_stage, null);
 		Log.d(CyanideViewer.TAG, "Creating a new ComicStage for #" + comicId);
-		cs.setComic(comicId);
+		cs.setComic(comicId, fragmentManager);
 		return cs;
 	}
 
@@ -59,12 +61,19 @@ public class ComicStage extends LinearLayout {
 	}
 
 	/** Sets the comic of this ComicStage. Will adjust the TextView and ImageView accordingly. */
-	public void setComic(long id) {
+	public void setComic(long id, final FragmentManager fragmentManager) {
 		this.idToLoad = id;
 		((TextView) findViewById(R.id.comic_id)).setText("#" + idToLoad);
 		this.imageView = (ImageView) findViewById(R.id.image_view);
 		// Set the ImageView to be clear if it has been set before
 		imageView.setImageResource(android.R.color.transparent);
+
+		findViewById(R.id.author_button).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				new AuthorDialog(comic.getAuthor()).show(fragmentManager, "authorDialog");
+			}
+		});
 	}
 
 	/**

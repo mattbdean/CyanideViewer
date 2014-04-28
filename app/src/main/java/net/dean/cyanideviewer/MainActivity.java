@@ -1,5 +1,6 @@
 package net.dean.cyanideviewer;
 
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -50,6 +51,8 @@ public class MainActivity extends FragmentActivity {
 
 	private LinearLayout loadingView;
 
+	private FragmentManager fragmentManager;
+
 	private Animation fadeIn;
 	private Animation fadeOut;
 
@@ -60,7 +63,8 @@ public class MainActivity extends FragmentActivity {
 		setContentView(R.layout.activity_main);
 
 		this.viewPager = (ViewPager) findViewById(R.id.comic_pager);
-		this.pagerAdapter = new ComicPagerAdapter();
+		this.fragmentManager = getFragmentManager();
+		this.pagerAdapter = new ComicPagerAdapter(fragmentManager);
 		this.favoriteButton = (ToggleButton) findViewById(R.id.action_favorite);
 		this.downloadButton = (ImageButton) findViewById(R.id.download);
 		this.loadingView = (LinearLayout) findViewById(R.id.loading_view);
@@ -394,17 +398,17 @@ public class MainActivity extends FragmentActivity {
 					// Shift it all the way to the left
 					midway = 0;
 				}
-				pagerAdapter.getComicStage(midway).setComic(id);
+				pagerAdapter.getComicStage(midway).setComic(id, fragmentManager);
 				curComicPagerIndex = midway;
 				// From the midway to the beginning
 				for (int i = midway - 1; i >= 0; i--) {
-					pagerAdapter.getComicStage(i).setComic(prevComic.getId());
+					pagerAdapter.getComicStage(i).setComic(prevComic.getId(), fragmentManager);
 					prevComic = CyanideApi.instance().getPrevious(prevComic.getId());
 				}
 
 				// From the midway to the end
 				for (int i = midway + 1; i < pagerAdapter.getCount(); i++) {
-					pagerAdapter.getComicStage(i).setComic(nextComic.getId());
+					pagerAdapter.getComicStage(i).setComic(nextComic.getId(), fragmentManager);
 					nextComic = CyanideApi.instance().getNext(nextComic.getId());
 				}
 

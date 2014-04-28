@@ -1,5 +1,6 @@
 package net.dean.cyanideviewer;
 
+import android.app.FragmentManager;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.View;
@@ -14,8 +15,13 @@ import java.util.ArrayList;
  * http://stackoverflow.com/a/13671777/1275092
  */
 public class ComicPagerAdapter extends PagerAdapter {
+	private FragmentManager fragmentManager;
 	/** A list of ComicStages that this adapter holds. */
 	private ArrayList<ComicStage> views = new ArrayList<>();
+
+	public ComicPagerAdapter(FragmentManager fragmentManager) {
+		this.fragmentManager = fragmentManager;
+	}
 
 	@Override
 	public int getItemPosition(Object object) {
@@ -65,7 +71,7 @@ public class ComicPagerAdapter extends PagerAdapter {
 	 * @return The position at which this view was added
 	 */
 	public int addView(Comic c, int position) {
-		views.add(position, ComicStage.newInstance(c.getId()));
+		views.add(position, ComicStage.newInstance(c.getId(), fragmentManager));
 		notifyDataSetChanged();
 		return position;
 	}

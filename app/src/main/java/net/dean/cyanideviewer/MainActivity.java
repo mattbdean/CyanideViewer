@@ -1,7 +1,9 @@
 package net.dean.cyanideviewer;
 
 import android.app.FragmentManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -135,24 +137,6 @@ public class MainActivity extends FragmentActivity {
 			@Override public void onPageScrollStateChanged(int state) {}
 
 		});
-
-		new SetComicTask() {
-			@Override
-			protected void onPostExecute(Integer currentItemIndex) {
-				super.onPostExecute(currentItemIndex);
-
-				// Load second newest comic
-				ComicStage before = pagerAdapter.getComicStage(currentItemIndex - 1);
-				if (before != null)
-					before.loadComic();
-
-				ComicStage after = pagerAdapter.getComicStage(currentItemIndex + 1);
-				if (after != null)
-					after.loadComic();
-
-				refreshButtonStates();
-			}
-		}.execute(CyanideApi.instance().getNewestId());
 	}
 
 	private void showLoading() {
@@ -317,9 +301,36 @@ public class MainActivity extends FragmentActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-//		refreshButtonStates();
+		SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
+		long lastId = prefs.getLong("lastId", CyanideApi.instance().getNewestId());
+
+		new SetComicTask() {
+			@Override
+			protected void onPostExecute(Integer currentItemIndex) {
+				super.onPostExecute(currentItemIndex);
+
+				// Load second newest comic
+				ComicStage before = pagerAdapter.getComicStage(currentItemIndex - 1);
+				if (before != null)
+					before.loadComic();
+
+				ComicStage after = pagerAdapter.getComicStage(currentItemIndex + 1);
+				if (after != null)
+					after.loadComic();
+
+				refreshButtonStates();
+			}
+		}.execute(lastId);
 	}
 
+	@Override
+	protected void onPause() {
+		super.onPause();
+
+		SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit();
+		editor.putLong("lastId", getCurrentComicId());
+		editor.apply();
+	}
 
 	/**
 	 * Called when the 'Random' button is called. Shows a random comic to the user.

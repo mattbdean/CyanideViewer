@@ -1,6 +1,5 @@
 package net.dean.cyanideviewer.api;
 
-import android.os.AsyncTask;
 import android.util.Log;
 
 import net.dean.cyanideviewer.Callback;
@@ -22,7 +21,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Provides high level access to the unofficial Cyanide and Happiness API.
@@ -37,11 +35,20 @@ public class CyanideApi extends BaseComicApi {
 
 	/** Retrieves the one and only instance of CyanideApi */
 	public static CyanideApi instance() {
-		if (instance == null) {
-			instance = new CyanideApi();
-			initIdRanges();
-		}
 		return instance;
+	}
+
+	public static void setUp() {
+		if (instance != null) {
+			Log.w(CyanideViewer.TAG, "Setting up CyanideApi more than one time");
+			return;
+		}
+
+		instance = new CyanideApi();
+		instance.firstId = instance.getIdFromUrl(SpecialSelection.FIRST.getUrl());
+		Log.i(CyanideViewer.TAG, "Found first ID: " + instance.firstId);
+		instance.newestId = getNewestComicId();
+		Log.i(CyanideViewer.TAG, "Found newest ID: " + instance.newestId);
 	}
 
 	/** The ID of the very first publicly available C&H comic */
@@ -227,30 +234,6 @@ public class CyanideApi extends BaseComicApi {
 	@Override
 	public long getFirstId() {
 		return firstId;
-	}
-
-	private static void initIdRanges() {
-		try {
-			instance.firstId = new AsyncTask<Void, Void, Long>() {
-				@Override
-				protected Long doInBackground(Void... params) {
-					return instance().getIdFromUrl(SpecialSelection.FIRST.getUrl());
-				}
-			}.execute().get();
-			Log.i(CyanideViewer.TAG, "Found first ID: " + instance.firstId);
-
-			instance.newestId = new AsyncTask<Void, Void, Long>() {
-
-				@Override
-				protected Long doInBackground(Void... params) {
-					return getNewestComicId();
-				}
-			}.execute().get();
-			Log.i(CyanideViewer.TAG, "Found newest ID: " + instance.newestId);
-
-		} catch (InterruptedException | ExecutionException e) {
-			Log.e(CyanideViewer.TAG, "Failed to find the first or newest comic IDs", e);
-		}
 	}
 
 	/**

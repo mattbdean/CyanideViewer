@@ -79,6 +79,8 @@ public class ComicDao extends BaseDao<Comic> {
 					// Get an Author via AuthorDao
 					comic.setAuthor(authorDao.get(c.getLong(columnIndex)));
 					break;
+				default:
+					Log.w(CyanideViewer.TAG, "Unknown column: " + key);
 			}
 		}
 

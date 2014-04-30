@@ -58,12 +58,21 @@ public class MainActivity extends FragmentActivity {
 	private Animation fadeIn;
 	private Animation fadeOut;
 
+	private boolean hasCreated;
+
+	private boolean working;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Crashlytics.start(this);
 		setContentView(R.layout.activity_main);
 
+		// Trivial attributes
+		this.working = false;
+		this.hasCreated = false;
+
+		// Initialize all views
 		this.viewPager = (ViewPager) findViewById(R.id.comic_pager);
 		this.fragmentManager = getFragmentManager();
 		this.pagerAdapter = new ComicPagerAdapter(fragmentManager);
@@ -74,6 +83,7 @@ public class MainActivity extends FragmentActivity {
 		fadeIn.setAnimationListener(new Animation.AnimationListener() {
 			@Override
 			public void onAnimationStart(Animation animation) {
+				working = true;
 				if (loadingView.getVisibility() != View.VISIBLE) {
 					loadingView.setVisibility(View.VISIBLE);
 				}
@@ -84,15 +94,59 @@ public class MainActivity extends FragmentActivity {
 		});
 		this.fadeOut = AnimationUtils.loadAnimation(this, R.anim.fade_out);
 		fadeOut.setAnimationListener(new Animation.AnimationListener() {
-			@Override public void onAnimationStart(Animation animation) {}
-
+			@Override public void onAnimationStart(Animation animation) { }
 			@Override
 			public void onAnimationEnd(Animation animation) {
 				loadingView.setVisibility(View.INVISIBLE);
+				working = false;
 			}
 			@Override public void onAnimationRepeat(Animation animation) {}
 		});
+	}
 
+	@Override
+	protected void onStart() {
+		super.onStart();
+		new AsyncTask<Void, Void, Void>() {
+
+			@Override
+			protected void onPreExecute() {
+				showLoading();
+			}
+
+			@Override
+			protected Void doInBackground(Void... params) {
+				CyanideApi.setUp();
+				return null;
+			}
+
+			@Override
+			protected void onPostExecute(Void v) {
+				onFinishedApiSetup();
+				hasCreated = true;
+				setLastComic();
+			}
+		}.execute();
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if (hasCreated) {
+			setLastComic();
+		}
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+
+		SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit();
+		editor.putLong("lastId", getCurrentComicId());
+		editor.apply();
+	}
+
+	private void onFinishedApiSetup() {
 		viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 			@Override
 			public void onPageSelected(final int position) {
@@ -139,12 +193,37 @@ public class MainActivity extends FragmentActivity {
 		});
 	}
 
+	private void setLastComic() {
+		SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
+		long lastId = prefs.getLong("lastId", CyanideApi.instance().getNewestId());
+
+		new SetComicTask() {
+			@Override
+			protected void onPostExecute(Integer currentItemIndex) {
+				super.onPostExecute(currentItemIndex);
+
+				// Load second newest comic
+				ComicStage before = pagerAdapter.getComicStage(currentItemIndex - 1);
+				if (before != null)
+					before.loadComic();
+
+				ComicStage after = pagerAdapter.getComicStage(currentItemIndex + 1);
+				if (after != null)
+					after.loadComic();
+
+				refreshButtonStates();
+			}
+		}.execute(lastId);
+	}
+
 	private void showLoading() {
-		loadingView.startAnimation(fadeIn);
+		if (!working) // Only start the animation if it is not showing already
+			loadingView.startAnimation(fadeIn);
 	}
 
 	private void showStage() {
-		loadingView.startAnimation(fadeOut);
+		if (working)
+			loadingView.startAnimation(fadeOut);
 	}
 
 
@@ -296,40 +375,6 @@ public class MainActivity extends FragmentActivity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-		SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
-		long lastId = prefs.getLong("lastId", CyanideApi.instance().getNewestId());
-
-		new SetComicTask() {
-			@Override
-			protected void onPostExecute(Integer currentItemIndex) {
-				super.onPostExecute(currentItemIndex);
-
-				// Load second newest comic
-				ComicStage before = pagerAdapter.getComicStage(currentItemIndex - 1);
-				if (before != null)
-					before.loadComic();
-
-				ComicStage after = pagerAdapter.getComicStage(currentItemIndex + 1);
-				if (after != null)
-					after.loadComic();
-
-				refreshButtonStates();
-			}
-		}.execute(lastId);
-	}
-
-	@Override
-	protected void onPause() {
-		super.onPause();
-
-		SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit();
-		editor.putLong("lastId", getCurrentComicId());
-		editor.apply();
 	}
 
 	/**

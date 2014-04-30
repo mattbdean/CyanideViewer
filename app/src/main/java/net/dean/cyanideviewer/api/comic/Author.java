@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class Author extends Model implements Parcelable {
-	public static final Author[] AUTHORS;
+	static final Author[] AUTHORS;
 
 	@DatabaseField(columnName = "name")
 	private String name;

@@ -26,7 +26,7 @@ import java.util.List;
  * Provides high level access to the unofficial Cyanide and Happiness API.
  */
 public class CyanideApi extends BaseComicApi {
-	private static final String BASE_URL = "http://explosm.net/comics/";
+	private static final String BASE_URL = "https://explosm.net/comics/";
 
 	/** The one and only instance of CyanideApi  */
 	private static CyanideApi instance;

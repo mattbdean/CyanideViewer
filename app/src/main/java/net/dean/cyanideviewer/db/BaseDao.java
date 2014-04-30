@@ -218,7 +218,7 @@ public abstract class BaseDao<T extends Model> {
 		checkWritable();
 
 		Log.v(CyanideViewer.TAG, "Deleting model (id=" + id + ") from the \"" + tableName + "\" table.");
-		return db.delete(tableName, columns[0] + " = ?", new String[] {Long.toString(id)}) == 1;
+		return db.delete(tableName, columns[0] + "=?", new String[] {Long.toString(id)}) == 1;
 	}
 
 	/**

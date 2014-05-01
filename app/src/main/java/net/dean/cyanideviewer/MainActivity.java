@@ -31,35 +31,56 @@ import java.util.ArrayList;
  */
 public class MainActivity extends FragmentActivity {
 
-	/**
-	 * The ViewPager used to scroll through comics
-	 */
+	/** An enumeration of all the buttons on this UI whose states are changed manually. */
+	private static enum RefreshableButtons {
+		/** Represents ${@link #downloadButton} */
+		DOWNLOAD,
+		/** Represents ${@link #firstComicButton} */
+		FIRST,
+		/** Represents ${@link #newestComicButton} */
+		NEWEST,
+		/** Represents ${@link #favoriteButton} */
+		FAVORITE
+	}
+
+	/** The ViewPager used to scroll through comics */
 	private ViewPager viewPager;
 
-	/**
-	 * The ComicPagerAdapter used to provide pages to the ViewPager
-	 */
+	/** The ComicPagerAdapter used to provide pages to the ViewPager */
 	private ComicPagerAdapter pagerAdapter;
 
-	/**
-	 * The button that, when pressed, downloads the current comic
-	 */
+	/** The button that, when pressed, downloads the current comic */
 	private ImageButton downloadButton;
 
-	/**
-	 * The button that, when pressed, toggles whether the current comic is a favorite
-	 */
+	/** The button that, when pressed, shows the user the first available comic */
+	private ImageButton firstComicButton;
+
+	/** The button that, when pressed, shows the user the newest available comic */
+	private ImageButton newestComicButton;
+
+	/** The button that, when pressed, toggles whether the current comic is a favorite */
 	private ToggleButton favoriteButton;
 
+	/**
+	 * The view that will be faded in and out when the application is doing work that cannot be done
+	 * solely in the background
+	 */
 	private LinearLayout loadingView;
 
+	/**
+	 * The FragmentManager used to instantiate {@link #pagerAdapter} and AuthorDialogs
+	 */
 	private FragmentManager fragmentManager;
 
+	/** The animation used to fade the loading view in */
 	private Animation fadeIn;
+	/** The animation used to fade the loading view out */
 	private Animation fadeOut;
 
+	/** True if the onCrated method has completed, false if else */
 	private boolean hasCreated;
 
+	/** True if the app is doing work and the loading view must be shown, false if else */
 	private boolean working;
 
 	@Override
@@ -78,6 +99,8 @@ public class MainActivity extends FragmentActivity {
 		this.pagerAdapter = new ComicPagerAdapter(fragmentManager);
 		this.favoriteButton = (ToggleButton) findViewById(R.id.action_favorite);
 		this.downloadButton = (ImageButton) findViewById(R.id.download);
+		this.firstComicButton = (ImageButton) findViewById(R.id.first_comic);
+		this.newestComicButton = (ImageButton) findViewById(R.id.newest_comic);
 		this.loadingView = (LinearLayout) findViewById(R.id.loading_view);
 		this.fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in);
 		fadeIn.setAnimationListener(new Animation.AnimationListener() {
@@ -146,6 +169,10 @@ public class MainActivity extends FragmentActivity {
 		editor.apply();
 	}
 
+	/**
+	 * Called when the CyanideApi class has finished setting up its ID ranges. Sets {@link #viewPager}'s
+	 * ${@link android.support.v4.view.ViewPager.OnPageChangeListener}
+	 */
 	private void onFinishedApiSetup() {
 		viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 			@Override
@@ -184,7 +211,7 @@ public class MainActivity extends FragmentActivity {
 					}.execute(getCurrentComicId());
 				}
 
-				refreshButtonStates();
+				refreshButtons();
 			}
 
 			@Override public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
@@ -193,6 +220,9 @@ public class MainActivity extends FragmentActivity {
 		});
 	}
 
+	/**
+	 * Reads the value of the last ID from the SharedPreferences and sets the current comic to that ID
+	 */
 	private void setLastComic() {
 		SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
 		long lastId = prefs.getLong("lastId", CyanideApi.instance().getNewestId());
@@ -211,44 +241,69 @@ public class MainActivity extends FragmentActivity {
 				if (after != null)
 					after.loadComic();
 
-				refreshButtonStates();
+				refreshButtons(RefreshableButtons.DOWNLOAD, RefreshableButtons.FAVORITE);
 			}
 		}.execute(lastId);
 	}
 
+	/**
+	 * Shows the 'loading' pane over the main one (where most of the UI elements are)
+	 */
 	private void showLoading() {
 		if (!working) // Only start the animation if it is not showing already
 			loadingView.startAnimation(fadeIn);
 	}
 
+	/**
+	 * Fades the 'loading' pane out and lets the user interact with the main UI
+	 */
 	private void showStage() {
 		if (working)
 			loadingView.startAnimation(fadeOut);
 	}
 
-
 	/**
-	 * Refreshes the state of the download button based on if the comic exists on the file system
+	 * Refreshes all of the possible buttons
 	 */
-	private void refreshDownloadButtonState() {
-		boolean hasLocal = CyanideApi.instance().hasLocalComic(getCurrentComicId());
-		downloadButton.setEnabled(!hasLocal);
+	private void refreshButtons() {
+		refreshButtons(RefreshableButtons.values());
 	}
 
 	/**
-	 * Refreshes the state of the favorite button based on whether the database thinks the current
-	 * comic is a favorite or not
+	 * Refreshes each of the buttons assigned to the values of {@link net.dean.cyanideviewer.MainActivity.RefreshableButtons}.
+	 * @param buttonsToRefresh The representation of the buttons to refresh.
 	 */
-	private void refreshFavoriteButtonState() {
-		favoriteButton.setChecked(getCurrentDbComic().isFavorite());
-	}
+	private void refreshButtons(RefreshableButtons... buttonsToRefresh) {
+		if (buttonsToRefresh.length == 0) {
+			return;
+		}
+		long currComicId = -2; // Need a unique value because it could be -1
 
-	/**
-	 * Refreshes the download button and favorite button states
-	 */
-	private void refreshButtonStates() {
-		refreshDownloadButtonState();
-		refreshFavoriteButtonState();
+		for (RefreshableButtons buttonToRefresh : buttonsToRefresh) {
+			switch (buttonToRefresh) {
+				case DOWNLOAD:
+					boolean hasLocal = CyanideApi.instance().hasLocalComic(getCurrentComicId());
+					downloadButton.setEnabled(!hasLocal);
+					break;
+				case FAVORITE:
+					favoriteButton.setChecked(getCurrentDbComic().isFavorite());
+					break;
+				case FIRST:
+					if (currComicId == -2) { // Only get it if we need it
+						currComicId = pagerAdapter.getComicStage(viewPager.getCurrentItem()).getComicIdToLoad();
+					}
+					newestComicButton.setEnabled(currComicId != CyanideApi.instance().getNewestId());
+					break;
+				case NEWEST:
+					if (currComicId == -2) { // Only get it if we need it
+						currComicId = pagerAdapter.getComicStage(viewPager.getCurrentItem()).getComicIdToLoad();
+					}
+					firstComicButton.setEnabled(currComicId != CyanideApi.instance().getFirstId());
+					break;
+				default:
+					Log.w(CyanideViewer.TAG, "Not refreshing unregistered button " + buttonToRefresh);
+			}
+		}
 	}
 
 	/**
@@ -271,7 +326,7 @@ public class MainActivity extends FragmentActivity {
 
 		pagerAdapter.getComicStage(viewPager.getCurrentItem()).getComic().downloadIcon();
 
-		refreshFavoriteButtonState();
+		refreshButtons(RefreshableButtons.FAVORITE, RefreshableButtons.DOWNLOAD);
 	}
 
 	/**
@@ -298,6 +353,10 @@ public class MainActivity extends FragmentActivity {
 		});
 	}
 
+	/**
+	 * Called when the user wants the very newest comic. Calls the CyanideApi instance and checks
+	 * for a new ID and then sets the current comic to the latest one available.
+	 */
 	public void onLatestRequested() {
 		Log.i(CyanideViewer.TAG, "Latest comic requested");
 		new AsyncTask<Void, Void, Long>() {
@@ -403,6 +462,14 @@ public class MainActivity extends FragmentActivity {
 	 */
 	public void setComic(final long id) {
 		new SetComicTask().execute(id);
+	}
+
+	public void onFirstComicButtonPressed(View view) {
+		setComic(CyanideApi.instance().getFirstId());
+	}
+
+	public void onNewestComicButtonPressed(View view) {
+		setComic(CyanideApi.instance().getNewestId());
 	}
 
 	/**
@@ -514,6 +581,7 @@ public class MainActivity extends FragmentActivity {
 				showStage();
 			}
 
+			refreshButtons(RefreshableButtons.FIRST, RefreshableButtons.NEWEST);
 		}
 	}
 }

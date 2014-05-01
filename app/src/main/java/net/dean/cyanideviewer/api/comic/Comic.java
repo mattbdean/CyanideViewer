@@ -160,6 +160,12 @@ public class Comic extends Model implements Parcelable {
 		FileOutputStream fos = null;
 
 		String ext = dest.getName().substring(dest.getName().lastIndexOf('.'));
+		// Create the parent file if it doesn't exist
+		if (!dest.getParentFile().isDirectory()) {
+			if (!dest.getParentFile().mkdirs()) {
+				Log.e(CyanideViewer.TAG, "Could not create the directory \"" + dest.getAbsolutePath() + "\"");
+			}
+		}
 
 		try {
 			bos = new ByteArrayOutputStream();

@@ -29,6 +29,14 @@ public interface ComicApi {
 	public long getIdFromUrl(String url);
 
 	/**
+	 * Parses an ID from a URL. For example, http://explosm.net/comics/1234 would return 1234.
+	 * @param url The URL to parse
+	 * @param followRedirect Whether to send an HTTP request and to parse the resulting URL
+	 * @return The ID of the given comic URL
+	 */
+	public long getIdFromUrl(String url, boolean followRedirect);
+
+	/**
 	 * Gets the URL of a Comic from the internet.
 	 * @param id The ID of the comic to look up
 	 * @return A String representing a URL, or null if the comic does not exist.

@@ -31,7 +31,7 @@ import java.util.List;
 public class CyanideApi extends BaseComicApi {
 	private static final String BASE_URL = "https://explosm.net/comics/";
 
-	/** The one and only instance of CyanideApi  */
+	/** The one and only instance of CyanideApi */
 	private static CyanideApi instance;
 
 	private static final DateFormat dateFormat = new SimpleDateFormat("MM.d.yyyy");
@@ -48,8 +48,17 @@ public class CyanideApi extends BaseComicApi {
 		}
 
 		instance = new CyanideApi();
-		instance.firstId = instance.getIdFromUrl(SpecialSelection.FIRST.getUrl());
+
+		try {
+			Document doc = Jsoup.connect(BASE_URL).get();
+			// Basically getIdFromUrl(BASE_URL + "/comics/id".remove("/comics/"))
+			instance.firstId = instance.getIdFromUrl(BASE_URL + doc.select("nobr").get(1).select("span")
+					.get(0).select("a[rel=first]").attr("href").replace("/comics/", ""), false);
+		} catch (IOException e) {
+			Log.e(CyanideViewer.TAG, "Failed to get first ID", e);
+		}
 		Log.i(CyanideViewer.TAG, "Found first ID: " + instance.firstId);
+
 		instance.newestId = getNewestComicId();
 		Log.i(CyanideViewer.TAG, "Found newest ID: " + instance.newestId);
 	}
@@ -60,19 +69,25 @@ public class CyanideApi extends BaseComicApi {
 	/** The ID of the newest C&H comic */
 	private long newestId;
 
-
 	@Override
 	public long getIdFromUrl(String url) {
-		String currentUrl = followRedirect(url);
+		return getIdFromUrl(url, true);
+	}
+
+	@Override
+	public long getIdFromUrl(String url, boolean followRedirect) {
+		if (followRedirect)
+			url = followRedirect(url);
 		// Regex for the explosm website. Possible matches:
 		// http://explosm.net/comics/3530
 		// http://explosm.net/comics/3530/
 		// http://www.explosm.net/comics/3530/
-		if (!currentUrl.matches("http(s)?://(www\\.)?explosm\\.net/comics/\\d*(/)?")) {
-			Log.e(CyanideViewer.TAG, "Cannot load comic: URL not in correct format: " + currentUrl);
+		// https://explosm.net/comics/3530
+		if (!url.matches("http(s)?://(www\\.)?explosm\\.net/comics/\\d*(/)?")) {
+			Log.e(CyanideViewer.TAG, "Cannot load comic: URL not in correct format: " + url);
 			return -1;
 		}
-		return Long.parseLong(currentUrl.substring(currentUrl.lastIndexOf('/', currentUrl.length() - 2)).replace("/", ""));
+		return Long.parseLong(url.substring(url.lastIndexOf('/', url.length() - 2)).replace("/", ""));
 	}
 
 	@Override

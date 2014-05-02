@@ -4,8 +4,6 @@ package net.dean.cyanideviewer.api;
  * Represents the "special" URLs available to the user.
  */
 public enum SpecialSelection {
-	/** The first comic */
-	FIRST("15"),
 	/** The newest comic, once it's redirect has been followed */
 	NEWEST("new"),
 	/** A random comic, once it's redirect has been followed */

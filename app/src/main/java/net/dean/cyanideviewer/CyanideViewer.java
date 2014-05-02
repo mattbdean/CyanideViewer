@@ -12,8 +12,6 @@ import net.dean.cyanideviewer.db.CyanideDatabaseHelper;
  * The main class for Cyanide Viewer.
  */
 public class CyanideViewer extends Application {
-	/** The tag used by all Log.x methods in this app */
-	public static final String TAG = "CyanideViewer";
 
 	/** This application's context */
 	private static Context context;
@@ -28,7 +26,7 @@ public class CyanideViewer extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		Log.i(TAG, "Starting application");
+		Log.i(Constants.TAG, "Starting application");
 		CyanideViewer.context = getApplicationContext();
 
 		if (helper == null) {

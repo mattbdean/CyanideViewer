@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import net.dean.cyanideviewer.CyanideViewer;
+import net.dean.cyanideviewer.Constants;
 
 /**
  * This class is used to open SQLite databases
@@ -74,7 +74,7 @@ public class CyanideDatabaseHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		Log.w(CyanideViewer.TAG, "Upgrading database from version " + oldVersion + " to " + newVersion
+		Log.w(Constants.TAG, "Upgrading database from version " + oldVersion + " to " + newVersion
 						+ ", which will destroy all old data");
 
 		// Drop all tables

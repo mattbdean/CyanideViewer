@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import net.dean.cyanideviewer.Constants;
 import net.dean.cyanideviewer.CyanideViewer;
 import net.dean.cyanideviewer.api.CyanideApi;
 
@@ -43,7 +44,7 @@ class IconDownloadTask extends AsyncTask<Void, Void, Boolean> {
 			c.setIconHash(HashUtils.getChecksum(dest));
 			CyanideViewer.getComicDao().update(c);
 		} catch (FileNotFoundException e) {
-			Log.e(CyanideViewer.TAG, "Could not find file " + dest + ". This really shouldn't happen.", e);
+			Log.e(Constants.TAG, "Could not find file " + dest + ". This really shouldn't happen.", e);
 		}
 
 		return true;
@@ -52,9 +53,9 @@ class IconDownloadTask extends AsyncTask<Void, Void, Boolean> {
 	@Override
 	protected void onPostExecute(Boolean success) {
 		if (success) {
-			Log.i(CyanideViewer.TAG, "Downloaded icon for #" + c.getId());
+			Log.i(Constants.TAG, "Downloaded icon for #" + c.getId());
 		} else {
-			Log.w(CyanideViewer.TAG, "Could not download icon for #" + c.getId());
+			Log.w(Constants.TAG, "Could not download icon for #" + c.getId());
 		}
 	}
 }

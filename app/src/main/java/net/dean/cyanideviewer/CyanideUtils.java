@@ -23,7 +23,7 @@ public final class CyanideUtils {
 		try {
 			return new URL(href);
 		} catch (MalformedURLException e) {
-			Log.e(CyanideViewer.TAG, "Malformed URL: " + href, e);
+			Log.e(Constants.TAG, "Malformed URL: " + href, e);
 			return null;
 		}
 	}

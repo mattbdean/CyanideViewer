@@ -7,7 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
-import net.dean.cyanideviewer.CyanideViewer;
+import net.dean.cyanideviewer.Constants;
 import net.dean.cyanideviewer.FavoriteComicListItem;
 import net.dean.cyanideviewer.R;
 import net.dean.cyanideviewer.api.CyanideApi;
@@ -45,14 +45,14 @@ class IconLoaderTask extends AsyncTask<Void, Void, Bitmap> {
 		try {
 			HashUtils.check(iconFile, bitmapHash);
 		} catch (HashMismatchException e) {
-			Log.e(CyanideViewer.TAG, String.format("Hash mismatch for comic #%s. Deleting file \"%s\".",
+			Log.e(Constants.TAG, String.format("Hash mismatch for comic #%s. Deleting file \"%s\".",
 					comic.getId(), iconFile.getAbsolutePath()));
 			if (!iconFile.delete()) {
-				Log.e(CyanideViewer.TAG, "Could not delete file " + iconFile.getAbsolutePath());
+				Log.e(Constants.TAG, "Could not delete file " + iconFile.getAbsolutePath());
 			}
 			return null;
 		} catch (FileNotFoundException e) {
-			Log.e(CyanideViewer.TAG, "Could not find local comic at " + iconFile.getAbsolutePath() +
+			Log.e(Constants.TAG, "Could not find local comic at " + iconFile.getAbsolutePath() +
 					". This really shouldn't happen.", e);
 		}
 

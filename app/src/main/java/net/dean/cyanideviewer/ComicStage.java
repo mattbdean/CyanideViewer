@@ -31,7 +31,7 @@ public class ComicStage extends LinearLayout {
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 		ComicStage cs = (ComicStage) li.inflate(R.layout.comic_stage, null);
-		Log.d(CyanideViewer.TAG, "Creating a new ComicStage for #" + comicId);
+		Log.d(Constants.TAG, "Creating a new ComicStage for #" + comicId);
 		cs.setComic(comicId, fragmentManager);
 		return cs;
 	}

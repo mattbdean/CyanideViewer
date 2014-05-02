@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import net.dean.cyanideviewer.ComicStage;
-import net.dean.cyanideviewer.CyanideViewer;
+import net.dean.cyanideviewer.Constants;
 import net.dean.cyanideviewer.R;
 
 import org.apache.http.HttpEntity;
@@ -67,7 +67,7 @@ class BitmapLoaderTask extends AsyncTask<Long, Void, Bitmap> {
 			HttpGet request = new HttpGet(stage.getComic().getUrl().toURI());
 			HttpResponse response = client.execute(request);
 			if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-				Log.w(CyanideViewer.TAG, "Failed to fetch comic at " + stage.getComic().getUrl().toExternalForm());
+				Log.w(Constants.TAG, "Failed to fetch comic at " + stage.getComic().getUrl().toExternalForm());
 				return null;
 			}
 			HttpEntity entity = response.getEntity();
@@ -85,10 +85,10 @@ class BitmapLoaderTask extends AsyncTask<Long, Void, Bitmap> {
 			}
 
 		} catch (URISyntaxException e) {
-			Log.e(CyanideViewer.TAG, "URISyntaxException: " + stage.getComic().getUrl(), e);
+			Log.e(Constants.TAG, "URISyntaxException: " + stage.getComic().getUrl(), e);
 			return null;
 		} catch (IOException e) {
-			Log.e(CyanideViewer.TAG, "IOException while trying to decode the image from URL " + stage.getComic().getUrl(), e);
+			Log.e(Constants.TAG, "IOException while trying to decode the image from URL " + stage.getComic().getUrl(), e);
 			return null;
 		}
 

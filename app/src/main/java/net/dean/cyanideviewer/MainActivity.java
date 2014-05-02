@@ -301,7 +301,7 @@ public class MainActivity extends FragmentActivity {
 					firstComicButton.setEnabled(currComicId != CyanideApi.instance().getFirstId());
 					break;
 				default:
-					Log.w(CyanideViewer.TAG, "Not refreshing unregistered button " + buttonToRefresh);
+					Log.w(Constants.TAG, "Not refreshing unregistered button " + buttonToRefresh);
 			}
 		}
 	}
@@ -318,7 +318,7 @@ public class MainActivity extends FragmentActivity {
 	 */
 	public void onFavoriteClicked(View view) {
 		Comic currentDbComic = getCurrentDbComic();
-		Log.v(CyanideViewer.TAG, "Current is favorite: " + currentDbComic.isFavorite());
+		Log.v(Constants.TAG, "Current is favorite: " + currentDbComic.isFavorite());
 
 		// Flip it
 		currentDbComic.setFavorite(!currentDbComic.isFavorite());
@@ -358,7 +358,7 @@ public class MainActivity extends FragmentActivity {
 	 * for a new ID and then sets the current comic to the latest one available.
 	 */
 	public void onLatestRequested() {
-		Log.i(CyanideViewer.TAG, "Latest comic requested");
+		Log.i(Constants.TAG, "Latest comic requested");
 		new AsyncTask<Void, Void, Long>() {
 
 			@Override
@@ -372,7 +372,7 @@ public class MainActivity extends FragmentActivity {
 
 					@Override
 					public void onComplete(Boolean result) {
-						Log.i(CyanideViewer.TAG, "User requested latest comic (newer was " + (result ? "" : "not") + " found)");
+						Log.i(Constants.TAG, "User requested latest comic (newer was " + (result ? "" : "not") + " found)");
 					}
 				});
 
@@ -421,7 +421,7 @@ public class MainActivity extends FragmentActivity {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (resultCode == FavoritesActivity.RESULT_OK) {
+		if (resultCode == Constants.RESULT_OK) {
 			// The user chose a comic to view
 			Comic theChosenOne = data.getExtras().getParcelable("comic");
 			setComic(theChosenOne.getId());
@@ -507,7 +507,7 @@ public class MainActivity extends FragmentActivity {
 
 		@Override
 		protected Integer doInBackground(Long... params) {
-			Log.d(CyanideViewer.TAG, "SetComicTask invoked for #" + params[0]);
+			Log.d(Constants.TAG, "SetComicTask invoked for #" + params[0]);
 			long id = params[0];
 
 			int curComicPagerIndex = -1;

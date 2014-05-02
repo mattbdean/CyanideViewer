@@ -5,7 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import net.dean.cyanideviewer.CyanideViewer;
+import net.dean.cyanideviewer.Constants;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -71,7 +71,7 @@ public abstract class BaseDao<T extends Model> {
 		if (!tableNames.contains(tableName)) {
 			tableNames.add(tableName);
 		} else {
-			Log.w(CyanideViewer.TAG, "Creating an extra BaseDao object for table \"" + tableName + "\"");
+			Log.w(Constants.TAG, "Creating an extra BaseDao object for table \"" + tableName + "\"");
 		}
 	}
 
@@ -82,7 +82,7 @@ public abstract class BaseDao<T extends Model> {
 	 */
 	public boolean add(T model) {
 		if (!isValid(model)) {
-			Log.w(CyanideViewer.TAG, "Model not valid: " + model);
+			Log.w(Constants.TAG, "Model not valid: " + model);
 			return false;
 		}
 
@@ -95,7 +95,7 @@ public abstract class BaseDao<T extends Model> {
 			addTo(entry.getKey(), entry.getValue(), values);
 		}
 
-		Log.v(CyanideViewer.TAG, "Adding model to the \"" + tableName + "\" table: " + model.toString());
+		Log.v(Constants.TAG, "Adding model to the \"" + tableName + "\" table: " + model.toString());
 		return db.insertOrThrow(tableName, null, values) != -1;
 	}
 
@@ -154,7 +154,7 @@ public abstract class BaseDao<T extends Model> {
 			return;
 		}
 
-		Log.i(CyanideViewer.TAG, "Could not determine object type of " + o + " (key was \"" + key + "\")");
+		Log.i(Constants.TAG, "Could not determine object type of " + o + " (key was \"" + key + "\")");
 	}
 
 	/**
@@ -210,7 +210,7 @@ public abstract class BaseDao<T extends Model> {
 			if (!entry.getKey().equals("is_favorite"))
 				addTo(entry.getKey(), entry.getValue(), values);
 
-		Log.v(CyanideViewer.TAG, "Updated model in table \"" + tableName + "\": " + model.toString());
+		Log.v(Constants.TAG, "Updated model in table \"" + tableName + "\": " + model.toString());
 		return db.update(tableName, values, columns[0] + "=?", new String[] {Long.toString(model.getId())});
 	}
 
@@ -222,7 +222,7 @@ public abstract class BaseDao<T extends Model> {
 	public boolean delete(long id) {
 		checkWritable();
 
-		Log.v(CyanideViewer.TAG, "Deleting model (id=" + id + ") from the \"" + tableName + "\" table.");
+		Log.v(Constants.TAG, "Deleting model (id=" + id + ") from the \"" + tableName + "\" table.");
 		return db.delete(tableName, columns[0] + "=?", new String[] {Long.toString(id)}) == 1;
 	}
 
@@ -232,7 +232,7 @@ public abstract class BaseDao<T extends Model> {
 	public void deleteAll() {
 		checkWritable();
 		// http://stackoverflow.com/a/6835115
-		Log.v(CyanideViewer.TAG, "Deleting all records in table \"" + tableName + "\".");
+		Log.v(Constants.TAG, "Deleting all records in table \"" + tableName + "\".");
 		db.execSQL("DELETE FROM " + tableName);
 		db.execSQL("VACUUM");
 	}

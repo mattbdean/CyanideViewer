@@ -3,8 +3,6 @@ package net.dean.cyanideviewer;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.app.NotificationManager;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -25,11 +23,6 @@ import java.util.List;
  * This fragment is responsible for showing the user Preferences defined in res/xml/preferences.xml
  */
 public class SettingsFragment extends PreferenceFragment {
-	/** The NotificationManager that will be used to send notifications to the OS */
-	private NotificationManager notificationManager;
-
-	/** The ID of the notification created by this app.*/
-	private static final int DELETE_COMIC_NOTIF_ID = 0;
 
 	/** The extensions to search and destroy */
 	private static final String[] EXTENSIONS = {"jpg", "jpeg", "png", "gif"};
@@ -44,8 +37,6 @@ public class SettingsFragment extends PreferenceFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-		this.notificationManager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
 
 		// Load the preferences
 		addPreferencesFromResource(R.xml.preferences);
@@ -96,7 +87,7 @@ public class SettingsFragment extends PreferenceFragment {
 	 */
 	private void onWipeDatabase() {
 		// Truncate the database
-		Log.w(CyanideViewer.TAG, "Truncating the database after user request");
+		Log.w(Constants.TAG, "Truncating the database after user request");
 		CyanideViewer.getComicDao().deleteAll();
 		Toast.makeText(getActivity().getApplicationContext(), "Database wiped.", Toast.LENGTH_SHORT).show();
 	}
@@ -107,7 +98,7 @@ public class SettingsFragment extends PreferenceFragment {
 	private void onDeleteImages() {
 		// Start removing files
 		new ImageDeletionTask(CyanideApi.instance().getSavedImageDirectory(),
-				"Deleting saved comics", DELETE_COMIC_NOTIF_ID).execute();
+				"Deleting saved comics", Constants.NOTIF_DELETE_COMIC).execute();
 	}
 
 	/**
@@ -170,13 +161,13 @@ public class SettingsFragment extends PreferenceFragment {
 				// Get the length before it's deleted
 				long size = f.length();
 				if (!f.delete()) {
-					Log.w(CyanideViewer.TAG, "Unable to delete " + f.getAbsolutePath());
+					Log.w(Constants.TAG, "Unable to delete " + f.getAbsolutePath());
 				} else {
 					// Update the notification progress
 					deletionCount++;
 					totalBytes += size;
 					onProgressUpdate(deletionCount, totalFilesForDeletion, totalBytes);
-					Log.d(CyanideViewer.TAG, "Deleted " + f.getAbsolutePath());
+					Log.d(Constants.TAG, "Deleted " + f.getAbsolutePath());
 				}
 			}
 

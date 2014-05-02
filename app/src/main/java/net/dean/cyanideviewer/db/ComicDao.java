@@ -4,8 +4,8 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.util.Log;
 
+import net.dean.cyanideviewer.Constants;
 import net.dean.cyanideviewer.CyanideUtils;
-import net.dean.cyanideviewer.CyanideViewer;
 import net.dean.cyanideviewer.api.CyanideApi;
 import net.dean.cyanideviewer.api.comic.Comic;
 
@@ -59,7 +59,7 @@ public class ComicDao extends BaseDao<Comic> {
 
 	@Override
 	public boolean delete(long id) {
-		Log.w(CyanideViewer.TAG, "Deleting comic :" + id);
+		Log.w(Constants.TAG, "Deleting comic :" + id);
 		return super.delete(id);
 	}
 
@@ -97,7 +97,7 @@ public class ComicDao extends BaseDao<Comic> {
 					comic.setIconHash(c.getString(columnIndex));
 					break;
 				default:
-					Log.w(CyanideViewer.TAG, "Unknown column: " + key);
+					Log.w(Constants.TAG, "Unknown column: " + key);
 			}
 		}
 

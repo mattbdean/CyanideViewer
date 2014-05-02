@@ -3,7 +3,7 @@ package net.dean.cyanideviewer.api;
 import android.os.Environment;
 import android.util.Log;
 
-import net.dean.cyanideviewer.CyanideViewer;
+import net.dean.cyanideviewer.Constants;
 import net.dean.cyanideviewer.api.comic.Comic;
 
 import org.apache.http.HttpHost;
@@ -62,7 +62,7 @@ public abstract class BaseComicApi implements ComicApi {
 		try {
 			new URL(url).toURI();
 		} catch (MalformedURLException | URISyntaxException e) {
-			Log.e(CyanideViewer.TAG, "Malformed URL: " + url, e);
+			Log.e(Constants.TAG, "Malformed URL: " + url, e);
 			return null;
 		}
 
@@ -77,13 +77,13 @@ public abstract class BaseComicApi implements ComicApi {
 			HttpHost currentHost = (HttpHost) context.getAttribute(ExecutionContext.HTTP_TARGET_HOST);
 			String currentUrl = (currentReq.getURI().isAbsolute() ? currentReq.getURI().toString() : (currentHost.toURI() + currentReq.getURI()));
 			response.getEntity().consumeContent();
-			Log.i(CyanideViewer.TAG, "Followed \"" + url + "\" to \"" + currentUrl + "\"");
+			Log.i(Constants.TAG, "Followed \"" + url + "\" to \"" + currentUrl + "\"");
 			return currentUrl;
 		} catch (SocketException e) {
-			Log.e(CyanideViewer.TAG, "Server-side error when trying to get the latest comic ID", e);
+			Log.e(Constants.TAG, "Server-side error when trying to get the latest comic ID", e);
 			return null;
 		} catch (IOException e) {
-			Log.e(CyanideViewer.TAG, "Unable to get the latest comic ID", e);
+			Log.e(Constants.TAG, "Unable to get the latest comic ID", e);
 			return null;
 		}
 	}

@@ -3,7 +3,7 @@ package net.dean.cyanideviewer.db;
 import android.database.Cursor;
 import android.util.Log;
 
-import net.dean.cyanideviewer.CyanideViewer;
+import net.dean.cyanideviewer.Constants;
 import net.dean.cyanideviewer.api.comic.Author;
 
 import java.util.List;
@@ -45,7 +45,7 @@ public class AuthorDao extends BaseDao<Author> {
 					author.setFacebook(c.getString(columnIndex));
 					break;
 				default:
-					Log.w(CyanideViewer.TAG, "Unknown column: " + key);
+					Log.w(Constants.TAG, "Unknown column: " + key);
 			}
 		}
 

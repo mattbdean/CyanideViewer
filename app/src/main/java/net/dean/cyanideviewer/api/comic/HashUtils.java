@@ -2,7 +2,7 @@ package net.dean.cyanideviewer.api.comic;
 
 import android.util.Log;
 
-import net.dean.cyanideviewer.CyanideViewer;
+import net.dean.cyanideviewer.Constants;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -37,7 +37,7 @@ public final class HashUtils {
 		try {
 			complete = MessageDigest.getInstance(ALGO);
 		} catch (NoSuchAlgorithmException e) {
-			Log.e(CyanideViewer.TAG, "Could not find algorithm " + ALGO);
+			Log.e(Constants.TAG, "Could not find algorithm " + ALGO);
 			return null;
 		}
 
@@ -52,12 +52,12 @@ public final class HashUtils {
 			} while (numRead != -1);
 
 		} catch (IOException e) {
-			Log.e(CyanideViewer.TAG, "Could not create a digest for InputStream " + inputStream);
+			Log.e(Constants.TAG, "Could not create a digest for InputStream " + inputStream);
 		} finally {
 			try {
 				inputStream.close();
 			} catch (IOException e) {
-				Log.e(CyanideViewer.TAG, "Unable to close FileInputStream", e);
+				Log.e(Constants.TAG, "Unable to close FileInputStream", e);
 			}
 		}
 

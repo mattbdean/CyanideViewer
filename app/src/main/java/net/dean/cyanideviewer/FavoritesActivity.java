@@ -20,11 +20,6 @@ import java.util.ArrayList;
  * This activity is responsible for showing the user all his/her favorites in a ListView
  */
 public class FavoritesActivity extends Activity {
-	/** Returned when the user picked a comic */
-	public static final int RESULT_OK = 0;
-
-	/** Returned when the user did not pick a comic */
-	public static final int RESULT_NONE = 1;
 
 	/** The adapter to give the ListView items */
 	private FavoritesAdapter adapter;
@@ -49,7 +44,7 @@ public class FavoritesActivity extends Activity {
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				Intent intent = new Intent();
 				intent.putExtra("comic", (Comic) adapter.getItem(position));
-				setResult(RESULT_OK, intent);
+				setResult(Constants.RESULT_OK, intent);
 				finish();
 			}
 		});
@@ -58,7 +53,7 @@ public class FavoritesActivity extends Activity {
 	@Override
 	public void onBackPressed() {
 		// Tell the calling activity that no comic was chosen
-		setResult(RESULT_NONE);
+		setResult(Constants.RESULT_NONE);
 		super.onBackPressed();
 	}
 

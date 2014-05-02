@@ -57,7 +57,7 @@ public class AuthorDialog extends DialogFragment {
 		try {
 			startActivity(intent);
 		} catch (Exception e) {
-			Log.e(CyanideViewer.TAG, String.format("Primary URI (%s) failed, using backup (%s)", primary, fallback), e);
+			Log.e(Constants.TAG, String.format("Primary URI (%s) failed, using backup (%s)", primary, fallback), e);
 			intent.setData(Uri.parse(fallback));
 			startActivity(intent);
 		}

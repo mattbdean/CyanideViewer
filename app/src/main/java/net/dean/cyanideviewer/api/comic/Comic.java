@@ -8,8 +8,8 @@ import android.widget.ImageButton;
 
 import net.dean.cyanideviewer.Callback;
 import net.dean.cyanideviewer.ComicStage;
+import net.dean.cyanideviewer.Constants;
 import net.dean.cyanideviewer.CyanideUtils;
-import net.dean.cyanideviewer.CyanideViewer;
 import net.dean.cyanideviewer.FavoriteComicListItem;
 import net.dean.cyanideviewer.db.DatabaseField;
 import net.dean.cyanideviewer.db.Model;
@@ -159,7 +159,7 @@ public class Comic extends Model implements Parcelable {
 		// Create the appropriate directories
 		if (!dest.getParentFile().isDirectory()) {
 			if (!dest.getParentFile().mkdirs()) {
-				Log.e(CyanideViewer.TAG, "Unable to create the parent directories for "
+				Log.e(Constants.TAG, "Unable to create the parent directories for "
 						+ dest.getAbsolutePath());
 			}
 		}
@@ -181,7 +181,7 @@ public class Comic extends Model implements Parcelable {
 		// Create the parent file if it doesn't exist
 		if (!dest.getParentFile().isDirectory()) {
 			if (!dest.getParentFile().mkdirs()) {
-				Log.e(CyanideViewer.TAG, "Could not create the directory \"" + dest.getAbsolutePath() + "\"");
+				Log.e(Constants.TAG, "Could not create the directory \"" + dest.getAbsolutePath() + "\"");
 			}
 		}
 
@@ -211,10 +211,10 @@ public class Comic extends Model implements Parcelable {
 			fos = new FileOutputStream(dest);
 			fos.write(bitmapData);
 
-			Log.i(CyanideViewer.TAG, "Wrote bitmap to " + dest.getAbsolutePath());
+			Log.i(Constants.TAG, "Wrote bitmap to " + dest.getAbsolutePath());
 			return true;
 		} catch (IOException e) {
-			Log.e(CyanideViewer.TAG, "Failed to write the bitmap to " + dest.getAbsolutePath(), e);
+			Log.e(Constants.TAG, "Failed to write the bitmap to " + dest.getAbsolutePath(), e);
 			return false;
 		} finally {
 			// Close the resources
@@ -226,7 +226,7 @@ public class Comic extends Model implements Parcelable {
 					fos.close();
 				}
 			} catch (IOException e) {
-				Log.e(CyanideViewer.TAG, "Unable to close either the ByteOutputStream or the FileOutputStream", e);
+				Log.e(Constants.TAG, "Unable to close either the ByteOutputStream or the FileOutputStream", e);
 			}
 		}
 	}

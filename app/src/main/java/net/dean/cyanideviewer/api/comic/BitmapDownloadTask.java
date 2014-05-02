@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ImageButton;
 
+import net.dean.cyanideviewer.Constants;
 import net.dean.cyanideviewer.CyanideViewer;
 import net.dean.cyanideviewer.NotificationHelper;
 import net.dean.cyanideviewer.api.CyanideApi;
@@ -20,8 +21,6 @@ import java.util.ArrayList;
  * This class is used to download bitmaps from the internet and show notifications about them
  */
 class BitmapDownloadTask extends AsyncTask<Void, Void, Boolean> {
-	/** The ID of the notification */
-	private static final int DOWNLOAD_NOTIF_ID = 1;
 
 	/** A list of downloaded comics */
 	private static final ArrayList<Integer> DOWNLOADED_IDS = new ArrayList<>();
@@ -43,7 +42,7 @@ class BitmapDownloadTask extends AsyncTask<Void, Void, Boolean> {
 	public BitmapDownloadTask(Comic c, ImageButton downloadButton) {
 		this.c = c;
 		this.downloadButton = downloadButton;
-		this.notifHelper = NotificationHelper.getInstance(downloadButton.getContext(), DOWNLOAD_NOTIF_ID);
+		this.notifHelper = NotificationHelper.getInstance(downloadButton.getContext(), Constants.NOTIF_DOWNLOAD_COMIC);
 	}
 
 	@Override
@@ -59,7 +58,7 @@ class BitmapDownloadTask extends AsyncTask<Void, Void, Boolean> {
 			c.setBitmapHash(HashUtils.getChecksum(dest));
 			CyanideViewer.getComicDao().update(c);
 		} catch (FileNotFoundException e) {
-			Log.e(CyanideViewer.TAG, "Could not find file " + dest + ". This really shouldn't happen.", e);
+			Log.e(Constants.TAG, "Could not find file " + dest + ". This really shouldn't happen.", e);
 		}
 
 		return true;

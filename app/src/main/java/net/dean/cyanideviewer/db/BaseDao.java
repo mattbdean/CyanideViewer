@@ -81,6 +81,11 @@ public abstract class BaseDao<T extends Model> {
 	 * @return True if the row was inserted successfully, false if else
 	 */
 	public boolean add(T model) {
+		if (!isValid(model)) {
+			Log.w(CyanideViewer.TAG, "Model not valid: " + model);
+			return false;
+		}
+
 		checkWritable();
 
 		ContentValues values = new ContentValues();
@@ -238,6 +243,13 @@ public abstract class BaseDao<T extends Model> {
 	 * @return A new model from a cursor
 	 */
 	protected abstract T parse(Cursor c);
+
+	/**
+	 * Checks if the model is valid enough to be put into the database.
+	 * @param model The model to check
+	 * @return True, if the model is valid. False if else.
+	 */
+	protected abstract boolean isValid(T model);
 
 	protected void checkWritable() {
 		if (!writable) {

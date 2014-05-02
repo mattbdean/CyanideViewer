@@ -6,6 +6,7 @@ import android.util.Log;
 
 import net.dean.cyanideviewer.CyanideUtils;
 import net.dean.cyanideviewer.CyanideViewer;
+import net.dean.cyanideviewer.api.CyanideApi;
 import net.dean.cyanideviewer.api.comic.Comic;
 
 import java.util.ArrayList;
@@ -101,5 +102,10 @@ public class ComicDao extends BaseDao<Comic> {
 		}
 
 		return comic;
+	}
+
+	@Override
+	protected boolean isValid(Comic model) {
+		return model.getId() <= CyanideApi.instance().getNewestId() && model.getId() >= CyanideApi.instance().getFirstId();
 	}
 }

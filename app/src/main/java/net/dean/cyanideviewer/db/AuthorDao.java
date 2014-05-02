@@ -51,4 +51,9 @@ public class AuthorDao extends BaseDao<Author> {
 
 		return author;
 	}
+
+	@Override
+	protected boolean isValid(Author model) {
+		return false; // add() not used, this method is irrelevant
+	}
 }

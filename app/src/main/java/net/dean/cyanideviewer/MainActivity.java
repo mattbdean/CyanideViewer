@@ -139,7 +139,7 @@ public class MainActivity extends FragmentActivity {
 
 			@Override
 			protected Void doInBackground(Void... params) {
-				CyanideApi.setUp();
+				CyanideApi.init();
 				return null;
 			}
 

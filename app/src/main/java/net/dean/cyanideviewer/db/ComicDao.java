@@ -79,6 +79,12 @@ public class ComicDao extends BaseDao<Comic> {
 					// Get an Author via AuthorDao
 					comic.setAuthor(authorDao.get(c.getLong(columnIndex)));
 					break;
+				case "bitmap_hash":
+					comic.setBitmapHash(c.getString(columnIndex));
+					break;
+				case "icon_hash":
+					comic.setIconHash(c.getString(columnIndex));
+					break;
 				default:
 					Log.w(CyanideViewer.TAG, "Unknown column: " + key);
 			}

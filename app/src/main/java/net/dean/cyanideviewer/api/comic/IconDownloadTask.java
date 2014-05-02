@@ -8,6 +8,7 @@ import net.dean.cyanideviewer.CyanideViewer;
 import net.dean.cyanideviewer.api.CyanideApi;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 class IconDownloadTask extends AsyncTask<Void, Void, Boolean> {
 	/** The width and height of all generated icons */
@@ -31,7 +32,21 @@ class IconDownloadTask extends AsyncTask<Void, Void, Boolean> {
 		}
 
 		File dest = new File(CyanideApi.instance().getSavedIconDirectory(), c.generateFileName());
-		return Comic.writeBitmap(icon, dest);
+		boolean success = Comic.writeBitmap(icon, dest);
+
+		if (!success) {
+			return false;
+		}
+
+		// Set the bitmap hash because it's been downloaded
+		try {
+			c.setIconHash(HashUtils.getChecksum(dest));
+			CyanideViewer.getComicDao().update(c);
+		} catch (FileNotFoundException e) {
+			Log.e(CyanideViewer.TAG, "Could not find file " + dest + ". This really shouldn't happen.", e);
+		}
+
+		return true;
 	}
 
 	@Override

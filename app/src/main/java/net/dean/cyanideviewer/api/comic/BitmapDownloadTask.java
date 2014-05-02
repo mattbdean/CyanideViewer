@@ -5,12 +5,15 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.ImageButton;
 
+import net.dean.cyanideviewer.CyanideViewer;
 import net.dean.cyanideviewer.NotificationHelper;
 import net.dean.cyanideviewer.api.CyanideApi;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 /**
@@ -46,7 +49,20 @@ class BitmapDownloadTask extends AsyncTask<Void, Void, Boolean> {
 	@Override
 	protected Boolean doInBackground(Void... params) {
 		File dest = new File(CyanideApi.instance().getSavedImageDirectory(), c.generateFileName());
-		return c.writeBitmap(dest);
+		boolean success = c.writeBitmap(dest);
+		if (!success) {
+			return false;
+		}
+
+		// Set the bitmap hash because it's been downloaded
+		try {
+			c.setBitmapHash(HashUtils.getChecksum(dest));
+			CyanideViewer.getComicDao().update(c);
+		} catch (FileNotFoundException e) {
+			Log.e(CyanideViewer.TAG, "Could not find file " + dest + ". This really shouldn't happen.", e);
+		}
+
+		return true;
 	}
 
 	@Override

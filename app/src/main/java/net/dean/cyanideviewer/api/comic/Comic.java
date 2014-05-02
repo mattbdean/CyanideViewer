@@ -40,11 +40,21 @@ public class Comic extends Model implements Parcelable {
 	@DatabaseField(columnName = "is_favorite", doesUpdate = true)
 	private Boolean isFavorite;
 
+	/** The date this comic was published */
 	@DatabaseField(columnName = "published")
 	private Date published;
 
+	/** The author who published this comic */
 	@DatabaseField(columnName = "author_id")
 	private Author author;
+
+	/** The MD5 hash of the bitmap */
+	@DatabaseField(columnName = "bitmap_hash", doesUpdate = true)
+	private String bitmapHash;
+
+	/** The MD5 hash of the comic's icon */
+	@DatabaseField(columnName = "icon_hash", doesUpdate = true)
+	private String iconHash;
 
 	/** The Bitmap that represents the comic */
 	private Bitmap bitmap;
@@ -68,6 +78,14 @@ public class Comic extends Model implements Parcelable {
 	}
 
 
+	/**
+	 * Instantiates a new Comic
+	 * @param id The ID of the comic
+	 * @param url The URL of the comic's image
+	 * @param published The date the comic was published
+	 * @param author The author of the comic
+	 * @param isFavorite If the comic is a favorite
+	 */
 	public Comic(long id, URL url, Date published, Author author, boolean isFavorite) {
 		super(id);
 		this.url = url;
@@ -315,6 +333,22 @@ public class Comic extends Model implements Parcelable {
 		this.author = author;
 	}
 
+	public String getBitmapHash() {
+		return bitmapHash;
+	}
+
+	public void setBitmapHash(String bitmapHash) {
+		this.bitmapHash = bitmapHash;
+	}
+
+	public String getIconHash() {
+		return iconHash;
+	}
+
+	public void setIconHash(String iconHash) {
+		this.iconHash = iconHash;
+	}
+
 	/**
 	 * Gets the Callback to execute when the bitmap has finished loading
 	 */
@@ -361,11 +395,14 @@ public class Comic extends Model implements Parcelable {
 	@Override
 	public String toString() {
 		return "Comic {" +
-				"id=" + id +
-				", url='" + url.toExternalForm() + '\'' +
+				"url=" + url +
 				", isFavorite=" + isFavorite +
 				", published=" + published +
 				", author=" + author +
+				", bitmap=" + bitmap +
+				", hasLoaded=" + hasLoaded +
+				", bitmapHash='" + bitmapHash + '\'' +
+				", iconHash=" + iconHash +
 				'}';
 	}
 }

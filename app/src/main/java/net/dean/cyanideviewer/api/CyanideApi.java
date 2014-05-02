@@ -7,12 +7,15 @@ import net.dean.cyanideviewer.CyanideUtils;
 import net.dean.cyanideviewer.CyanideViewer;
 import net.dean.cyanideviewer.api.comic.Author;
 import net.dean.cyanideviewer.api.comic.Comic;
+import net.dean.cyanideviewer.api.comic.HashMismatchException;
+import net.dean.cyanideviewer.api.comic.HashUtils;
 
 import org.apache.commons.io.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -38,9 +41,9 @@ public class CyanideApi extends BaseComicApi {
 		return instance;
 	}
 
-	public static void setUp() {
+	public static void init() {
 		if (instance != null) {
-			Log.w(CyanideViewer.TAG, "Setting up CyanideApi more than one time");
+			Log.w(CyanideViewer.TAG, "Setting up CyanideApi multiple times");
 			return;
 		}
 
@@ -179,7 +182,22 @@ public class CyanideApi extends BaseComicApi {
 			String lookingFor = f.getAbsolutePath().substring(f.getAbsolutePath().lastIndexOf('/') + 1, f.getAbsolutePath().indexOf('.'));
 			String idString = Long.toString(id);
 			if (lookingFor.equals(idString)) {
-				// Found the local file
+				// Found the local file, test it to see if the checksum in the database matches the file's
+				String bitmapHash = CyanideViewer.getComicDao().get(id).getBitmapHash();
+				try {
+					HashUtils.check(f, bitmapHash);
+				} catch (HashMismatchException e) {
+					Log.e(CyanideViewer.TAG, String.format("Hash mismatch for comic #%s. Deleting file \"%s\".",
+							id, f.getAbsolutePath()));
+					if (!f.delete()) {
+						Log.e(CyanideViewer.TAG, "Could not delete file " + f.getAbsolutePath());
+					}
+					return null;
+				} catch (FileNotFoundException e) {
+					Log.e(CyanideViewer.TAG, "Could not find local comic at " + f.getAbsolutePath() +
+						". This really shouldn't happen.", e);
+				}
+
 				return f;
 			}
 		}

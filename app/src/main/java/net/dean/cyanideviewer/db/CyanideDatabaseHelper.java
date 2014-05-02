@@ -20,7 +20,7 @@ public class CyanideDatabaseHelper extends SQLiteOpenHelper {
 	static final String TABLE_AUTHORS = "authors";
 
 	/** The SQLite version of the database to use */
-	private static final int DB_VERSION = 3;
+	private static final int DB_VERSION = 1;
 
 	/** The SQL query to use when creating the 'comics' table */
 	// I really don't know how to format this...
@@ -31,6 +31,8 @@ public class CyanideDatabaseHelper extends SQLiteOpenHelper {
 					"is_favorite INTEGER," +
 					"published INTEGER," +
 					"author_id INTEGER," +
+					"bitmap_hash TEXT," +
+					"icon_hash TEXT," +
 					"FOREIGN KEY(author_id) REFERENCES %s(id)" +
 			");", TABLE_COMICS, TABLE_AUTHORS);
 

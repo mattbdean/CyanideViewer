@@ -322,7 +322,7 @@ public class MainActivity extends FragmentActivity {
 
 		// Flip it
 		currentDbComic.setFavorite(!currentDbComic.isFavorite());
-		CyanideViewer.getComicDao().update(currentDbComic);
+		CyanideViewer.getComicDao().setFavorite(currentDbComic);
 
 		pagerAdapter.getComicStage(viewPager.getCurrentItem()).getComic().downloadIcon();
 

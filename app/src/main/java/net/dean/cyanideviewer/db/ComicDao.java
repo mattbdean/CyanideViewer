@@ -1,5 +1,6 @@
 package net.dean.cyanideviewer.db;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.util.Log;
 
@@ -44,6 +45,15 @@ public class ComicDao extends BaseDao<Comic> {
 		}
 
 		return favorites;
+	}
+
+	public int setFavorite(Comic c) {
+		checkWritable();
+
+		ContentValues values = new ContentValues();
+		values.put("is_favorite", c.isFavorite());
+
+		return db.update(tableName, values, "id=?", new String[] {Long.toString(c.getId())});
 	}
 
 	@Override

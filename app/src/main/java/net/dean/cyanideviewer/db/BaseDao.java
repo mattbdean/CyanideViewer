@@ -201,9 +201,9 @@ public abstract class BaseDao<T extends Model> {
 		ContentValues values = new ContentValues();
 
 		Map<String, Object> fields = model.getDatabaseFieldsUpdate();
-		for (Map.Entry<String, Object> entry : fields.entrySet()) {
-			addTo(entry.getKey(), entry.getValue(), values);
-		}
+		for (Map.Entry<String, Object> entry : fields.entrySet())
+			if (!entry.getKey().equals("is_favorite"))
+				addTo(entry.getKey(), entry.getValue(), values);
 
 		Log.v(CyanideViewer.TAG, "Updated model in table \"" + tableName + "\": " + model.toString());
 		return db.update(tableName, values, columns[0] + "=?", new String[] {Long.toString(model.getId())});

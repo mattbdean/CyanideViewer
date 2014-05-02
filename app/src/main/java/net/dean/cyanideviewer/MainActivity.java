@@ -362,6 +362,11 @@ public class MainActivity extends FragmentActivity {
 		new AsyncTask<Void, Void, Long>() {
 
 			@Override
+			protected void onPreExecute() {
+				showLoading();
+			}
+
+			@Override
 			protected Long doInBackground(Void... params) {
 				CyanideApi.instance().checkForNewComic(new Callback<Boolean>() {
 
@@ -443,6 +448,12 @@ public class MainActivity extends FragmentActivity {
 	 */
 	public void onRandomClicked(View v) {
 		new AbstractComicTask<Void>() {
+
+			@Override
+			protected void onPreExecute() {
+				showLoading();
+				super.onPreExecute();
+			}
 
 			@Override
 			protected Comic doInBackground(Void... params) {

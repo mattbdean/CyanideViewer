@@ -58,7 +58,7 @@ class BitmapDownloadTask extends AsyncTask<Void, Void, Boolean> {
 			c.setBitmapHash(HashUtils.getChecksum(dest));
 			CyanideViewer.getComicDao().update(c);
 		} catch (FileNotFoundException e) {
-			Log.e(Constants.TAG, "Could not find file " + dest + ". This really shouldn't happen.", e);
+			Log.e(Constants.TAG_API, "Could not find file " + dest + ". This really shouldn't happen.", e);
 		}
 
 		return true;

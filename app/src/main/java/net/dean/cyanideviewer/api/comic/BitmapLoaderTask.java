@@ -8,7 +8,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import net.dean.cyanideviewer.ComicStage;
+import net.dean.cyanideviewer.ComicSTAG_APIe;
 import net.dean.cyanideviewer.Constants;
 import net.dean.cyanideviewer.R;
 
@@ -32,24 +32,24 @@ import uk.co.senab.photoview.PhotoViewAttacher;
  */
 class BitmapLoaderTask extends AsyncTask<Long, Void, Bitmap> {
 	/**
-	 * The ComicStage whose components will be altered after the bitmap and it's metadata have finished
+	 * The ComicSTAG_APIe whose components will be altered after the bitmap and it's metadata have finished
 	 * loading
 	 */
-	private ComicStage stage;
+	private ComicSTAG_APIe sTAG_APIe;
 
 	/**
 	 * Instantiates a new BitmapLoaderTask
-	 * @param stage The ComicStage to use
+	 * @param sTAG_APIe The ComicSTAG_APIe to use
 	 */
-	public BitmapLoaderTask(ComicStage stage) {
-		this.stage = stage;
+	public BitmapLoaderTask(ComicSTAG_APIe sTAG_APIe) {
+		this.sTAG_APIe = sTAG_APIe;
 	}
 
 	@Override
 	protected void onPreExecute() {
-		((TextView) stage.findViewById(R.id.comic_id)).setText("#" + stage.getComic().getId());
-		((ImageButton) stage.findViewById(R.id.author_button)).setImageResource(stage.getComic().getAuthor().getIconResource());
-		((TextView) stage.findViewById(R.id.comic_date_published)).setText(stage.getComic().getPublishedFormatted());
+		((TextView) sTAG_APIe.findViewById(R.id.comic_id)).setText("#" + sTAG_APIe.getComic().getId());
+		((ImageButton) sTAG_APIe.findViewById(R.id.author_button)).setImageResource(sTAG_APIe.getComic().getAuthor().getIconResource());
+		((TextView) sTAG_APIe.findViewById(R.id.comic_date_published)).setText(sTAG_APIe.getComic().getPublishedFormatted());
 	}
 
 	@Override
@@ -57,17 +57,17 @@ class BitmapLoaderTask extends AsyncTask<Long, Void, Bitmap> {
 		// Adapted from http://stackoverflow.com/a/6621552/1275092
 
 		try {
-			if (stage.getComic().getUrl().getProtocol().equals("file")) {
+			if (sTAG_APIe.getComic().getUrl().getProtocol().equals("file")) {
 				// Local file, no need to make any HTTP requests
-				return BitmapFactory.decodeFile(URLDecoder.decode(stage.getComic().getUrl().getPath(), "UTF-8"));
+				return BitmapFactory.decodeFile(URLDecoder.decode(sTAG_APIe.getComic().getUrl().getPath(), "UTF-8"));
 			}
 
 			HttpClient client = new DefaultHttpClient();
 			client.getParams().setParameter(ClientPNames.ALLOW_CIRCULAR_REDIRECTS, false);
-			HttpGet request = new HttpGet(stage.getComic().getUrl().toURI());
+			HttpGet request = new HttpGet(sTAG_APIe.getComic().getUrl().toURI());
 			HttpResponse response = client.execute(request);
 			if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-				Log.w(Constants.TAG, "Failed to fetch comic at " + stage.getComic().getUrl().toExternalForm());
+				Log.w(Constants.TAG_API, "Failed to fetch comic at " + sTAG_APIe.getComic().getUrl().toExternalForm());
 				return null;
 			}
 			HttpEntity entity = response.getEntity();
@@ -85,10 +85,10 @@ class BitmapLoaderTask extends AsyncTask<Long, Void, Bitmap> {
 			}
 
 		} catch (URISyntaxException e) {
-			Log.e(Constants.TAG, "URISyntaxException: " + stage.getComic().getUrl(), e);
+			Log.e(Constants.TAG_API, "URISyntaxException: " + sTAG_APIe.getComic().getUrl(), e);
 			return null;
 		} catch (IOException e) {
-			Log.e(Constants.TAG, "IOException while trying to decode the image from URL " + stage.getComic().getUrl(), e);
+			Log.e(Constants.TAG_API, "IOException while trying to decode the image from URL " + sTAG_APIe.getComic().getUrl(), e);
 			return null;
 		}
 
@@ -98,17 +98,17 @@ class BitmapLoaderTask extends AsyncTask<Long, Void, Bitmap> {
 	@Override
 	protected void onPostExecute(Bitmap bitmap) {
 		if (bitmap != null) {
-			stage.getComic().setBitmap(bitmap);
+			sTAG_APIe.getComic().setBitmap(bitmap);
 
-			ImageView imageView = stage.getImageView();
+			ImageView imageView = sTAG_APIe.getImageView();
 			imageView.setImageBitmap(bitmap);
 			new PhotoViewAttacher(imageView);
 
-			stage.getComic().setHasLoaded(true);
+			sTAG_APIe.getComic().setHasLoaded(true);
 
-			if (stage.getComic().getOnBitmapLoaded() != null) {
-				stage.getComic().getOnBitmapLoaded().onComplete(null);
-				stage.getComic().resetOnBitmapLoaded();
+			if (sTAG_APIe.getComic().getOnBitmapLoaded() != null) {
+				sTAG_APIe.getComic().getOnBitmapLoaded().onComplete(null);
+				sTAG_APIe.getComic().resetOnBitmapLoaded();
 			}
 		}
 	}

@@ -59,7 +59,7 @@ public class ComicDao extends BaseDao<Comic> {
 
 	@Override
 	public boolean delete(long id) {
-		Log.w(Constants.TAG, "Deleting comic :" + id);
+		Log.w(Constants.TAG_DB, "Deleting comic :" + id);
 		return super.delete(id);
 	}
 
@@ -97,7 +97,7 @@ public class ComicDao extends BaseDao<Comic> {
 					comic.setIconHash(c.getString(columnIndex));
 					break;
 				default:
-					Log.w(Constants.TAG, "Unknown column: " + key);
+					Log.w(Constants.TAG_DB, "Unknown column: " + key);
 			}
 		}
 

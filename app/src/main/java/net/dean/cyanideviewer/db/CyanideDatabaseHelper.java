@@ -74,7 +74,7 @@ public class CyanideDatabaseHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		Log.w(Constants.TAG, "Upgrading database from version " + oldVersion + " to " + newVersion
+		Log.w(Constants.TAG_DB, "Upgrading database from version " + oldVersion + " to " + newVersion
 						+ ", which will destroy all old data");
 
 		// Drop all tables

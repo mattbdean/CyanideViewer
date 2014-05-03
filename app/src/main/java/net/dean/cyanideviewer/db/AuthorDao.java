@@ -45,7 +45,7 @@ public class AuthorDao extends BaseDao<Author> {
 					author.setFacebook(c.getString(columnIndex));
 					break;
 				default:
-					Log.w(Constants.TAG, "Unknown column: " + key);
+					Log.w(Constants.TAG_DB_DB, "Unknown column: " + key);
 			}
 		}
 

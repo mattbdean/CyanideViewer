@@ -44,7 +44,7 @@ public class CyanideApi extends BaseComicApi {
 
 	public static void init() {
 		if (instance != null) {
-			Log.w(Constants.TAG, "Setting up CyanideApi multiple times");
+			Log.w(Constants.TAG_API, "Setting up CyanideApi multiple times");
 			return;
 		}
 
@@ -56,12 +56,12 @@ public class CyanideApi extends BaseComicApi {
 			instance.firstId = instance.getIdFromUrl(BASE_URL + doc.select("nobr").get(1).select("span")
 					.get(0).select("a[rel=first]").attr("href").replace("/comics/", ""), false);
 		} catch (IOException e) {
-			Log.e(Constants.TAG, "Failed to get first ID", e);
+			Log.e(Constants.TAG_API, "Failed to get first ID", e);
 		}
-		Log.i(Constants.TAG, "Found first ID: " + instance.firstId);
+		Log.i(Constants.TAG_API, "Found first ID: " + instance.firstId);
 
 		instance.newestId = getNewestComicId();
-		Log.i(Constants.TAG, "Found newest ID: " + instance.newestId);
+		Log.i(Constants.TAG_API, "Found newest ID: " + instance.newestId);
 	}
 
 	/** The ID of the very first publicly available C&H comic */
@@ -85,7 +85,7 @@ public class CyanideApi extends BaseComicApi {
 		// http://www.explosm.net/comics/3530/
 		// https://explosm.net/comics/3530
 		if (!url.matches("http(s)?://(www\\.)?explosm\\.net/comics/\\d*(/)?")) {
-			Log.e(Constants.TAG, "Cannot load comic: URL not in correct format: " + url);
+			Log.e(Constants.TAG_API, "Cannot load comic: URL not in correct format: " + url);
 			return -1;
 		}
 		return Long.parseLong(url.substring(url.lastIndexOf('/', url.length() - 2)).replace("/", ""));
@@ -101,16 +101,16 @@ public class CyanideApi extends BaseComicApi {
 	public Comic getPrevious(long relativeToId) {
 		long newId = relativeToId - 1;
 
-		Log.i(Constants.TAG, "Getting the previous comic relative to #" + relativeToId);
+		Log.i(Constants.TAG_API, "Getting the previous comic relative to #" + relativeToId);
 		if (newId < firstId) {
 			// The ID is less than the first comic's ID
-			Log.w(Constants.TAG, String.format("The given ID (%s) was lower than the minimum ID (%s)", newId, firstId));
+			Log.w(Constants.TAG_API, String.format("The given ID (%s) was lower than the minimum ID (%s)", newId, firstId));
 			return getComic(firstId);
 		}
 
 		if (newId > newestId) {
 			// The ID is greater than the newest comic's ID
-			Log.w(Constants.TAG, String.format("The given ID (%s) was greater than the maximum ID (%s)", newId, newestId));
+			Log.w(Constants.TAG_API, String.format("The given ID (%s) was greater than the maximum ID (%s)", newId, newestId));
 			return getComic(newestId);
 		}
 
@@ -121,7 +121,7 @@ public class CyanideApi extends BaseComicApi {
 			return getComic(newId);
 		}
 
-		Log.i(Constants.TAG, "There was no comic associated with comic #" + newId + ", trying #" + (newId - 1));
+		Log.i(Constants.TAG_API, "There was no comic associated with comic #" + newId + ", trying #" + (newId - 1));
 		// Go to the previous comic
 		return getPrevious(newId);
 	}
@@ -130,16 +130,16 @@ public class CyanideApi extends BaseComicApi {
 	public Comic getNext(long relativeToId) {
 		long newId = relativeToId + 1;
 
-		Log.i(Constants.TAG, "Getting the next comic relative to #" + relativeToId);
+		Log.i(Constants.TAG_API, "Getting the next comic relative to #" + relativeToId);
 		if (newId < firstId) {
 			// The ID is less than the first comic's ID
-			Log.w(Constants.TAG, String.format("The given ID (%s) was lower than the minimum ID (%s)", newId, firstId));
+			Log.w(Constants.TAG_API, String.format("The given ID (%s) was lower than the minimum ID (%s)", newId, firstId));
 			return null;
 		}
 
 		if (newId > newestId) {
 			// The ID is greater than the newest comic's ID
-			Log.w(Constants.TAG, String.format("The given ID (%s) was greater than the maximum ID (%s)", newId, newestId));
+			Log.w(Constants.TAG_API, String.format("The given ID (%s) was greater than the maximum ID (%s)", newId, newestId));
 			return null;
 		}
 
@@ -150,7 +150,7 @@ public class CyanideApi extends BaseComicApi {
 			return getComic(newId);
 		}
 
-		Log.i(Constants.TAG, "There was no comic associated with comic #" + newId + ", trying #" + (newId + 1));
+		Log.i(Constants.TAG_API, "There was no comic associated with comic #" + newId + ", trying #" + (newId + 1));
 		// Go to the previous comic
 		return getNext(newId);
 	}
@@ -187,7 +187,7 @@ public class CyanideApi extends BaseComicApi {
 		if (!getSavedImageDirectory().isDirectory()) {
 			if (!getSavedImageDirectory().mkdirs()) {
 				// Prevent IllegalArgumentException by making sure this location is a directory
-				Log.e(Constants.TAG, "Unable to create the directory " + getSavedImageDirectory().getAbsolutePath() +
+				Log.e(Constants.TAG_API, "Unable to create the directory " + getSavedImageDirectory().getAbsolutePath() +
 						". Does it exist as a file?");
 			}
 		}
@@ -203,14 +203,14 @@ public class CyanideApi extends BaseComicApi {
 				try {
 					HashUtils.check(f, bitmapHash);
 				} catch (HashMismatchException e) {
-					Log.e(Constants.TAG, String.format("Hash mismatch for comic #%s. Deleting file \"%s\".",
+					Log.e(Constants.TAG_API, String.format("Hash mismatch for comic #%s. Deleting file \"%s\".",
 							id, f.getAbsolutePath()));
 					if (!f.delete()) {
-						Log.e(Constants.TAG, "Could not delete file " + f.getAbsolutePath());
+						Log.e(Constants.TAG_API, "Could not delete file " + f.getAbsolutePath());
 					}
 					return null;
 				} catch (FileNotFoundException e) {
-					Log.e(Constants.TAG, "Could not find local comic at " + f.getAbsolutePath() +
+					Log.e(Constants.TAG_API, "Could not find local comic at " + f.getAbsolutePath() +
 						". This really shouldn't happen.", e);
 				}
 
@@ -228,13 +228,13 @@ public class CyanideApi extends BaseComicApi {
 		Comic dbComic = CyanideViewer.getComicDao().get(id);
 		if (dbComic != null) {
 			// The comic was found in the database
-			Log.i(Constants.TAG, "Comic #" + id + " was found on the database, using it's info");
+			Log.i(Constants.TAG_API, "Comic #" + id + " was found on the database, using it's info");
 			c = dbComic;
 		} else {
 			String url = getBitmapUrl(id);
 			if (url != null) {
 				// The wasn't in the database, add it
-				Log.i(Constants.TAG, "Comic #" + id + " was not found in the database.");
+				Log.i(Constants.TAG_API, "Comic #" + id + " was not found in the database.");
 				c = fillMetadata(c);
 				CyanideViewer.getComicDao().add(c);
 			}
@@ -247,9 +247,9 @@ public class CyanideApi extends BaseComicApi {
 			try {
 				URL url = localComic.toURI().toURL();
 				c.setUrl(url);
-				Log.i(Constants.TAG, "Using comic on filesystem for #" + id + ": " + url.toExternalForm());
+				Log.i(Constants.TAG_API, "Using comic on filesystem for #" + id + ": " + url.toExternalForm());
 			} catch (MalformedURLException e) {
-				Log.e(Constants.TAG, "Malformed URL: " + localComic.getAbsolutePath(), e);
+				Log.e(Constants.TAG_API, "Malformed URL: " + localComic.getAbsolutePath(), e);
 			}
 		}
 
@@ -293,7 +293,7 @@ public class CyanideApi extends BaseComicApi {
 							// Parse the date
 							c.setPublished(dateFormat.parse(date));
 						} catch (ParseException e) {
-							Log.e(Constants.TAG, "Unable to parse " + date + " to a date.", e);
+							Log.e(Constants.TAG_API, "Unable to parse " + date + " to a date.", e);
 						}
 					}
 
@@ -303,7 +303,7 @@ public class CyanideApi extends BaseComicApi {
 					}
 				}
 			} catch (IOException e) {
-				Log.e(Constants.TAG, "Unable to fill in comic metadata for #" + c.getId());
+				Log.e(Constants.TAG_API, "Unable to fill in comic metadata for #" + c.getId());
 				return null;
 			}
 		}
@@ -323,9 +323,9 @@ public class CyanideApi extends BaseComicApi {
 			// Return the one image that contains "/db/files/Comics/" in the src attribute
 			return doc.select("#maincontent img[src*=/db/files/Comics/]").get(0).attr("src");
 		} catch (IndexOutOfBoundsException e) {
-			Log.w(Constants.TAG, "Could not find the comic's image on " + comicUrl);
+			Log.w(Constants.TAG_API, "Could not find the comic's image on " + comicUrl);
 		} catch (IOException e) {
-			Log.e(Constants.TAG, "IOException while trying to find the bitmap URL of the comic at " + comicUrl, e);
+			Log.e(Constants.TAG_API, "IOException while trying to find the bitmap URL of the comic at " + comicUrl, e);
 			// TODO Error recovery. Notify the user somehow. Maybe a 'retry' button?
 		}
 
@@ -345,7 +345,7 @@ public class CyanideApi extends BaseComicApi {
 				// There was no comic on that page
 				newestValidComicId--;
 				if (newestValidComicId < 0) {
-					Log.e(Constants.TAG, "Search for the newest valid comic ID went negative, aborting.");
+					Log.e(Constants.TAG_API, "Search for the newest valid comic ID went negative, aborting.");
 					return -1;
 				}
 				continue;

@@ -10,6 +10,8 @@ public final class Constants {
 
 	/** The tag used by all Log.x methods in this app */
 	public static final String TAG = "CyanideViewer";
+	public static final String TAG_API = TAG + "|API";
+	public static final String TAG_DB = TAG + "|DB";
 	/** Returned when the user picked a comic */
 	public static final int RESULT_OK = 0;
 	/** Returned when the user did not pick a comic */

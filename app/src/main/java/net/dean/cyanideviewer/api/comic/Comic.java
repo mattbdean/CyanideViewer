@@ -7,7 +7,7 @@ import android.util.Log;
 import android.widget.ImageButton;
 
 import net.dean.cyanideviewer.Callback;
-import net.dean.cyanideviewer.ComicStage;
+import net.dean.cyanideviewer.ComicSTAG_APIe;
 import net.dean.cyanideviewer.Constants;
 import net.dean.cyanideviewer.CyanideUtils;
 import net.dean.cyanideviewer.FavoriteComicListItem;
@@ -110,11 +110,11 @@ public class Comic extends Model implements Parcelable {
 	}
 
 	/**
-	 * Loads and assigns the {@link #bitmap} attribute and then sets the source of a ComicStage's
+	 * Loads and assigns the {@link #bitmap} attribute and then sets the source of a ComicSTAG_APIe's
 	 * ImageView to it.
-	 * @param target The ComicStage to use
+	 * @param target The ComicSTAG_APIe to use
 	 */
-	public void loadBitmap(ComicStage target) {
+	public void loadBitmap(ComicSTAG_APIe target) {
 		new BitmapLoaderTask(target).execute();
 	}
 
@@ -159,7 +159,7 @@ public class Comic extends Model implements Parcelable {
 		// Create the appropriate directories
 		if (!dest.getParentFile().isDirectory()) {
 			if (!dest.getParentFile().mkdirs()) {
-				Log.e(Constants.TAG, "Unable to create the parent directories for "
+				Log.e(Constants.TAG_API, "Unable to create the parent directories for "
 						+ dest.getAbsolutePath());
 			}
 		}
@@ -181,7 +181,7 @@ public class Comic extends Model implements Parcelable {
 		// Create the parent file if it doesn't exist
 		if (!dest.getParentFile().isDirectory()) {
 			if (!dest.getParentFile().mkdirs()) {
-				Log.e(Constants.TAG, "Could not create the directory \"" + dest.getAbsolutePath() + "\"");
+				Log.e(Constants.TAG_API, "Could not create the directory \"" + dest.getAbsolutePath() + "\"");
 			}
 		}
 
@@ -211,10 +211,10 @@ public class Comic extends Model implements Parcelable {
 			fos = new FileOutputStream(dest);
 			fos.write(bitmapData);
 
-			Log.i(Constants.TAG, "Wrote bitmap to " + dest.getAbsolutePath());
+			Log.i(Constants.TAG_API, "Wrote bitmap to " + dest.getAbsolutePath());
 			return true;
 		} catch (IOException e) {
-			Log.e(Constants.TAG, "Failed to write the bitmap to " + dest.getAbsolutePath(), e);
+			Log.e(Constants.TAG_API, "Failed to write the bitmap to " + dest.getAbsolutePath(), e);
 			return false;
 		} finally {
 			// Close the resources
@@ -226,7 +226,7 @@ public class Comic extends Model implements Parcelable {
 					fos.close();
 				}
 			} catch (IOException e) {
-				Log.e(Constants.TAG, "Unable to close either the ByteOutputStream or the FileOutputStream", e);
+				Log.e(Constants.TAG_API, "Unable to close either the ByteOutputStream or the FileOutputStream", e);
 			}
 		}
 	}

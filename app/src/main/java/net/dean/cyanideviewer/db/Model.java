@@ -45,7 +45,7 @@ public abstract class Model {
 					try {
 						fields.put(f.getAnnotation(DatabaseField.class).columnName(), f.get(this));
 					} catch (IllegalAccessException e) {
-						Log.e(Constants.TAG, "Unable to access field " + f.getName() + " in class " + f.getClass().getName());
+						Log.e(Constants.TAG_DB, "Unable to access field " + f.getName() + " in class " + f.getClass().getName());
 					}
 
 				}
@@ -84,9 +84,9 @@ public abstract class Model {
 					field.setAccessible(false);
 				}
 			} catch (IllegalAccessException e) {
-				Log.e(Constants.TAG, "Unable to access field " + field.getName() + " in class " + field.getClass().getName());
+				Log.e(Constants.TAG_DB, "Unable to access field " + field.getName() + " in class " + field.getClass().getName());
 			} catch (NoSuchFieldException e) {
-				Log.e(Constants.TAG, "No such field " + getClass().getName() + "." + fieldName + " (this really shouldn't happen)", e);
+				Log.e(Constants.TAG_DB, "No such field " + getClass().getName() + "." + fieldName + " (this really shouldn't happen)", e);
 			}
 		}
 

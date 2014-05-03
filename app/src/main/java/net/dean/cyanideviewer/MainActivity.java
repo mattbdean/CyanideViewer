@@ -411,9 +411,6 @@ public class MainActivity extends FragmentActivity {
 				}
 
 				return true;
-			case R.id.menu_go_to_latest:
-				onLatestRequested();
-				return true;
 		}
 
 		return super.onOptionsItemSelected(item);
@@ -480,7 +477,7 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	public void onNewestComicButtonPressed(View view) {
-		setComic(CyanideApi.instance().getNewestId());
+		onLatestRequested();
 	}
 
 	/**

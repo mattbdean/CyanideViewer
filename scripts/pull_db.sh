@@ -5,10 +5,13 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 source "$DIR"/settings.sh
 
-# Pulling from /data requires root
-adb root 1>/dev/null
-
-if adb pull "$ANDROID_LOCATION" "$DIR/$DB_NAME"; then
+# First, run as the application and make the database world readable and world writable
+# Then, pull the database
+# Finally, run as the application and make the database readable and writable to the owner
+# http://stackoverflow.com/a/18472135/1275092
+if adb shell "run-as $PACKAGE chmod 666 $ANDROID_LOCATION" \
+	&& adb pull "$ANDROID_LOCATION" "$DIR/$DB_NAME" \
+	&& adb shell "run-as $PACKAGE chmod 600 $ANDROID_LOCATION"; then
 	# Only launch the browser if the file was pulled successfully
 
 	if command -v "$PREFERRED_BROWSER" 2>/dev/null; then

@@ -173,10 +173,6 @@ public abstract class BaseDao<T extends Model> {
 		return model;
 	}
 
-	public boolean exists(long id) {
-		return get(id) != null;
-	}
-
 	/**
 	 * Gets a list of all models of type T in the database
 	 */

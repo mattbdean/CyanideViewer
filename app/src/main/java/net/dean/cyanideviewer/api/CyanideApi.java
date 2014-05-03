@@ -225,10 +225,11 @@ public class CyanideApi extends BaseComicApi {
 	public Comic getComic(long id) {
 		Comic c = new Comic(id, null, null, null);
 
-		if (CyanideViewer.getComicDao().exists(id)) {
+		Comic dbComic = CyanideViewer.getComicDao().get(id);
+		if (dbComic != null) {
 			// The comic was found in the database
 			Log.i(Constants.TAG, "Comic #" + id + " was found on the database, using it's info");
-			c = CyanideViewer.getComicDao().get(id);
+			c = dbComic;
 		} else {
 			String url = getBitmapUrl(id);
 			if (url != null) {

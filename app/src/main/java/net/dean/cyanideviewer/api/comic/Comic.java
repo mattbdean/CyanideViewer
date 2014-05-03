@@ -7,7 +7,7 @@ import android.util.Log;
 import android.widget.ImageButton;
 
 import net.dean.cyanideviewer.Callback;
-import net.dean.cyanideviewer.ComicSTAG_APIe;
+import net.dean.cyanideviewer.ComicStage;
 import net.dean.cyanideviewer.Constants;
 import net.dean.cyanideviewer.CyanideUtils;
 import net.dean.cyanideviewer.FavoriteComicListItem;
@@ -110,11 +110,11 @@ public class Comic extends Model implements Parcelable {
 	}
 
 	/**
-	 * Loads and assigns the {@link #bitmap} attribute and then sets the source of a ComicSTAG_APIe's
+	 * Loads and assigns the {@link #bitmap} attribute and then sets the source of a ComicStage's
 	 * ImageView to it.
-	 * @param target The ComicSTAG_APIe to use
+	 * @param target The ComicStage to use
 	 */
-	public void loadBitmap(ComicSTAG_APIe target) {
+	public void loadBitmap(ComicStage target) {
 		new BitmapLoaderTask(target).execute();
 	}
 

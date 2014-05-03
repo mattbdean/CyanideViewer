@@ -2,7 +2,10 @@ package net.dean.cyanideviewer;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.util.Log;
+
+import com.crashlytics.android.Crashlytics;
 
 import net.dean.cyanideviewer.db.AuthorDao;
 import net.dean.cyanideviewer.db.ComicDao;
@@ -27,6 +30,13 @@ public class CyanideViewer extends Application {
 	public void onCreate() {
 		super.onCreate();
 		Log.i(Constants.TAG, "Starting application");
+
+		// http://stackoverflow.com/a/7089300/1275092
+		if ((getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) == 0) {
+			// android:debuggable is false (production build), enable Crashlytics
+			Crashlytics.start(this);
+		}
+
 		CyanideViewer.context = getApplicationContext();
 
 		if (helper == null) {

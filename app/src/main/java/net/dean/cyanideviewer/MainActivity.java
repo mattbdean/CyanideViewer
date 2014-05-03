@@ -25,8 +25,6 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.crashlytics.android.Crashlytics;
-
 import net.dean.cyanideviewer.api.CyanideApi;
 import net.dean.cyanideviewer.api.comic.Comic;
 
@@ -92,7 +90,6 @@ public class MainActivity extends FragmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Crashlytics.start(this);
 		setContentView(R.layout.activity_main);
 
 		// Trivial attributes

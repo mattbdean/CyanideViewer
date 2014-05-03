@@ -8,9 +8,14 @@
           android:orderInCategory="10"
           android:showAsAction="ifRoom"/>
 
+    <item android:id="@+id/menu_go_to"
+          android:title="@string/menu_go_to"
+          android:icon="@drawable/ic_action_go_to"
+          android:orderInCategory="11"
+          android:showAsAction="ifRoom"/>
+
     <item android:id="@+id/action_settings"
         android:title="@string/menu_settings"
         android:orderInCategory="100"
         android:showAsAction="never" />
-
 </menu>

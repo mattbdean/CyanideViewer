@@ -1,19 +1,25 @@
 package net.dean.cyanideviewer;
 
+import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.text.InputFilter;
+import android.text.InputType;
+import android.text.method.DigitsKeyListener;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -411,6 +417,44 @@ public class MainActivity extends FragmentActivity {
 				}
 
 				return true;
+			case R.id.menu_go_to:
+				AlertDialog.Builder idChooser = new AlertDialog.Builder(this);
+
+				final EditText input = new EditText(this);
+				input.setKeyListener(DigitsKeyListener.getInstance("0123456789"));
+				input.setRawInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_CLASS_NUMBER);
+				// Restrict max length
+				// http://stackoverflow.com/a/2462218/1275092
+				InputFilter[] filters = new InputFilter[1];
+				filters[0] = new InputFilter.LengthFilter(Long.toString(CyanideApi.instance().getNewestId()).length());
+				input.setFilters(filters);
+
+				idChooser.setTitle("Choose a comic ID")
+						.setView(input)
+						.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								long id = Long.parseLong(input.getText().toString());
+
+								// Check the bounds
+								if (id < CyanideApi.instance().getFirstId()) {
+									id = CyanideApi.instance().getFirstId();
+								} else if (id > CyanideApi.instance().getNewestId()) {
+									id = CyanideApi.instance().getNewestId();
+								}
+
+								// TODO: Wasted resources trying to figure out comic ID, got whole comic instead
+								setComic(id);
+							}
+						})
+						.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								dialog.dismiss();
+							}
+						});
+				idChooser.create().show();
+
 		}
 
 		return super.onOptionsItemSelected(item);
@@ -506,6 +550,18 @@ public class MainActivity extends FragmentActivity {
 		protected Integer doInBackground(Long... params) {
 			Log.d(Constants.TAG, "SetComicTask invoked for #" + params[0]);
 			long id = params[0];
+
+			// Fix the ID range
+			if (id > CyanideApi.instance().getNewestId()) {
+				id = CyanideApi.instance().getNewestId();
+			} else if (id < CyanideApi.instance().getFirstId()) {
+				id = CyanideApi.instance().getFirstId();
+			}
+
+			Comic c = CyanideApi.instance().getComic(id);
+			while (c == null) {
+				c = CyanideApi.instance().getComic(++id);
+			}
 
 			int curComicPagerIndex = -1;
 			Comic prevComic = CyanideApi.instance().getPrevious(id);

@@ -237,6 +237,9 @@ public class CyanideApi extends BaseComicApi {
 				Log.i(Constants.TAG_API, "Comic #" + id + " was not found in the database.");
 				c = fillMetadata(c);
 				CyanideViewer.getComicDao().add(c);
+			} else {
+				// Comic is not available
+				return null;
 			}
 		}
 

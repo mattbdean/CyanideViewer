@@ -429,7 +429,8 @@ public class MainActivity extends FragmentActivity {
 				filters[0] = new InputFilter.LengthFilter(Long.toString(CyanideApi.instance().getNewestId()).length());
 				input.setFilters(filters);
 
-				idChooser.setTitle("Choose a comic ID")
+				idChooser.setTitle("Where to?")
+						.setMessage("Choose an ID of the comic you want to see, and I'll try my best to take you there")
 						.setView(input)
 						.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 							@Override

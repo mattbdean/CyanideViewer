@@ -29,7 +29,6 @@ import net.dean.cyanideviewer.api.CyanideApi;
 import net.dean.cyanideviewer.api.comic.Comic;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The main activity of Cyanide Viewer
@@ -37,7 +36,7 @@ import java.util.List;
 public class MainActivity extends FragmentActivity {
 
 	/** An enumeration of all the buttons on this UI whose states are changed manually. */
-	private enum RefreshableButtons {
+	public static enum RefreshableButtons {
 		/** Represents ${@link #downloadButton} */
 		DOWNLOAD,
 		/** Represents ${@link #firstComicButton} */
@@ -98,7 +97,7 @@ public class MainActivity extends FragmentActivity {
 		// Trivial attributes
 		this.working = false;
 		this.hasCreated = false;
-		this.historyManager = new HistoryManager();
+		this.historyManager = new HistoryManager(this);
 
 		// Initialize all views
 		this.viewPager = (ViewPager) findViewById(R.id.comic_pager);
@@ -234,7 +233,7 @@ public class MainActivity extends FragmentActivity {
 		SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
 		long lastId = prefs.getLong("lastId", CyanideApi.instance().getNewestId());
 
-		new SetComicTask() {
+		new SetComicTask(this) {
 			@Override
 			protected void onPostExecute(Integer currentItemIndex) {
 				super.onPostExecute(currentItemIndex);
@@ -256,7 +255,7 @@ public class MainActivity extends FragmentActivity {
 	/**
 	 * Shows the 'loading' pane over the main one (where most of the UI elements are)
 	 */
-	private void showLoading() {
+	public void showLoading() {
 		if (!working) // Only start the animation if it is not showing already
 			loadingView.startAnimation(fadeIn);
 	}
@@ -264,7 +263,7 @@ public class MainActivity extends FragmentActivity {
 	/**
 	 * Fades the 'loading' pane out and lets the user interact with the main UI
 	 */
-	private void showStage() {
+	public void showStage() {
 		if (working)
 			loadingView.startAnimation(fadeOut);
 	}
@@ -280,7 +279,7 @@ public class MainActivity extends FragmentActivity {
 	 * Refreshes each of the buttons assigned to the values of {@link net.dean.cyanideviewer.MainActivity.RefreshableButtons}.
 	 * @param buttonsToRefresh The representation of the buttons to refresh.
 	 */
-	private void refreshButtons(RefreshableButtons... buttonsToRefresh) {
+	public void refreshButtons(RefreshableButtons... buttonsToRefresh) {
 		if (buttonsToRefresh.length == 0) {
 			return;
 		}
@@ -513,7 +512,7 @@ public class MainActivity extends FragmentActivity {
 	 * @param id The ID to use
 	 */
 	public void setComic(final long id) {
-		new SetComicTask().execute(id);
+		new SetComicTask(this).execute(id);
 	}
 
 	public void onFirstComicButtonPressed(View view) {
@@ -524,187 +523,20 @@ public class MainActivity extends FragmentActivity {
 		onLatestRequested();
 	}
 
-	/**
-	 * This class is used to set the current comic being displayed to the user to a specific comic
-	 */
-	private class SetComicTask extends AsyncTask<Long, Void, Integer> {
-		private boolean showStagePostExecute;
 
-		public SetComicTask() {
-			this(true);
-		}
-
-		public SetComicTask(boolean showStagePostExecute) {
-			this.showStagePostExecute = showStagePostExecute;
-		}
-
-		@Override
-		protected void onPreExecute() {
-			// Show the loading screen
-			showLoading();
-
-			viewPager.setAdapter(null);
-		}
-
-		@Override
-		protected Integer doInBackground(Long... params) {
-			Log.d(Constants.TAG, "SetComicTask invoked for #" + params[0]);
-			long id = params[0];
-
-			// Fix the ID range
-			if (id > CyanideApi.instance().getNewestId()) {
-				id = CyanideApi.instance().getNewestId();
-			} else if (id < CyanideApi.instance().getFirstId()) {
-				id = CyanideApi.instance().getFirstId();
-			}
-
-			Comic c = CyanideApi.instance().getComic(id);
-			while (c == null) {
-				c = CyanideApi.instance().getComic(++id);
-			}
-
-			historyManager.add(c.getId());
-
-			int curComicPagerIndex = -1;
-			Comic prevComic = CyanideApi.instance().getPrevious(id);
-			Comic nextComic = CyanideApi.instance().getNext(id);
-
-			// Reuse all the views to be more efficient
-			if (pagerAdapter.getCount() != 0) {
-				for (int i = 0; i < pagerAdapter.getCount(); i++) {
-					ComicStage stage = pagerAdapter.getComicStage(i);
-					if (stage.getComicIdToLoad() == id) {
-						// ComicStage already exists, return it's id
-						return i;
-					}
-				}
-				// Not the first time this has been called
-				int midway = pagerAdapter.getCount() / 2;
-				if (id == CyanideApi.instance().getNewestId()) {
-					// Make midway all the way to the right so that there are no views to the right of it
-					midway = pagerAdapter.getCount() - 1;
-				} else if (id == CyanideApi.instance().getFirstId()) {
-					// Shift it all the way to the left
-					midway = 0;
-				}
-				pagerAdapter.getComicStage(midway).setComic(id, fragmentManager);
-				curComicPagerIndex = midway;
-				// From the midway to the beginning
-				for (int i = midway - 1; i >= 0; i--) {
-					pagerAdapter.getComicStage(i).setComic(prevComic.getId(), fragmentManager);
-					prevComic = CyanideApi.instance().getPrevious(prevComic.getId());
-				}
-
-				// From the midway to the end
-				for (int i = midway + 1; i < pagerAdapter.getCount(); i++) {
-					pagerAdapter.getComicStage(i).setComic(nextComic.getId(), fragmentManager);
-					nextComic = CyanideApi.instance().getNext(nextComic.getId());
-				}
-
-				// Load the comics and remove the loading screen
-				pagerAdapter.getComicStage(curComicPagerIndex).loadComic(new Callback<Void>() {
-					@Override
-					public void onComplete(Void result) {
-						showStage();
-					}
-				});
-
-				ComicStage before = pagerAdapter.getComicStage(curComicPagerIndex - 1);
-				if (before != null)
-					before.loadComic();
-				ComicStage after = pagerAdapter.getComicStage(curComicPagerIndex + 1);
-				if (after != null)
-					after.loadComic();
-			} else {
-				// First time setup
-				if (prevComic != null) {
-					// Add the previous comic if it exists
-					pagerAdapter.addView(prevComic);
-				}
-
-				// Current comic
-				Comic curComic = CyanideApi.instance().getComic(id);
-				if (curComic != null) { // Current might be a short
-					curComicPagerIndex = pagerAdapter.addView(curComic);
-					pagerAdapter.getComicStage(curComicPagerIndex).loadComic();
-				}
-
-				if (nextComic != null) {
-					// Add the next comic if it exists
-					pagerAdapter.addView(nextComic);
-				}
-			}
-
-			return curComicPagerIndex;
-		}
-
-		@Override
-		protected void onPostExecute(Integer currentItemIndex) {
-			viewPager.setAdapter(pagerAdapter);
-			viewPager.setCurrentItem(currentItemIndex);
-
-			if (showStagePostExecute) {
-				showStage();
-			}
-
-			refreshButtons(RefreshableButtons.FIRST, RefreshableButtons.NEWEST);
-		}
+	public HistoryManager getHistoryManager() {
+		return historyManager;
 	}
 
-	/**
-	 * This class manages the specific history of the user's comic browsing. Comic IDs should only
-	 * be added to the record if the ID is <i>specific</i>, (e.g. when ${@link #setComic(long)} is called
-	 * or a ${@link net.dean.cyanideviewer.MainActivity.SetComicTask} is executed.
-	 */
-	private class HistoryManager {
-		/**
-		 * A list of the comic IDs the user has. The newest element will be removed from this list
-		 * once the 'Back' button is pressed.
-		 */
-		private List<Long> specificHistory;
+	public ComicPagerAdapter getPagerAdapter() {
+		return pagerAdapter;
+	}
 
-		/**
-		 * Instantiates a new HistoryManager
-		 */
-		public HistoryManager() {
-			this.specificHistory = new ArrayList<>();
-		}
+	public FragmentManager getFragmentManager() {
+		return fragmentManager;
+	}
 
-		/**
-		 * Adds an ID to the history
-		 * @param id The ID to use
-		 */
-		public void add(Long id) {
-			if (specificHistory.size() > 0) {
-				if ((specificHistory.get(specificHistory.size() - 1)).equals(id)) {
-					return;
-				}
-			}
-			specificHistory.add(id);
-		}
-
-		/**
-		 * Pops the latest element in the history and sets the new latest element as the current comic.
-		 * If there is only one element in the history, the default implementation of <code>onBackPressed()</code>
-		 * will be called.
-		 *
-		 * @throws java.lang.IndexOutOfBoundsException If the history is empty. ${@link #add(Long)}
-		 *         needs to be called before this method.
-		 */
-		public void back() {
-			if (specificHistory.isEmpty()) {
-				Log.e(Constants.TAG, "History is empty", new IndexOutOfBoundsException());
-			}
-			if (specificHistory.size() == 1) {
-				MainActivity.super.onBackPressed();
-				return;
-			}
-
-			int removeIndex = specificHistory.size() - 1;
-			long id = specificHistory.get(removeIndex - 1);
-			specificHistory.remove(removeIndex);
-
-			setComic(id);
-		}
+	public ViewPager getViewPager() {
+		return viewPager;
 	}
 }

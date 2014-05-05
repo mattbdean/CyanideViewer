@@ -29,6 +29,7 @@ import net.dean.cyanideviewer.api.CyanideApi;
 import net.dean.cyanideviewer.api.comic.Comic;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The main activity of Cyanide Viewer
@@ -36,7 +37,7 @@ import java.util.ArrayList;
 public class MainActivity extends FragmentActivity {
 
 	/** An enumeration of all the buttons on this UI whose states are changed manually. */
-	private static enum RefreshableButtons {
+	private enum RefreshableButtons {
 		/** Represents ${@link #downloadButton} */
 		DOWNLOAD,
 		/** Represents ${@link #firstComicButton} */
@@ -46,6 +47,8 @@ public class MainActivity extends FragmentActivity {
 		/** Represents ${@link #favoriteButton} */
 		FAVORITE
 	}
+
+	private HistoryManager historyManager;
 
 	/** The ViewPager used to scroll through comics */
 	private ViewPager viewPager;
@@ -95,6 +98,7 @@ public class MainActivity extends FragmentActivity {
 		// Trivial attributes
 		this.working = false;
 		this.hasCreated = false;
+		this.historyManager = new HistoryManager();
 
 		// Initialize all views
 		this.viewPager = (ViewPager) findViewById(R.id.comic_pager);
@@ -468,8 +472,7 @@ public class MainActivity extends FragmentActivity {
 
 	@Override
 	public void onBackPressed() {
-		super.onBackPressed();
-		// TODO: Go to last viewed
+		historyManager.back();
 	}
 
 	@Override
@@ -560,6 +563,8 @@ public class MainActivity extends FragmentActivity {
 				c = CyanideApi.instance().getComic(++id);
 			}
 
+			historyManager.add(c.getId());
+
 			int curComicPagerIndex = -1;
 			Comic prevComic = CyanideApi.instance().getPrevious(id);
 			Comic nextComic = CyanideApi.instance().getNext(id);
@@ -643,6 +648,63 @@ public class MainActivity extends FragmentActivity {
 			}
 
 			refreshButtons(RefreshableButtons.FIRST, RefreshableButtons.NEWEST);
+		}
+	}
+
+	/**
+	 * This class manages the specific history of the user's comic browsing. Comic IDs should only
+	 * be added to the record if the ID is <i>specific</i>, (e.g. when ${@link #setComic(long)} is called
+	 * or a ${@link net.dean.cyanideviewer.MainActivity.SetComicTask} is executed.
+	 */
+	private class HistoryManager {
+		/**
+		 * A list of the comic IDs the user has. The newest element will be removed from this list
+		 * once the 'Back' button is pressed.
+		 */
+		private List<Long> specificHistory;
+
+		/**
+		 * Instantiates a new HistoryManager
+		 */
+		public HistoryManager() {
+			this.specificHistory = new ArrayList<>();
+		}
+
+		/**
+		 * Adds an ID to the history
+		 * @param id The ID to use
+		 */
+		public void add(Long id) {
+			if (specificHistory.size() > 0) {
+				if ((specificHistory.get(specificHistory.size() - 1)).equals(id)) {
+					return;
+				}
+			}
+			specificHistory.add(id);
+		}
+
+		/**
+		 * Pops the latest element in the history and sets the new latest element as the current comic.
+		 * If there is only one element in the history, the default implementation of <code>onBackPressed()</code>
+		 * will be called.
+		 *
+		 * @throws java.lang.IndexOutOfBoundsException If the history is empty. ${@link #add(Long)}
+		 *         needs to be called before this method.
+		 */
+		public void back() {
+			if (specificHistory.isEmpty()) {
+				Log.e(Constants.TAG, "History is empty", new IndexOutOfBoundsException());
+			}
+			if (specificHistory.size() == 1) {
+				MainActivity.super.onBackPressed();
+				return;
+			}
+
+			int removeIndex = specificHistory.size() - 1;
+			long id = specificHistory.get(removeIndex - 1);
+			specificHistory.remove(removeIndex);
+
+			setComic(id);
 		}
 	}
 }

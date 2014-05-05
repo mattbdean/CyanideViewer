@@ -533,10 +533,6 @@ public class MainActivity extends FragmentActivity {
 		return pagerAdapter;
 	}
 
-	public FragmentManager getFragmentManager() {
-		return fragmentManager;
-	}
-
 	public ViewPager getViewPager() {
 		return viewPager;
 	}

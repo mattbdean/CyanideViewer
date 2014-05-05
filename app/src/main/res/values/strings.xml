@@ -42,4 +42,8 @@
         Clears everything this app knows about the C&amp;H comics you\'ve seen. This process can not
         be undone, nor is it recommended.
     </string>
+
+    <!-- Font Awesome icons -->
+    <string name="icon_facebook">&#xf09a;</string>
+    <string name="icon_twitter">&#xf099;</string>
 </resources>

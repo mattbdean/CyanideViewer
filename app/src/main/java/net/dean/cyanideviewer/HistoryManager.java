@@ -10,16 +10,16 @@ import java.util.List;
 /**
  * This class manages the specific history of the user's comic browsing. Comic IDs should only
  * be added to the record if the ID is <i>specific</i>, (e.g. when ${@link net.dean.cyanideviewer.ui.MainActivity#setComic(long)} is called
- * or a ${@link net.dean.cyanideviewer.ui.MainActivity.SetComicTask} is executed.
+ * or a ${@link net.dean.cyanideviewer.SetComicTask} is executed.
  */
 public class HistoryManager {
 	/**
 	 * A list of the comic IDs the user has. The newest element will be removed from this list
 	 * once the 'Back' button is pressed.
 	 */
-	private List<Long> specificHistory;
+	private final List<Long> specificHistory;
 
-	private MainActivity activity;
+	private final MainActivity activity;
 
 	/**
 	 * Instantiates a new HistoryManager

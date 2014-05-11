@@ -2,13 +2,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="net.dean.cyanideviewer.ui.SettingsActivity">
+    tools:context="net.dean.cyanideviewer.ui.settings.SettingsActivity">
 
     <fragment
         android:id="@+id/settings_fragment_placeholder"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="net.dean.cyanideviewer.ui.SettingsFragment">
+        android:name="net.dean.cyanideviewer.ui.settings.SettingsFragment">
     </fragment>
 
 </RelativeLayout>

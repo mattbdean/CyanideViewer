@@ -1,4 +1,4 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="fill_parent"
              android:layout_height="fill_parent"
@@ -42,7 +42,8 @@
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@id/action_favorite"
                 android:onClick="onDownloadClicked"
-                android:src="@drawable/ic_action_download"/>
+                android:src="@drawable/ic_action_download"
+                android:contentDescription="@string/desc_download"/>
         </RelativeLayout>
     </FrameLayout>
 
@@ -62,4 +63,4 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
     </LinearLayout>
-</FrameLayout>
+</merge>

@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class Author extends Model implements Parcelable {
-	static final Author[] AUTHORS;
+	private static final Author[] AUTHORS;
 
 	@DatabaseField(columnName = "name")
 	private String name;
@@ -40,36 +40,17 @@ public class Author extends Model implements Parcelable {
 		return name;
 	}
 
-	public String getFirstName() {
-		return name.substring(0, name.indexOf(' '));
-	}
-
-	public String getLastName() {
-		return name.substring(name.indexOf(' ') + 1);
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	public String getTwitter() {
 		return twitter;
-	}
-
-	public void setTwitter(String twitter) {
-		this.twitter = twitter;
 	}
 
 	public String getFacebook() {
 		return facebook;
 	}
 
-	public void setFacebook(String facebook) {
-		this.facebook = facebook;
-	}
-
 	public int getIconResource() {
-		switch (getFirstName().toLowerCase()) {
+		// switch (firstName.toLowerCase())
+		switch (name.substring(0, name.indexOf(' ')).toLowerCase()) {
 			case "kris":
 				return R.drawable.ic_author_kris;
 			case "rob":

@@ -40,7 +40,7 @@ public abstract class BaseComicApi implements ComicApi {
 	private static final File ICON_DIR = new File(IMAGE_DIR, "icons");
 
 	/** The HttpClient that will be used to make requests */
-	protected HttpClient client;
+	protected final HttpClient client;
 
 	/**
 	 * Instantiates a new BaseComicApi
@@ -54,7 +54,7 @@ public abstract class BaseComicApi implements ComicApi {
 	 * location is returned. For example, if "http://explosm.net/comics/random" redirected to
 	 * "http://explosm.net/comics/3123", then the latter value would be returned. If a URL does
 	 * not redirect, the original URL will be returned. For example, if "http://example.com" did
-	 * not redirect to another webpage, that value would be returned.
+	 * not redirect to another web page, that value would be returned.
 	 * @param url The URL to follow
 	 * @return The destination of an HTTP GET request
 	 */

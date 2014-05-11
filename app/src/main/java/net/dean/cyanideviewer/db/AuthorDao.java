@@ -23,33 +23,39 @@ public class AuthorDao extends BaseDao<Author> {
 
 	@Override
 	protected Author parse(Cursor c) {
-		Author author = new Author(-1, null, null, null);
 		if (c.isAfterLast()) {
 			return null;
 		}
+
+		// Don't instantiate the Author until we have enough information
+		long id = -1;
+		String name = null;
+		String twitter = null;
+		String facebook = null;
+
 
 		List<String> fields = Author.getDatabaseFieldNames(Author.class);
 		for (String key : fields) {
 			int columnIndex = c.getColumnIndex(key);
 			switch (key) {
 				case "id":
-					author.setId(c.getLong(columnIndex));
+					id = c.getLong(columnIndex);
 					break;
 				case "name":
-					author.setName(c.getString(columnIndex));
+					name = c.getString(columnIndex);
 					break;
 				case "twitter":
-					author.setTwitter(c.getString(columnIndex));
+					twitter = c.getString(columnIndex);
 					break;
 				case "facebook":
-					author.setFacebook(c.getString(columnIndex));
+					facebook = c.getString(columnIndex);
 					break;
 				default:
 					Log.w(Constants.TAG_DB, "Unknown column: " + key);
 			}
 		}
 
-		return author;
+		return new Author(id, name, twitter, facebook);
 	}
 
 	@Override

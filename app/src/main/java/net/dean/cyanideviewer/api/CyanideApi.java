@@ -177,12 +177,6 @@ public class CyanideApi extends BaseComicApi {
 	}
 
 	@Override
-	public boolean getSupportsRandomComics() {
-		// Will always be true
-		return true;
-	}
-
-	@Override
 	public File getLocalComic(long id) {
 		if (!getSavedImageDirectory().isDirectory()) {
 			if (!getSavedImageDirectory().mkdirs()) {

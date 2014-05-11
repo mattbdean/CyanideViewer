@@ -85,12 +85,6 @@ public interface ComicApi {
 	public Comic getRandom();
 
 	/**
-	 * Checks If this API supports random comics
-	 * @return If this API supports random comics
-	 */
-	public boolean getSupportsRandomComics();
-
-	/**
 	 * Tests if a comic with a certain ID has been downloaded
 	 * @param id The ID to use
 	 * @return Whether the comic has been downloaded

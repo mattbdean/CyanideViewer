@@ -38,7 +38,8 @@
                 android:padding="4dp"
                 android:layout_toRightOf="@id/comic_id"
                 android:src="@drawable/ic_action_about"
-                android:layout_centerVertical="true"/>
+                android:layout_centerVertical="true"
+                android:contentDescription="@string/desc_more_info"/>
         </RelativeLayout>
 
         <!-- Info panel -->
@@ -70,7 +71,8 @@
                 <ImageView
                     android:id="@+id/author_icon"
                     android:layout_width="75dp"
-                    android:layout_height="75dp"/>
+                    android:layout_height="75dp"
+                    android:contentDescription="@string/desc_author_icon"/>
 
                 <TextView
                     android:id="@+id/author_name"
@@ -121,6 +123,7 @@
         <ImageView
             android:id="@+id/image_view"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:contentDescription="@string/desc_image_view"/>
     </RelativeLayout>
 </net.dean.cyanideviewer.ui.ComicStage>

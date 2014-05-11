@@ -10,7 +10,7 @@ public enum SpecialSelection {
 	RANDOM("random");
 
 	/** This SpecialSelection's fully qualified URL */
-	private String url;
+	private final String url;
 
 	private SpecialSelection(String urlAppendage) {
 		this.url = CyanideApi.instance().getBaseUrl() + urlAppendage;

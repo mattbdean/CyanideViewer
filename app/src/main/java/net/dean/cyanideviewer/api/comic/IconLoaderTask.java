@@ -20,9 +20,9 @@ import java.io.FileNotFoundException;
  */
 class IconLoaderTask extends AsyncTask<Void, Void, Bitmap> {
 	/** The comic to load the icon for */
-	private Comic comic;
+	private final Comic comic;
 	/** The list item whose components will be changed when the comic's icon is loaded */
-	private FavoriteComicListItem item;
+	private final FavoriteComicListItem item;
 
 	/**
 	 * Instantiates a new IconLoaderTask

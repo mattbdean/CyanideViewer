@@ -25,7 +25,8 @@
             android:layout_height="wrap_content"
             android:maxWidth="32dp"
             android:maxHeight="32dp"
-            android:padding="@dimen/item_padding"/>
+            android:padding="@dimen/item_padding"
+            android:contentDescription="@string/desc_favorite_icon"/>
     </RelativeLayout>
 
     <TextView

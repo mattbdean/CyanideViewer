@@ -1,8 +1,10 @@
-package net.dean.cyanideviewer;
+package net.dean.cyanideviewer.ui;
 
 import android.app.NotificationManager;
 import android.content.Context;
 import android.support.v4.app.NotificationCompat;
+
+import net.dean.cyanideviewer.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,8 +13,8 @@ public class NotificationHelper {
 	private static final List<NotificationHelper> REGISTERED_HELPERS = new ArrayList<>();
 
 	private final int notifId;
-	private NotificationManager manager;
-	private NotificationCompat.Builder builder;
+	private final NotificationManager manager;
+	private final NotificationCompat.Builder builder;
 
 	public static NotificationHelper getInstance(Context context, int notifId) {
 		for (NotificationHelper helper : REGISTERED_HELPERS) {

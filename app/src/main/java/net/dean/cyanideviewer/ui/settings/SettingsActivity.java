@@ -1,4 +1,4 @@
-package net.dean.cyanideviewer.ui;
+package net.dean.cyanideviewer.ui.settings;
 
 import android.app.Activity;
 import android.os.Bundle;

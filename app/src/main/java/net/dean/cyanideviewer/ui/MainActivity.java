@@ -1,11 +1,11 @@
 package net.dean.cyanideviewer.ui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Menu;
@@ -27,13 +27,14 @@ import net.dean.cyanideviewer.R;
 import net.dean.cyanideviewer.SetComicTask;
 import net.dean.cyanideviewer.api.CyanideApi;
 import net.dean.cyanideviewer.api.comic.Comic;
+import net.dean.cyanideviewer.ui.settings.SettingsActivity;
 
 import java.util.ArrayList;
 
 /**
  * The main activity of Cyanide Viewer
  */
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends Activity {
 
 	/** An enumeration of all the buttons on this UI whose states are changed manually. */
 	public static enum RefreshableButtons {

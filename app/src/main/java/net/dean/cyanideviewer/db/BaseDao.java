@@ -26,10 +26,10 @@ import java.util.Map;
  */
 public abstract class BaseDao<T extends Model> {
 	/** A list of all table names being operated on by all subclasses of this class ever constructed */
-	static List<String> tableNames = new ArrayList<>();
+	static final List<String> tableNames = new ArrayList<>();
 
 	/** The database that will be used to perform CRUD operations on */
-	protected SQLiteDatabase db;
+	protected final SQLiteDatabase db;
 
 	/** The name of the table to operate on */
 	protected final String tableName;

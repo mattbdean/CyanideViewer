@@ -10,7 +10,7 @@ import android.widget.ImageButton;
 
 import net.dean.cyanideviewer.Constants;
 import net.dean.cyanideviewer.CyanideViewer;
-import net.dean.cyanideviewer.NotificationHelper;
+import net.dean.cyanideviewer.ui.NotificationHelper;
 import net.dean.cyanideviewer.api.CyanideApi;
 
 import java.io.File;
@@ -26,13 +26,13 @@ class BitmapDownloadTask extends AsyncTask<Void, Void, Boolean> {
 	private static final ArrayList<Integer> DOWNLOADED_IDS = new ArrayList<>();
 
 	/** The NotificationHelper that will help show notifications about the downloads */
-	private NotificationHelper notifHelper;
+	private final NotificationHelper notifHelper;
 
 	/** The Comic to download the bitmap from */
-	private Comic c;
+	private final Comic c;
 
 	/** The button to disable after downloading */
-	private ImageButton downloadButton;
+	private final ImageButton downloadButton;
 
 	/**
 	 * Instantiates a new BitmapDownloadTask

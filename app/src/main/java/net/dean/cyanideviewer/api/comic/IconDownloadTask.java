@@ -15,7 +15,7 @@ class IconDownloadTask extends AsyncTask<Void, Void, Boolean> {
 	/** The width and height of all generated icons */
 	public static final int ICON_DIMENS = 144;
 
-	private Comic c;
+	private final Comic c;
 
 	public IconDownloadTask(Comic c) {
 		this.c = c;

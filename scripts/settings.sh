@@ -1,3 +1,5 @@
+#!/bin/bash
+
 ## The name of the database. This will be the name of the file pushed/pulled to/from the device
 DB_NAME="comics.db"
 

@@ -28,8 +28,8 @@ import uk.co.senab.photoview.PhotoViewAttacher;
  */
 class BitmapLoaderTask extends AsyncTask<Long, Void, Bitmap> {
 
-	private Comic comic;
-	private ImageView imageView;
+	private final Comic comic;
+	private final ImageView imageView;
 
 	public BitmapLoaderTask(Comic comic, ImageView imageView) {
 		this.comic = comic;

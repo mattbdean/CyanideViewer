@@ -80,7 +80,7 @@ public class ComicStage extends LinearLayout {
 		((TextView) findViewById(R.id.comic_id)).setText("#" + idToLoad);
 		this.imageView = (ImageView) findViewById(R.id.image_view);
 		// Set the ImageView to be clear if it has been set before
-		imageView.setImageResource(android.R.color.transparent);
+		imageView.setImageBitmap(null);
 
 		findViewById(R.id.more_info).setOnClickListener(new OnClickListener() {
 			@Override
@@ -119,7 +119,7 @@ public class ComicStage extends LinearLayout {
 		facebook.setOnClickListener(listener);
 	}
 
-	public void openUri(String primary, String fallback) {
+	void openUri(String primary, String fallback) {
 		Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(primary));
 		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); // http://stackoverflow.com/a/3689900/1275092
 		try {
@@ -131,7 +131,7 @@ public class ComicStage extends LinearLayout {
 		}
 	}
 
-	public void toggle() {
+	void toggle() {
 		showing = !showing;
 
 		if (infoPane == null) {
@@ -208,14 +208,14 @@ public class ComicStage extends LinearLayout {
 		return imageView;
 	}
 
-
 	@Override
 	public String toString() {
-		final StringBuilder sb = new StringBuilder("ComicStage {");
-		sb.append("idToLoad=").append(idToLoad);
-		sb.append(", comic=").append(comic);
-		sb.append(", imageView=").append(imageView);
-		sb.append('}');
-		return sb.toString();
+		return "ComicStage {" +
+				"imageView=" + imageView +
+				", idToLoad=" + idToLoad +
+				", comic=" + comic +
+				", showing=" + showing +
+				", infoPane=" + infoPane +
+				'}';
 	}
 }

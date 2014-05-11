@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class ComicDao extends BaseDao<Comic> {
 
-	private AuthorDao authorDao;
+	private final AuthorDao authorDao;
 
 	public ComicDao(CyanideDatabaseHelper helper, AuthorDao authorDao) {
 		super(helper, CyanideDatabaseHelper.TABLE_COMICS, Comic.class);

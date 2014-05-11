@@ -1,6 +1,5 @@
 package net.dean.cyanideviewer;
 
-import android.app.FragmentManager;
 import android.os.AsyncTask;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
@@ -15,12 +14,11 @@ import net.dean.cyanideviewer.ui.MainActivity;
  * This class is used to set the current comic being displayed to the user to a specific comic
  */
 public class SetComicTask extends AsyncTask<Long, Void, Integer> {
-	private boolean showStagePostExecute;
-	private MainActivity activity;
-	private HistoryManager historyManager;
-	private ComicPagerAdapter pagerAdapter;
-	private FragmentManager fragmentManager;
-	private ViewPager viewPager;
+	private final boolean showStagePostExecute;
+	private final MainActivity activity;
+	private final HistoryManager historyManager;
+	private final ComicPagerAdapter pagerAdapter;
+	private final ViewPager viewPager;
 
 	public SetComicTask(MainActivity activity) {
 		this(activity, true);
@@ -32,7 +30,6 @@ public class SetComicTask extends AsyncTask<Long, Void, Integer> {
 		this.historyManager = activity.getHistoryManager();
 		this.pagerAdapter = activity.getPagerAdapter();
 		this.viewPager = activity.getViewPager();
-		this.fragmentManager = activity.getFragmentManager();
 	}
 
 	@Override

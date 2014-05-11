@@ -174,7 +174,7 @@ public class ComicStage extends LinearLayout {
 
 						// Set the rest of the metadata
 						((TextView) findViewById(R.id.published)).setText(comic.getPublishedFormatted());
-						((ImageView)findViewById(R.id.author_icon)).setImageResource(comic.getAuthor().getIconResource());
+						((ImageView)findViewById(R.id.author_icon)).setImageBitmap(comic.getAuthor().getIcon());
 						((TextView) findViewById(R.id.author_name)).setText(comic.getAuthor().getName());
 
 

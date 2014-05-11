@@ -1,5 +1,7 @@
 package net.dean.cyanideviewer.api.comic;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -10,10 +12,13 @@ import net.dean.cyanideviewer.db.Model;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class Author extends Model implements Parcelable {
 	private static final Author[] AUTHORS;
+
+	private static final HashMap<Integer, Bitmap> iconCache = new HashMap<>();
 
 	@DatabaseField(columnName = "name")
 	private String name;
@@ -48,20 +53,36 @@ public class Author extends Model implements Parcelable {
 		return facebook;
 	}
 
-	public int getIconResource() {
+	public Bitmap getIcon() {
+		int resId = -1;
+
 		// switch (firstName.toLowerCase())
 		switch (name.substring(0, name.indexOf(' ')).toLowerCase()) {
 			case "kris":
-				return R.drawable.ic_author_kris;
+				resId = R.drawable.ic_author_kris;
+				break;
 			case "rob":
-				return R.drawable.ic_author_rob;
+				resId = R.drawable.ic_author_rob;
+				break;
 			case "matt":
-				return R.drawable.ic_author_matt;
+				resId = R.drawable.ic_author_matt;
+				break;
 			case "dave":
-				return R.drawable.ic_author_dave;
+				resId = R.drawable.ic_author_dave;
+				break;
 		}
 
-		return -1;
+		if (resId == -1) {
+			return null;
+		}
+
+		if (iconCache.containsKey(resId)) {
+			return iconCache.get(resId);
+		}
+
+		Bitmap bmp = BitmapFactory.decodeResource(CyanideViewer.getContext().getResources(), resId);
+		iconCache.put(resId, bmp);
+		return bmp;
 	}
 
 	public static final Creator CREATOR = new Creator() {

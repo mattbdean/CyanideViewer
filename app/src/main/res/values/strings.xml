@@ -5,7 +5,7 @@
     <!-- Menus -->
     <string name="menu_settings">Settings</string>
     <string name="menu_favorites">Favorites</string>
-    <string name="menu_go_to">Go to comic</string>
+    <string name="menu_navigation">Navigation</string>
 
     <!-- Activities -->
     <string name="title_activity_favorites">Favorites</string>
@@ -46,4 +46,5 @@
     <!-- Font Awesome icons -->
     <string name="icon_facebook">&#xf09a;</string>
     <string name="icon_twitter">&#xf099;</string>
+    <string name="nav_hint" formatted="false">Comic ID (%s to %s)</string>
 </resources>

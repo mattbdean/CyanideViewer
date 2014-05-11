@@ -5,8 +5,8 @@
              android:orientation="vertical">
 
 
-    <!-- ComicStage container -->
-    <LinearLayout
+    <!-- ComicStage pager container -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -16,67 +16,35 @@
         <android.support.v4.view.ViewPager
             android:id="@+id/comic_pager"
             android:layout_width="match_parent"
-            android:layout_height="0px"
-            android:layout_weight="1"/>
+            android:layout_height="match_parent"/>
 
         <!-- Buttons (favorite, download, random) -->
         <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="72dp"
-            style="@style/secondaryBackground"
-            android:paddingBottom="@dimen/activity_vertical_margin"
-            android:paddingTop="8dp"
-            android:gravity="center">
+            android:layout_width="wrap_content"
+            android:layout_height="60dp"
+            android:gravity="left|center_vertical"
+            android:padding="@dimen/item_padding_small"
+            android:layout_gravity="bottom">
 
-            <ImageButton
-                android:id="@+id/first_comic"
+            <ToggleButton
+                android:id="@+id/action_favorite"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_action_first"
                 android:layout_alignParentLeft="true"
-                android:onClick="onFirstComicButtonPressed"
-                android:layout_marginLeft="@dimen/item_padding_small"/>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:gravity="center">
-
-                <ToggleButton
-                    android:id="@+id/action_favorite"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:drawableTop="@drawable/ic_action_favorite_details"
-                    android:onClick="onFavoriteClicked"
-                    android:textOff=""
-                    android:textOn=""/>
-
-                <ImageButton
-                    android:id="@+id/download"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:onClick="onDownloadClicked"
-                    android:src="@drawable/ic_action_download"/>
-
-                <ImageButton
-                    android:id="@+id/action_random"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:onClick="onRandomClicked"
-                    android:src="@drawable/ic_action_random"/>
-            </LinearLayout>
+                android:drawableTop="@drawable/ic_action_favorite_details"
+                android:onClick="onFavoriteClicked"
+                android:textOff=""
+                android:textOn=""/>
 
             <ImageButton
-                android:id="@+id/newest_comic"
+                android:id="@+id/download"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_action_newest"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="@dimen/item_padding_small"
-                android:onClick="onNewestComicButtonPressed"/>
+                android:layout_toRightOf="@id/action_favorite"
+                android:onClick="onDownloadClicked"
+                android:src="@drawable/ic_action_download"/>
         </RelativeLayout>
-    </LinearLayout>
+    </FrameLayout>
 
 
     <!-- Progress bar -->

@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 
-import net.dean.cyanideviewer.MainActivity.RefreshableButtons;
 import net.dean.cyanideviewer.api.CyanideApi;
 import net.dean.cyanideviewer.api.comic.Comic;
 
@@ -84,17 +83,17 @@ public class SetComicTask extends AsyncTask<Long, Void, Integer> {
 				// Shift it all the way to the left
 				midway = 0;
 			}
-			pagerAdapter.getComicStage(midway).setComic(id, fragmentManager);
+			pagerAdapter.getComicStage(midway).setComic(id);
 			curComicPagerIndex = midway;
 			// From the midway to the beginning
 			for (int i = midway - 1; i >= 0; i--) {
-				pagerAdapter.getComicStage(i).setComic(prevComic.getId(), fragmentManager);
+				pagerAdapter.getComicStage(i).setComic(prevComic.getId());
 				prevComic = CyanideApi.instance().getPrevious(prevComic.getId());
 			}
 
 			// From the midway to the end
 			for (int i = midway + 1; i < pagerAdapter.getCount(); i++) {
-				pagerAdapter.getComicStage(i).setComic(nextComic.getId(), fragmentManager);
+				pagerAdapter.getComicStage(i).setComic(nextComic.getId());
 				nextComic = CyanideApi.instance().getNext(nextComic.getId());
 			}
 
@@ -143,7 +142,5 @@ public class SetComicTask extends AsyncTask<Long, Void, Integer> {
 		if (showStagePostExecute) {
 			activity.showStage();
 		}
-
-		activity.refreshButtons(RefreshableButtons.FIRST, RefreshableButtons.NEWEST);
 	}
 }

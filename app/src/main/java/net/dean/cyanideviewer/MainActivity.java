@@ -1,25 +1,18 @@
 package net.dean.cyanideviewer;
 
-import android.app.AlertDialog;
-import android.app.FragmentManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.text.InputFilter;
-import android.text.InputType;
-import android.text.method.DigitsKeyListener;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -39,10 +32,6 @@ public class MainActivity extends FragmentActivity {
 	public static enum RefreshableButtons {
 		/** Represents ${@link #downloadButton} */
 		DOWNLOAD,
-		/** Represents ${@link #firstComicButton} */
-		FIRST,
-		/** Represents ${@link #newestComicButton} */
-		NEWEST,
 		/** Represents ${@link #favoriteButton} */
 		FAVORITE
 	}
@@ -58,12 +47,6 @@ public class MainActivity extends FragmentActivity {
 	/** The button that, when pressed, downloads the current comic */
 	private ImageButton downloadButton;
 
-	/** The button that, when pressed, shows the user the first available comic */
-	private ImageButton firstComicButton;
-
-	/** The button that, when pressed, shows the user the newest available comic */
-	private ImageButton newestComicButton;
-
 	/** The button that, when pressed, toggles whether the current comic is a favorite */
 	private ToggleButton favoriteButton;
 
@@ -72,11 +55,6 @@ public class MainActivity extends FragmentActivity {
 	 * solely in the background
 	 */
 	private LinearLayout loadingView;
-
-	/**
-	 * The FragmentManager used to instantiate {@link #pagerAdapter} and AuthorDialogs
-	 */
-	private FragmentManager fragmentManager;
 
 	/** The animation used to fade the loading view in */
 	private Animation fadeIn;
@@ -101,12 +79,9 @@ public class MainActivity extends FragmentActivity {
 
 		// Initialize all views
 		this.viewPager = (ViewPager) findViewById(R.id.comic_pager);
-		this.fragmentManager = getFragmentManager();
-		this.pagerAdapter = new ComicPagerAdapter(fragmentManager);
+		this.pagerAdapter = new ComicPagerAdapter();
 		this.favoriteButton = (ToggleButton) findViewById(R.id.action_favorite);
 		this.downloadButton = (ImageButton) findViewById(R.id.download);
-		this.firstComicButton = (ImageButton) findViewById(R.id.first_comic);
-		this.newestComicButton = (ImageButton) findViewById(R.id.newest_comic);
 		this.loadingView = (LinearLayout) findViewById(R.id.loading_view);
 		this.fadeIn = AnimationUtils.loadAnimation(this, R.anim.fade_in);
 		fadeIn.setAnimationListener(new Animation.AnimationListener() {
@@ -283,7 +258,6 @@ public class MainActivity extends FragmentActivity {
 		if (buttonsToRefresh.length == 0) {
 			return;
 		}
-		long currComicId = -2; // Need a unique value because it could be -1
 
 		for (RefreshableButtons buttonToRefresh : buttonsToRefresh) {
 			switch (buttonToRefresh) {
@@ -293,18 +267,6 @@ public class MainActivity extends FragmentActivity {
 					break;
 				case FAVORITE:
 					favoriteButton.setChecked(getCurrentDbComic().isFavorite());
-					break;
-				case FIRST:
-					if (currComicId == -2) { // Only get it if we need it
-						currComicId = pagerAdapter.getComicStage(viewPager.getCurrentItem()).getComicIdToLoad();
-					}
-					newestComicButton.setEnabled(currComicId != CyanideApi.instance().getNewestId());
-					break;
-				case NEWEST:
-					if (currComicId == -2) { // Only get it if we need it
-						currComicId = pagerAdapter.getComicStage(viewPager.getCurrentItem()).getComicIdToLoad();
-					}
-					firstComicButton.setEnabled(currComicId != CyanideApi.instance().getFirstId());
 					break;
 				default:
 					Log.w(Constants.TAG, "Not refreshing unregistered button " + buttonToRefresh);
@@ -417,45 +379,29 @@ public class MainActivity extends FragmentActivity {
 				}
 
 				return true;
-			case R.id.menu_go_to:
-				AlertDialog.Builder idChooser = new AlertDialog.Builder(this);
+			case R.id.nav:
+				NavigationDialog dialog = new NavigationDialog();
+				dialog.setCallback(new Callback<Long>() {
+					@Override
+					public void onComplete(Long id) {
+						if (id == NavigationDialog.RESULT_CANCEL) {
+							return;
+						} else if (id == NavigationDialog.RESULT_RANDOM) {
+							setRandom();
+							return;
+						}
 
-				final EditText input = new EditText(this);
-				input.setKeyListener(DigitsKeyListener.getInstance("0123456789"));
-				input.setRawInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_CLASS_NUMBER);
-				// Restrict max length
-				// http://stackoverflow.com/a/2462218/1275092
-				InputFilter[] filters = new InputFilter[1];
-				filters[0] = new InputFilter.LengthFilter(Long.toString(CyanideApi.instance().getNewestId()).length());
-				input.setFilters(filters);
+						// Check the bounds
+						if (id < CyanideApi.instance().getFirstId()) {
+							id = CyanideApi.instance().getFirstId();
+						} else if (id > CyanideApi.instance().getNewestId()) {
+							id = CyanideApi.instance().getNewestId();
+						}
 
-				idChooser.setTitle("Where to?")
-						.setMessage("Choose an ID of the comic you want to see, and I'll try my best to take you there")
-						.setView(input)
-						.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								long id = Long.parseLong(input.getText().toString());
-
-								// Check the bounds
-								if (id < CyanideApi.instance().getFirstId()) {
-									id = CyanideApi.instance().getFirstId();
-								} else if (id > CyanideApi.instance().getNewestId()) {
-									id = CyanideApi.instance().getNewestId();
-								}
-
-								// TODO: Wasted resources trying to figure out comic ID, got whole comic instead
-								setComic(id);
-							}
-						})
-						.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog, int which) {
-								dialog.dismiss();
-							}
-						});
-				idChooser.create().show();
-
+						setComic(id);
+					}
+				});
+				dialog.show(getFragmentManager(), "navDialog");
 		}
 
 		return super.onOptionsItemSelected(item);
@@ -482,12 +428,7 @@ public class MainActivity extends FragmentActivity {
 		return true;
 	}
 
-	/**
-	 * Called when the 'Random' button is called. Shows a random comic to the user.
-	 *
-	 * @param v The view that contained the 'Random' button
-	 */
-	public void onRandomClicked(View v) {
+	public void setRandom() {
 		new AbstractComicTask<Void>() {
 
 			@Override
@@ -515,15 +456,6 @@ public class MainActivity extends FragmentActivity {
 	public void setComic(final long id) {
 		new SetComicTask(this).execute(id);
 	}
-
-	public void onFirstComicButtonPressed(View view) {
-		setComic(CyanideApi.instance().getFirstId());
-	}
-
-	public void onNewestComicButtonPressed(View view) {
-		onLatestRequested();
-	}
-
 
 	public HistoryManager getHistoryManager() {
 		return historyManager;

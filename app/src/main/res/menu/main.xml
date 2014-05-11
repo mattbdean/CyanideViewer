@@ -8,8 +8,8 @@
           android:orderInCategory="10"
           android:showAsAction="ifRoom"/>
 
-    <item android:id="@+id/menu_go_to"
-          android:title="@string/menu_go_to"
+    <item android:id="@+id/nav"
+          android:title="@string/menu_navigation"
           android:icon="@drawable/ic_action_go_to"
           android:orderInCategory="11"
           android:showAsAction="ifRoom"/>

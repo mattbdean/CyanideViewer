@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/comic_id"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/item_padding"/>
+
+    
+    <ImageButton
+        android:id="@+id/nav_random"
+        android:layout_width="@dimen/nav_button_size"
+        android:layout_height="@dimen/nav_button_size"
+        android:src="@drawable/ic_action_random"
+        android:layout_below="@id/comic_id"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="@dimen/item_padding"/>
+
+    <!--
+    Put this button after 'random' because random's ID needs
+    to be created first
+    -->
+    <ImageButton
+        android:id="@+id/nav_first"
+        android:layout_width="@dimen/nav_button_size"
+        android:layout_height="@dimen/nav_button_size"
+        android:layout_below="@id/comic_id"
+        android:layout_toLeftOf="@id/nav_random"
+        android:src="@drawable/ic_action_first"
+        android:layout_margin="@dimen/item_padding"/>
+
+    <ImageButton
+        android:id="@+id/nav_newest"
+        android:layout_width="@dimen/nav_button_size"
+        android:layout_height="@dimen/nav_button_size"
+        android:layout_toRightOf="@id/nav_random"
+        android:layout_below="@id/comic_id"
+        android:src="@drawable/ic_action_newest"
+        android:layout_margin="@dimen/item_padding"/>
+</RelativeLayout>

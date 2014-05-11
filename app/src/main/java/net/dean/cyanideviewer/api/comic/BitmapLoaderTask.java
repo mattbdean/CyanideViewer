@@ -85,7 +85,9 @@ class BitmapLoaderTask extends AsyncTask<Long, Void, Bitmap> {
 			comic.setBitmap(bitmap);
 
 			imageView.setImageBitmap(bitmap);
-			new PhotoViewAttacher(imageView);
+			PhotoViewAttacher attacher = new PhotoViewAttacher(imageView);
+			attacher.setMediumScale(1.5F); // Default of 1.75
+			attacher.setMaximumScale(2.0F); // Default of 3
 
 			comic.setHasLoaded(true);
 

@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 import net.dean.cyanideviewer.Constants;
-import net.dean.cyanideviewer.FavoriteComicListItem;
+import net.dean.cyanideviewer.ui.FavoriteComicListItem;
 import net.dean.cyanideviewer.R;
 import net.dean.cyanideviewer.api.CyanideApi;
 

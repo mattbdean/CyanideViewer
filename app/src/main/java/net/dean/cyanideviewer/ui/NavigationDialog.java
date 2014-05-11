@@ -1,4 +1,4 @@
-package net.dean.cyanideviewer;
+package net.dean.cyanideviewer.ui;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -11,6 +11,8 @@ import android.text.method.DigitsKeyListener;
 import android.view.View;
 import android.widget.EditText;
 
+import net.dean.cyanideviewer.Callback;
+import net.dean.cyanideviewer.R;
 import net.dean.cyanideviewer.api.CyanideApi;
 
 public class NavigationDialog extends DialogFragment {

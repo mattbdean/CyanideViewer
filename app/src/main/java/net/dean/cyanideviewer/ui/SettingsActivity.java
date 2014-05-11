@@ -1,7 +1,9 @@
-package net.dean.cyanideviewer;
+package net.dean.cyanideviewer.ui;
 
 import android.app.Activity;
 import android.os.Bundle;
+
+import net.dean.cyanideviewer.R;
 
 /**
  * This activity is responsible for showing a SettingsFragment

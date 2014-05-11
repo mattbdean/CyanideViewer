@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<net.dean.cyanideviewer.ComicStage
+<net.dean.cyanideviewer.ui.ComicStage
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -19,14 +19,13 @@
             android:paddingBottom="@dimen/item_padding"
             android:paddingTop="@dimen/item_padding">
 
-            <net.dean.cyanideviewer.TextViewPlus
+            <net.dean.cyanideviewer.ui.TextViewPlus
                 android:id="@+id/comic_id"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="@dimen/item_padding"
-                android:text="#3000"
                 android:textColor="@color/text_unfocused"
                 android:textSize="45sp"
                 app:fontFile="Roboto-Light.ttf"/>
@@ -57,7 +56,6 @@
                 android:layout_marginBottom="@dimen/item_padding"
                 android:gravity="center"
                 android:layout_centerHorizontal="true"
-                android:text="Wednesday, September 16, 2009"
                 android:textColor="@color/text_focused"
                 android:textSize="20sp"/>
 
@@ -72,14 +70,12 @@
                 <ImageView
                     android:id="@+id/author_icon"
                     android:layout_width="75dp"
-                    android:layout_height="75dp"
-                    android:src="@drawable/ic_author_dave"/>
+                    android:layout_height="75dp"/>
 
                 <TextView
                     android:id="@+id/author_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Kris Wilson"
                     android:textColor="@color/text_focused"
                     android:textSize="25sp"
                     android:layout_toRightOf="@id/author_icon"/>
@@ -127,4 +123,4 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
     </RelativeLayout>
-</net.dean.cyanideviewer.ComicStage>
+</net.dean.cyanideviewer.ui.ComicStage>

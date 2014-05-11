@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import net.dean.cyanideviewer.Callback;
 import net.dean.cyanideviewer.Constants;
 import net.dean.cyanideviewer.CyanideUtils;
-import net.dean.cyanideviewer.FavoriteComicListItem;
+import net.dean.cyanideviewer.ui.FavoriteComicListItem;
 import net.dean.cyanideviewer.db.DatabaseField;
 import net.dean.cyanideviewer.db.Model;
 

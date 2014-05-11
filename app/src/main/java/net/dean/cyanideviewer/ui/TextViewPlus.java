@@ -1,9 +1,12 @@
-package net.dean.cyanideviewer;
+package net.dean.cyanideviewer.ui;
 
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.widget.TextView;
+
+import net.dean.cyanideviewer.R;
+import net.dean.cyanideviewer.Typefaces;
 
 /**
  * http://stackoverflow.com/a/7197867/1275092

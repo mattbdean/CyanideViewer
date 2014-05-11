@@ -1,4 +1,4 @@
-package net.dean.cyanideviewer;
+package net.dean.cyanideviewer.ui;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import net.dean.cyanideviewer.CyanideViewer;
+import net.dean.cyanideviewer.R;
 import net.dean.cyanideviewer.api.comic.Comic;
 
 /**

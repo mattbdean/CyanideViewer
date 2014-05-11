@@ -7,6 +7,9 @@ import android.util.Log;
 
 import net.dean.cyanideviewer.api.CyanideApi;
 import net.dean.cyanideviewer.api.comic.Comic;
+import net.dean.cyanideviewer.ui.ComicPagerAdapter;
+import net.dean.cyanideviewer.ui.ComicStage;
+import net.dean.cyanideviewer.ui.MainActivity;
 
 /**
  * This class is used to set the current comic being displayed to the user to a specific comic

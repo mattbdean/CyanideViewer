@@ -17,7 +17,7 @@ public final class Constants {
 	/** Returned when the user did not pick a comic */
 	public static final int RESULT_NONE = 1;
 	/** The ID of the notification created by this app.*/
-	static final int NOTIF_DELETE_COMIC = 0;
+	public static final int NOTIF_DELETE_COMIC = 0;
 	/** The ID of the notification */
 	public static final int NOTIF_DOWNLOAD_COMIC = 1;
 }

@@ -12,7 +12,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="net.dean.cyanideviewer.MainActivity"
+            android:name=".ui.MainActivity"
             android:label="@string/app_name"
             android:configChanges="keyboardHidden|orientation|screenSize">
             <intent-filter>
@@ -22,11 +22,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="net.dean.cyanideviewer.FavoritesActivity"
+            android:name=".ui.FavoritesActivity"
             android:label="@string/title_activity_favorites" >
         </activity>
         <activity
-            android:name="net.dean.cyanideviewer.SettingsActivity"
+            android:name=".ui.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:configChanges="keyboardHidden|orientation|screenSize">
         </activity>

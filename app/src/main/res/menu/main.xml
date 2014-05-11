@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="net.dean.cyanideviewer.MainActivity" >
+    tools:context="net.dean.cyanideviewer.ui.MainActivity" >
 
     <item android:id="@+id/menu_favorites"
           android:title="@string/menu_favorites"

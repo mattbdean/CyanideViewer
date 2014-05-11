@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<net.dean.cyanideviewer.FavoriteComicListItem
+<net.dean.cyanideviewer.ui.FavoriteComicListItem
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:gravity="center"
@@ -35,4 +35,4 @@
         android:padding="@dimen/item_padding_small"
         android:textColor="#000000"
         style="@android:style/TextAppearance.DeviceDefault.Medium"/>
-</net.dean.cyanideviewer.FavoriteComicListItem>
+</net.dean.cyanideviewer.ui.FavoriteComicListItem>

@@ -1,4 +1,4 @@
-package net.dean.cyanideviewer;
+package net.dean.cyanideviewer.ui;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -11,6 +11,10 @@ import android.preference.PreferenceFragment;
 import android.util.Log;
 import android.widget.Toast;
 
+import net.dean.cyanideviewer.Constants;
+import net.dean.cyanideviewer.CyanideViewer;
+import net.dean.cyanideviewer.NotificationHelper;
+import net.dean.cyanideviewer.R;
 import net.dean.cyanideviewer.api.CyanideApi;
 
 import org.apache.commons.io.FileUtils;

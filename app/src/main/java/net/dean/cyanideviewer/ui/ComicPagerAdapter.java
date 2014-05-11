@@ -1,4 +1,4 @@
-package net.dean.cyanideviewer;
+package net.dean.cyanideviewer.ui;
 
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;

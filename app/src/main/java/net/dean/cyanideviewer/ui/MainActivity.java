@@ -1,4 +1,4 @@
-package net.dean.cyanideviewer;
+package net.dean.cyanideviewer.ui;
 
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +18,13 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import net.dean.cyanideviewer.AbstractComicTask;
+import net.dean.cyanideviewer.Callback;
+import net.dean.cyanideviewer.Constants;
+import net.dean.cyanideviewer.CyanideViewer;
+import net.dean.cyanideviewer.HistoryManager;
+import net.dean.cyanideviewer.R;
+import net.dean.cyanideviewer.SetComicTask;
 import net.dean.cyanideviewer.api.CyanideApi;
 import net.dean.cyanideviewer.api.comic.Comic;
 
@@ -251,7 +258,7 @@ public class MainActivity extends FragmentActivity {
 	}
 
 	/**
-	 * Refreshes each of the buttons assigned to the values of {@link net.dean.cyanideviewer.MainActivity.RefreshableButtons}.
+	 * Refreshes each of the buttons assigned to the values of {@link MainActivity.RefreshableButtons}.
 	 * @param buttonsToRefresh The representation of the buttons to refresh.
 	 */
 	public void refreshButtons(RefreshableButtons... buttonsToRefresh) {

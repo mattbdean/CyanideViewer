@@ -1,4 +1,4 @@
-package net.dean.cyanideviewer;
+package net.dean.cyanideviewer.ui;
 
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -14,6 +14,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import net.dean.cyanideviewer.AbstractComicTask;
+import net.dean.cyanideviewer.Callback;
+import net.dean.cyanideviewer.Constants;
+import net.dean.cyanideviewer.CyanideViewer;
+import net.dean.cyanideviewer.R;
+import net.dean.cyanideviewer.Typefaces;
 import net.dean.cyanideviewer.api.CyanideApi;
 import net.dean.cyanideviewer.api.comic.Comic;
 

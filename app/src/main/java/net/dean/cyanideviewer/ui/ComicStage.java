@@ -17,6 +17,7 @@ import android.widget.TextView;
 import net.dean.cyanideviewer.AbstractComicTask;
 import net.dean.cyanideviewer.Callback;
 import net.dean.cyanideviewer.Constants;
+import net.dean.cyanideviewer.CyanideUtils;
 import net.dean.cyanideviewer.CyanideViewer;
 import net.dean.cyanideviewer.R;
 import net.dean.cyanideviewer.Typefaces;
@@ -173,7 +174,7 @@ public class ComicStage extends LinearLayout {
 						ComicStage.this.comic = comic;
 
 						// Set the rest of the metadata
-						((TextView) findViewById(R.id.published)).setText(comic.getPublishedFormatted());
+						((TextView) findViewById(R.id.published)).setText(CyanideUtils.format(comic.getPublished()));
 						((ImageView)findViewById(R.id.author_icon)).setImageBitmap(comic.getAuthor().getIcon());
 						((TextView) findViewById(R.id.author_name)).setText(comic.getAuthor().getName());
 

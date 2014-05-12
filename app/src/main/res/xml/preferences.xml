@@ -5,23 +5,10 @@
     android:layout_height="match_parent">
     <PreferenceCategory
         android:title="@string/pref_basic_settings_title">
-        <CheckBoxPreference
-            android:key="pref_preserve_data_usage"
-            android:title="@string/pref_preserve_data_usage"
-            android:summary="@string/pref_preserve_data_usage_summary"
-            android:defaultValue="false" />
 
-        <CheckBoxPreference
-            android:key="pref_night_mode"
-            android:title="@string/pref_night_mode"
-            android:summary="@string/pref_night_mode_summary"
-            android:defaultValue="false" />
-
-        <CheckBoxPreference
-            android:key="pref_save_ext_sdcard"
-            android:title="@string/pref_save_ext_sdcard"
-            android:summary="@string/pref_save_ext_sdcard_summary"
-            android:defaultValue="false" />
+        <Preference
+            android:key="pref_download_location"
+            android:title="@string/pref_download_location"/>
 
     </PreferenceCategory>
 
@@ -39,6 +26,4 @@
             android:summary="@string/pref_wipe_db_summary" />
 
     </PreferenceCategory>
-
-
 </PreferenceScreen>

@@ -4,6 +4,8 @@ package net.dean.cyanideviewer;
  * A collection of constant values that pertains to all parts of the application.
  */
 public final class Constants {
+	public static final String KEY_DOWNLOAD_LOCATION = "pref_download_location";
+
 	private Constants() {
 		// Prevent instances
 	}

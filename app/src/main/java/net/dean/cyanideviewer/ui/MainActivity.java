@@ -153,7 +153,7 @@ public class MainActivity extends Activity {
 	protected void onPause() {
 		super.onPause();
 
-		SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit();
+		SharedPreferences.Editor editor = CyanideViewer.getPrefs().edit();
 		editor.putLong("lastId", getCurrentComicId());
 		editor.apply();
 	}

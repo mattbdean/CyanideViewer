@@ -1,9 +1,9 @@
 package net.dean.cyanideviewer.api;
 
-import android.os.Environment;
 import android.util.Log;
 
 import net.dean.cyanideviewer.Constants;
+import net.dean.cyanideviewer.CyanideViewer;
 import net.dean.cyanideviewer.api.comic.Comic;
 
 import org.apache.http.HttpHost;
@@ -30,14 +30,9 @@ import java.net.URL;
  * getSavedImageDirectory(), and getSavedIconDirectory(). It also contains a few utility methods.
  */
 public abstract class BaseComicApi implements ComicApi {
-	/** The directory that will be used to write images to */
-	private static final File IMAGE_DIR = new File(Environment.getExternalStorageDirectory(), "CyanideViewer");
 
-	/**
-	 * The directory that will be used to write icons to. This is a subdirectory of {@link #IMAGE_DIR}
-	 * called "icons"
-	 */
-	private static final File ICON_DIR = new File(IMAGE_DIR, "icons");
+	/** The directory that will be used to write icons to. */
+	private static final File ICON_DIR = new File(CyanideViewer.getContext().getFilesDir(), "icons");
 
 	/** The HttpClient that will be used to make requests */
 	protected final HttpClient client;
@@ -106,12 +101,9 @@ public abstract class BaseComicApi implements ComicApi {
 		return getComic(getNewestId());
 	}
 
-	// Since getSavedImageDirectory() is called a lot, create one instance of the image directory
-	// to speed things up, since it relies on a potentially expensive call (Environment.getExternalStorageDirectory())
-
 	@Override
 	public File getSavedImageDirectory() {
-		return IMAGE_DIR;
+		return new File(CyanideViewer.getPrefs().getString(Constants.KEY_DOWNLOAD_LOCATION, null));
 	}
 
 	@Override

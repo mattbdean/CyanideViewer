@@ -2,7 +2,9 @@ package net.dean.cyanideviewer;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
+import android.os.Environment;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
@@ -10,6 +12,8 @@ import com.crashlytics.android.Crashlytics;
 import net.dean.cyanideviewer.db.AuthorDao;
 import net.dean.cyanideviewer.db.ComicDao;
 import net.dean.cyanideviewer.db.CyanideDatabaseHelper;
+
+import java.io.File;
 
 /**
  * The main class for Cyanide Viewer.
@@ -26,6 +30,8 @@ public class CyanideViewer extends Application {
 
 	private static CyanideDatabaseHelper helper;
 
+	private static SharedPreferences prefs;
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -38,10 +44,19 @@ public class CyanideViewer extends Application {
 		}
 
 		CyanideViewer.context = getApplicationContext();
+		CyanideViewer.prefs = getSharedPreferences(getClass().getPackage().getName() + "_preferences", Context.MODE_PRIVATE);
 
 		if (helper == null) {
 			helper = new CyanideDatabaseHelper(context);
 		}
+
+
+		if (!prefs.contains(Constants.KEY_DOWNLOAD_LOCATION)) {
+			String currentDir = new File(Environment.getExternalStorageDirectory(), "CyanideViewer").getAbsolutePath();
+			prefs.edit().putString(Constants.KEY_DOWNLOAD_LOCATION, currentDir).commit();
+		}
+
+
 
 		CyanideViewer.helper = new CyanideDatabaseHelper(context);
 		CyanideViewer.authorDao = new AuthorDao(helper);
@@ -60,5 +75,9 @@ public class CyanideViewer extends Application {
 
 	public static AuthorDao getAuthorDao() {
 		return authorDao;
+	}
+
+	public static SharedPreferences getPrefs() {
+		return prefs;
 	}
 }

@@ -4,11 +4,16 @@ import android.util.Log;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DateFormat;
+import java.util.Date;
 
 /**
  * A collection of utility methods commonly used throughout the application
  */
 public final class CyanideUtils {
+	private static DateFormat df = DateFormat.getDateInstance(DateFormat.FULL,
+			CyanideViewer.getContext().getResources().getConfiguration().locale);
+
 	private CyanideUtils() {
 		// No instances
 	}
@@ -26,5 +31,9 @@ public final class CyanideUtils {
 			Log.e(Constants.TAG, "Malformed URL: " + href, e);
 			return null;
 		}
+	}
+
+	public static String format(Date date) {
+		return df.format(date);
 	}
 }

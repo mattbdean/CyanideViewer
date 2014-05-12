@@ -13,21 +13,7 @@
 
     <!-- Preferences - Basic -->
     <string name="pref_basic_settings_title">Basic</string>
-    <string name="pref_preserve_data_usage">Preserve data usage</string>
-    <string name="pref_preserve_data_usage_summary">
-        Downloads every comic you view, reducing data usage. This may, however, take up more storage
-        space on your phone
-    </string>
-    <string name="pref_night_mode">Night mode</string>
-    <string name="pref_night_mode_summary">
-        Change the main colors of the app to make it easier
-        to read during the night
-    </string>
-    <string name="pref_save_ext_sdcard">Use external SD card</string>
-    <string name="pref_save_ext_sdcard_summary">
-        External SD cards usually contain more storage space, so by keeping
-        your downloaded comics on here, you leave more space for other apps and games
-    </string>
+    <string name="pref_download_location">Download location</string>
 
     <!-- Preferences - Advanced -->
     <string name="pref_advanced_settings_title">Advanced</string>
@@ -43,10 +29,15 @@
         be undone, nor is it recommended.
     </string>
 
+
     <!-- Font Awesome icons -->
     <string name="icon_facebook">&#xf09a;</string>
     <string name="icon_twitter">&#xf099;</string>
+
+    <!-- Navigation format string -->
     <string name="nav_hint">Comic ID (%1$d to %2$d)</string>
+
+    <!-- Content descriptions -->
     <string name="desc_nav_random">Random comic</string>
     <string name="desc_favorite_icon">Icon for comic</string>
     <string name="desc_nav_first">First comic</string>

@@ -31,6 +31,16 @@
             android:configChanges="keyboardHidden|orientation|screenSize">
         </activity>
 
+        <activity
+            android:name="com.nononsenseapps.filepicker.FilePickerActivity"
+            android:label="@string/app_name"
+            android:theme="@style/FilePicker.Theme">
+            <intent-filter>
+                <action android:name="android.intent.action.GET_CONTENT" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <receiver android:name=".api.comic.BitmapDownloadTask$NotificationReceiver" />
         <meta-data android:name="com.crashlytics.ApiKey" android:value="f8263e4a0031e704a27934ca476ab309786a5529"/>
     </application>

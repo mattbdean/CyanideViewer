@@ -10,26 +10,21 @@ import android.widget.ImageView;
 import net.dean.cyanideviewer.Callback;
 import net.dean.cyanideviewer.Constants;
 import net.dean.cyanideviewer.CyanideUtils;
-import net.dean.cyanideviewer.ui.FavoriteComicListItem;
 import net.dean.cyanideviewer.db.DatabaseField;
 import net.dean.cyanideviewer.db.Model;
+import net.dean.cyanideviewer.ui.FavoriteComicListItem;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 /**
  * Represents an Cyanide and Happiness comic.
  */
 public class Comic extends Model implements Parcelable {
-	private static final DateFormat dateFormat = new SimpleDateFormat("EEEE, MMMM d, yyyy", Locale.US);
-
 	/** The URL of the comic's image */
 	@DatabaseField(columnName = "url")
 	private URL url;
@@ -315,10 +310,6 @@ public class Comic extends Model implements Parcelable {
 
 	public Date getPublished() {
 		return published;
-	}
-
-	public String getPublishedFormatted() {
-		return dateFormat.format(published);
 	}
 
 	public void setPublished(Date published) {

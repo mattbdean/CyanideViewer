@@ -329,39 +329,6 @@ public class MainActivity extends Activity {
 		});
 	}
 
-	/**
-	 * Called when the user wants the very newest comic. Calls the CyanideApi instance and checks
-	 * for a new ID and then sets the current comic to the latest one available.
-	 */
-	public void onLatestRequested() {
-		Log.i(Constants.TAG, "Latest comic requested");
-		new AsyncTask<Void, Void, Long>() {
-
-			@Override
-			protected void onPreExecute() {
-				showLoading();
-			}
-
-			@Override
-			protected Long doInBackground(Void... params) {
-				CyanideApi.instance().checkForNewComic(new Callback<Boolean>() {
-
-					@Override
-					public void onComplete(Boolean result) {
-						Log.i(Constants.TAG, "User requested latest comic (newer was " + (result ? "" : "not") + " found)");
-					}
-				});
-
-				return CyanideApi.instance().getNewestId();
-			}
-
-			@Override
-			protected void onPostExecute(Long id) {
-				setComic(id);
-			}
-		}.execute();
-	}
-
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle action bar item clicks here. The action bar will

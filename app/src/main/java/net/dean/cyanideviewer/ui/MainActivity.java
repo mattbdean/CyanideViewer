@@ -213,7 +213,7 @@ public class MainActivity extends Activity {
 	 * Reads the value of the last ID from the SharedPreferences and sets the current comic to that ID
 	 */
 	private void setLastComic() {
-		SharedPreferences prefs = getPreferences(Context.MODE_PRIVATE);
+		SharedPreferences prefs = CyanideViewer.getPrefs();
 		long lastId = prefs.getLong("lastId", CyanideApi.instance().getNewestId());
 
 		new SetComicTask(this) {

@@ -7,11 +7,10 @@ Cyanide Viewer is a simple Android application for reading [Cyanide and Happines
 
  + A pure-Java implementation of an unofficial Cyanide and Happiness API using Jsoup
  + An intuitive user interface
- + The ability to get random comics
+ + View random comics
  + Download and favorite comics
 
 ##Upcoming features
- + RSS reader to send notifications on when a new C&H comic comes out
- + Pull-to-refresh functionality to get the latest comic
+ + Notifications when new comics come out
  + Android 2.2+ support
  + Night mode
